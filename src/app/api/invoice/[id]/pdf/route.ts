@@ -102,19 +102,26 @@ export async function GET(
     }
 
     const browser = await puppeteer.launch({
-      args: isLocal ? ['--no-sandbox', '--disable-setuid-sandbox'] : (chromium as any).args,
+      args: isLocal 
+        ? ['--no-sandbox', '--disable-setuid-sandbox'] 
+        : [...(chromium as any).args, '--hide-scrollbars', '--disable-web-security'],
       defaultViewport: (chromium as any).defaultViewport,
       executablePath,
       headless: isLocal ? 'new' : (chromium as any).headless,
     })
 
     const page = await browser.newPage()
-    await page.setContent(html, { waitUntil: 'networkidle0' })
+    
+    // Optimized page loading
+    await page.setContent(html, { 
+      waitUntil: isLocal ? 'networkidle0' : 'networkidle2',
+      timeout: 15000 
+    })
 
     const pdf = await page.pdf({
       format: 'A4',
       printBackground: true,
-      margin: { top: '0px', right: '0px', bottom: '0px', left: '0px' }
+      margin: { top: '0.4in', right: '0.4in', bottom: '0.4in', left: '0.4in' }
     })
 
     await browser.close()
