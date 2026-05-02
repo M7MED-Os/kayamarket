@@ -70,6 +70,7 @@ export async function GET(request: Request) {
   const html = generateInvoiceHTML(order, productDescription, settings || { cod_enabled: true, cod_deposit_required: false })
 
   // 6. Generate PDF using Puppeteer
+  let browser
   try {
     const puppeteerCore = await import('puppeteer-core')
     const chromium = (await import('@sparticuz/chromium')).default
