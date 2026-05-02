@@ -18,9 +18,6 @@ export default function InvoiceActions({ order, hasPdfInvoice = false, storeName
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
   // Debug log
-  useEffect(() => {
-    console.log('Invoice Permissions:', { storeName, hasPdfInvoice })
-  }, [hasPdfInvoice, storeName])
 
   useEffect(() => {
     setCurrentUrl(window.location.href)

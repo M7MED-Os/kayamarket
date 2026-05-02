@@ -32,8 +32,6 @@ export default async function InvoicePage({
    // 1. Check if there's a logged-in user (Merchant)
    const { data: { user } } = await supabase.auth.getUser()
 
-   console.log(`[Invoice] Access Attempt - ID: ${id}, Token: ${token}, User: ${user?.id || 'GUEST'}`)
-
    // 2. Fetch Order + Items + Store Config in one go using RPC v2
    // We pass the token if available. If not, the RPC will check auth.uid()
    let { data: rows, error: rpcError } = await supabase.rpc('get_order_invoice_v2', {
@@ -43,7 +41,6 @@ export default async function InvoicePage({
 
    // 3. Fallback: If no data but user is logged in, try with Admin Client directly without RPC
    if ((!rows || rows.length === 0) && user) {
-      console.log('[Invoice] RPC returned empty for merchant, falling back to manual Admin fetch...')
       const { createAdminClient } = await import('@/lib/supabase/server')
       const adminSupabase = createAdminClient()
 
@@ -134,8 +131,7 @@ export default async function InvoicePage({
    const finalPrice = Number(order.final_price)
    const discountPct = Number(order.discount_pct || order.discount_percentage || 0)
    const productPrice = Number(order.product_price)
-   const isDepositOrder = storeSettings?.cod_deposit_required || order.payment_method?.includes('عربون') || order.payment_method?.includes('مقدم')
-   const depositAmount = isDepositOrder ? (finalPrice * (storeSettings?.deposit_percentage || 50)) / 100 : 0
+   const depositAmount = storeSettings?.cod_deposit_required ? (finalPrice * (storeSettings.deposit_percentage || 50)) / 100 : 0
 
    const shortId = id.split('-')[0].toUpperCase()
    const primaryColor = storeBranding?.primary_color || '#0ea5e9'
@@ -266,34 +262,34 @@ export default async function InvoicePage({
                      {/* Customer Info */}
                      <div className="space-y-6">
                         <div className="flex items-center gap-3 mb-2">
-                           <div className="h-2 w-2 rounded-full" style={{ background: primaryColor }} />
+                           <div className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--store-primary)' }} />
                            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">بيانات العميل</h3>
                         </div>
                         <div className="grid gap-5">
                            <div className="flex items-center gap-4">
-                              <div className="h-10 w-10 rounded-xl bg-zinc-50 flex items-center justify-center shrink-0" style={{ color: primaryColor }}>
+                              <div className="h-10 w-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400 shrink-0">
                                  <User className="h-5 w-5" />
                               </div>
                               <div>
-                                 <p className="text-[10px] font-bold text-zinc-400 mb-0.5 uppercase">الاسم الكامل</p>
+                                 <p className="text-[10px] font-bold text-zinc-400 mb-0.5">الاسم الكامل</p>
                                  <p className="text-sm font-black text-zinc-900 leading-none">{order.customer_name}</p>
                               </div>
                            </div>
                            <div className="flex items-center gap-4">
-                              <div className="h-10 w-10 rounded-xl bg-zinc-50 flex items-center justify-center shrink-0" style={{ color: primaryColor }}>
+                              <div className="h-10 w-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400 shrink-0">
                                  <Phone className="h-5 w-5" />
                               </div>
                               <div>
-                                 <p className="text-[10px] font-bold text-zinc-400 mb-0.5 uppercase">رقم الهاتف</p>
+                                 <p className="text-[10px] font-bold text-zinc-400 mb-0.5">رقم الهاتف</p>
                                  <p className="text-sm font-black text-zinc-900 leading-none" dir="ltr">{order.customer_phone}</p>
                               </div>
                            </div>
                            <div className="flex items-center gap-4">
-                              <div className="h-10 w-10 rounded-xl bg-zinc-50 flex items-center justify-center shrink-0" style={{ color: primaryColor }}>
+                              <div className="h-10 w-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400 shrink-0">
                                  <MapPin className="h-5 w-5" />
                               </div>
                               <div>
-                                 <p className="text-[10px] font-bold text-zinc-400 mb-0.5 uppercase">عنوان التوصيل</p>
+                                 <p className="text-[10px] font-bold text-zinc-400 mb-0.5">عنوان التوصيل</p>
                                  <p className="text-sm font-black text-zinc-900 leading-tight">{order.customer_address}</p>
                               </div>
                            </div>
@@ -303,31 +299,32 @@ export default async function InvoicePage({
                      {/* Payment Info */}
                      <div className="space-y-6">
                         <div className="flex items-center gap-3 mb-2">
-                           <div className="h-2 w-2 rounded-full" style={{ background: primaryColor }} />
+                           <div className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--store-primary)' }} />
                            <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">طريقة الدفع</h3>
                         </div>
-                        <div className="bg-transparent px-0 py-1 space-y-6">
+                        <div className="bg-transparent px-0 py-1 space-y-5">
                            <div className="flex items-center gap-4">
-                              <div className="h-12 w-12 rounded-2xl flex items-center justify-center shadow-sm border border-zinc-100 shrink-0" style={{ background: `${primaryColor}10`, color: primaryColor }}>
+                              <div className="h-12 w-12 rounded-2xl bg-zinc-50 flex items-center justify-center text-zinc-900 shadow-sm border border-zinc-100 shrink-0">
                                  <Wallet className="h-6 w-6" />
                               </div>
                               <div>
-                                 <p className="text-[10px] font-bold text-zinc-400 mb-0.5 uppercase">الوسيلة المختارة</p>
+                                 <p className="text-[10px] font-bold text-zinc-400 mb-0.5">الوسيلة المختارة</p>
                                  <p className="text-base font-black text-zinc-900">
                                     {order.payment_method}
+                                    {depositAmount > 0 && order.payment_method === 'الدفع عند الاستلام' && ' (بمقدم)'}
                                  </p>
                               </div>
                            </div>
 
-                           {isDepositOrder && (
-                              <div className="pt-6 border-t border-zinc-100 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                 <div className="p-4 rounded-2xl bg-amber-50 border border-amber-100">
-                                    <p className="text-[10px] font-black text-amber-600 mb-1 uppercase tracking-wider">المبلغ المقدم</p>
-                                    <p className="text-xl font-black text-amber-700">{depositAmount.toLocaleString()} <span className="text-[10px]">ج.م</span></p>
+                           {depositAmount > 0 && order.payment_method === 'الدفع عند الاستلام' && (
+                              <div className="pt-4 border-t border-zinc-100 flex flex-wrap gap-x-8 gap-y-4">
+                                 <div>
+                                    <p className="text-[10px] font-bold text-amber-600 mb-0.5 uppercase tracking-wider">المبلغ المقدم</p>
+                                    <p className="text-xl font-black text-amber-600 leading-none">{depositAmount.toLocaleString()} ج.م</p>
                                  </div>
-                                 <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-100">
-                                    <p className="text-[10px] font-black text-zinc-400 mb-1 uppercase tracking-wider">المتبقي عند الاستلام</p>
-                                    <p className="text-xl font-black text-zinc-900">{(finalPrice - depositAmount).toLocaleString()} <span className="text-[10px]">ج.م</span></p>
+                                 <div>
+                                    <p className="text-[10px] font-bold text-zinc-400 mb-0.5 uppercase tracking-wider">المتبقي عند الاستلام</p>
+                                    <p className="text-xl font-black text-zinc-900 leading-none">{(finalPrice - depositAmount).toLocaleString()} ج.م</p>
                                  </div>
                               </div>
                            )}
@@ -338,7 +335,7 @@ export default async function InvoicePage({
                   {/* ── Order Summary Section ───────────────────────────────────── */}
                   <div className="space-y-6 pt-10 border-t border-zinc-50">
                      <div className="flex items-center gap-3 mb-2">
-                        <div className="h-2 w-2 rounded-full" style={{ background: primaryColor }} />
+                        <div className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--store-primary)' }} />
                         <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">تفاصيل الطلب والأسعار</h3>
                      </div>
 
@@ -362,8 +359,8 @@ export default async function InvoicePage({
                            )}
                         </div>
 
-                        <div className="space-y-4 pt-8 border-t border-zinc-100">
-                           <div className="flex justify-between text-[11px] font-bold text-zinc-400 uppercase tracking-[0.1em]">
+                        <div className="space-y-4 pt-6 border-t border-zinc-100/80">
+                           <div className="flex justify-between text-xs font-bold text-zinc-400 uppercase tracking-widest">
                               <span>المجموع الفرعي</span>
                               <span>{productPrice.toLocaleString()} ج.م</span>
                            </div>
@@ -378,10 +375,10 @@ export default async function InvoicePage({
                               </div>
                            )}
 
-                           <div className="flex justify-between items-center pt-6 border-t-2 border-zinc-900">
+                           <div className="flex justify-between items-center pt-6 border-t border-zinc-200">
                               <span className="text-xl font-black text-zinc-900">الإجمالي النهائي</span>
-                              <span className="text-4xl font-black tracking-tighter" style={{ color: primaryColor }}>
-                                 {finalPrice.toLocaleString()} <span className="text-xs mr-1 font-bold opacity-40 uppercase">ج.م</span>
+                              <span className="text-3xl md:text-4xl font-black tracking-tight" style={{ color: 'var(--store-primary)' }}>
+                                 {finalPrice.toLocaleString()} <span className="text-xs mr-1 font-bold opacity-60 uppercase">ج.م</span>
                               </span>
                            </div>
                         </div>
