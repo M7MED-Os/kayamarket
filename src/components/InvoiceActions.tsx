@@ -45,8 +45,8 @@ export default function InvoiceActions({ order, hasPdfInvoice = false, storeName
       const token = urlObj.searchParams.get('token')
       
       const apiUrl = token 
-        ? `/api/invoice/${actualOrderId}/pdf?token=${token}`
-        : `/api/invoice/${actualOrderId}/pdf`
+        ? `${window.location.origin}/api/invoice/${actualOrderId}/pdf?token=${token}`
+        : `${window.location.origin}/api/invoice/${actualOrderId}/pdf`
 
       const response = await fetch(apiUrl)
       if (!response.ok) throw new Error('Failed to generate PDF')

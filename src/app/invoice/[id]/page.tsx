@@ -220,7 +220,7 @@ export default async function InvoicePage({
                   </div>
                   <div>
                      <h2 className="text-xl md:text-2xl font-black text-emerald-900">تم استلام طلبك بنجاح!</h2>
-                     <p className="mt-2 text-sm font-bold text-emerald-700/70">يرجى تنزيل الفاتورة والضغط على "تأكيد عبر واتساب" لإتمام الطلب 11</p>
+                     <p className="mt-2 text-sm font-bold text-emerald-700/70">يرجى تنزيل الفاتورة والضغط على "تأكيد عبر واتساب" لإتمام الطلب 11111</p>
                   </div>
                </div>
                <div className="flex flex-col items-center justify-center gap-4 w-full">
