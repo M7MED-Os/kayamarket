@@ -70,23 +70,31 @@ export async function GET(request: Request) {
   const html = generateInvoiceHTML(order, productDescription, settings || { cod_enabled: true, cod_deposit_required: false })
 
   // 6. Generate PDF using Puppeteer
-  let browser
   try {
+    const puppeteerCore = await import('puppeteer-core')
+    const chromium = (await import('@sparticuz/chromium')).default
+    
+    let executablePath: string
     if (process.env.NODE_ENV === 'production') {
-      const puppeteerCore = await import('puppeteer-core')
-      const chromium = (await import('@sparticuz/chromium')).default
-      browser = await puppeteerCore.default.launch({
-        args: chromium.args,
-        executablePath: await chromium.executablePath(),
-        headless: true,
-      })
+      executablePath = await chromium.executablePath()
     } else {
-      const puppeteer = await import('puppeteer')
-      browser = await puppeteer.default.launch({
-        headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      })
+      // Local Windows paths
+      const fs = await import('fs')
+      const localPaths = [
+        'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+        'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+        'C:\\Users\\1\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe',
+      ]
+      executablePath = localPaths.find(p => fs.existsSync(p)) || ''
     }
+
+    browser = await puppeteerCore.default.launch({
+      args: process.env.NODE_ENV === 'production' 
+        ? chromium.args 
+        : ['--no-sandbox', '--disable-setuid-sandbox'],
+      executablePath,
+      headless: true,
+    })
 
     const page = await browser.newPage()
     await page.setViewport({ width: 794, height: 1123, deviceScaleFactor: 2 })
