@@ -1,58 +1,63 @@
 import fs from 'fs'
 import path from 'path'
 
-export function generateInvoiceHTML(order: any, store: any, branding: any, settings: any = { cod_enabled: true, cod_deposit_required: false }, items: any[] = []) {
-    const shortId = (order.order_id || order.id || '000000').split('-')[0].toUpperCase()
-    const primaryColor = branding?.primary_color || '#e11d48'
-    const logoUrl = branding?.logo_url || ''
-    const storeName = store?.name || 'متجرنا'
-    const tagline = branding?.tagline || 'شكراً لتعاملكم معنا'
+export function generateInvoiceHTML(order: any, store: any, branding: any, settings: any = {}, items: any[] = []) {
+    // Safeguards for null objects
+    const safeOrder = order || {}
+    const safeStore = store || {}
+    const safeBranding = branding || {}
+    const safeSettings = settings || {}
+    const safeItems = Array.isArray(items) ? items : []
+
+    const shortId = String(safeOrder.order_id || safeOrder.id || '0000').split('-')[0].toUpperCase()
+    const primaryColor = safeBranding.primary_color || '#0ea5e9'
+    const logoUrl = safeBranding.logo_url || ''
+    const storeName = safeStore.name || 'متجرنا'
+    const tagline = safeBranding.tagline || 'شكراً لتعاملكم معنا'
     
     // Payment info
-    const instapay = branding?.invoice_instapay || 'غير مسجل'
-    const wallet = branding?.invoice_wallet || 'غير مسجل'
-    const whatsapp = store?.whatsapp_phone || 'غير مسجل'
+    const instapay = safeBranding.invoice_instapay || 'غير مسجل'
+    const wallet = safeBranding.invoice_wallet || 'غير مسجل'
+    const whatsapp = safeStore.whatsapp_phone || 'غير مسجل'
 
     // Calc totals
-    const originalPrice = Number(order.product_price || 0)
-    const discountPercent = Number(order.discount_percentage || order.discount_pct || 0)
+    const originalPrice = Number(safeOrder.product_price || 0)
+    const discountPercent = Number(safeOrder.discount_percentage || safeOrder.discount_pct || 0)
     const discountAmount = (originalPrice * discountPercent) / 100
-    const finalPrice = Number(order.final_price || originalPrice)
+    const finalPrice = Number(safeOrder.final_price || originalPrice)
     
-    // Deposit logic
-    const isCOD = order.payment_method === 'الدفع عند الاستلام'
-    const isDepositRequired = isCOD && settings?.cod_deposit_required
-    const depositPercent = Number(settings?.deposit_percentage || 0)
+    // Improved Deposit logic (Sync with UI)
+    const paymentMethod = String(safeOrder.payment_method || '')
+    const isDepositRequired = safeSettings.cod_deposit_required || paymentMethod.includes('عربون') || paymentMethod.includes('مقدم')
+    const depositPercent = Number(safeSettings.deposit_percentage || 50)
     const depositAmount = (finalPrice * depositPercent) / 100
     const remainingAmount = finalPrice - depositAmount
 
     // Dynamic Message Logic
-    let statusMessage = ""
-    if (!isCOD) {
-        statusMessage = `لإتمام الطلب يرجى دفع إجمالي المبلغ (${finalPrice.toFixed(2)} ج.م) وإرسال إيصال الدفع (سكرين شوت) مع هذه الفاتورة على الواتساب للبدء في تجهيز طلبك فوراً.`
+    let statusMessage = "تم تسجيل طلبك بنجاح. يرجى إرسال هذه الفاتورة عبر الواتساب الآن للبدء في تجهيز طلبك."
+    if (paymentMethod.includes('إلكتروني') || paymentMethod.includes('أونلاين')) {
+        statusMessage = `لإتمام الطلب يرجى دفع إجمالي المبلغ (${finalPrice.toLocaleString()} ج.م) وإرسال إيصال الدفع مع هذه الفاتورة على الواتساب.`
     } else if (isDepositRequired) {
-        statusMessage = `يرجى دفع مقدم بقيمة ${depositAmount.toFixed(2)} ج.م وإرسال إيصال الدفع مع هذه الفاتورة على الواتساب لتأكيد الحجز والبدء في تجهيز طلبك. الباقي (${remainingAmount.toFixed(2)} ج.م) عند الاستلام.`
-    } else {
-        statusMessage = `تم تسجيل طلبك بنجاح. يرجى إرسال هذه الفاتورة عبر الواتساب الآن للبدء في تجهيز طلبك وتأكيد موعد التوصيل.`
+        statusMessage = `يرجى دفع مقدم بقيمة ${depositAmount.toLocaleString()} ج.م وإرسال إيصال الدفع مع هذه الفاتورة لتأكيد الحجز. المتبقي (${remainingAmount.toLocaleString()} ج.م) عند الاستلام.`
     }
 
     // Items table rows
-    const itemsRows = items && items.length > 0 
-        ? items.map(item => `
+    const itemsRows = safeItems.length > 0 
+        ? safeItems.map(item => `
             <tr>
-                <td class="product-name">${item.product_name || item.name}</td>
-                <td style="text-align: center;">${item.quantity}</td>
+                <td class="product-name">${item?.product_name || item?.name || 'منتج غير مسمى'}</td>
+                <td style="text-align: center;">${item?.quantity || 1}</td>
                 <td class="price-col" style="text-align: left;">
-                    <span>${(Number(item.product_price || item.price) * item.quantity).toFixed(2)} ج.م</span>
+                    <span>${(Number(item?.product_price || item?.price || 0) * (item?.quantity || 1)).toLocaleString()} ج.م</span>
                 </td>
             </tr>
         `).join('')
         : `
             <tr>
-                <td class="product-name">${order.product_name}</td>
+                <td class="product-name">${safeOrder.product_name || 'طلب مخصص'}</td>
                 <td style="text-align: center;">1</td>
                 <td class="price-col" style="text-align: left;">
-                    <span>${originalPrice.toFixed(2)} ج.م</span>
+                    <span>${originalPrice.toLocaleString()} ج.م</span>
                 </td>
             </tr>
         `
