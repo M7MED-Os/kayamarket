@@ -21,6 +21,7 @@ export async function GET(
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
+    console.log(`[PDF] Generating for ID: ${id}, Token: ${token ? 'YES' : 'NO'}`)
 
     // 1. Fetch Order Data using Admin Client or RPC
     let order: any = null
@@ -82,46 +83,24 @@ export async function GET(
 
     // 4. Launch Browser to generate PDF
     const isLocal = process.env.NODE_ENV === 'development'
-    
-    // Improved local path detection for Windows
-    let executablePath = ''
-    if (isLocal) {
-      const commonPaths = [
-        'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-        'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
-        'C:\\Users\\1\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe' // Common user path
-      ]
-      for (const p of commonPaths) {
-        if (require('fs').existsSync(p)) {
-          executablePath = p
-          break
-        }
-      }
-    } else {
-      executablePath = await chromium.executablePath()
-    }
+    const executablePath = isLocal 
+      ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe' 
+      : await chromium.executablePath()
 
     const browser = await puppeteer.launch({
-      args: isLocal 
-        ? ['--no-sandbox', '--disable-setuid-sandbox'] 
-        : [...(chromium as any).args, '--hide-scrollbars', '--disable-web-security'],
+      args: isLocal ? [] : (chromium as any).args,
       defaultViewport: (chromium as any).defaultViewport,
       executablePath,
-      headless: isLocal ? 'new' : (chromium as any).headless,
+      headless: isLocal ? true : (chromium as any).headless,
     })
 
     const page = await browser.newPage()
-    
-    // Optimized page loading
-    await page.setContent(html, { 
-      waitUntil: isLocal ? 'networkidle0' : 'networkidle2',
-      timeout: 15000 
-    })
+    await page.setContent(html, { waitUntil: 'networkidle0' })
 
     const pdf = await page.pdf({
       format: 'A4',
       printBackground: true,
-      margin: { top: '0.4in', right: '0.4in', bottom: '0.4in', left: '0.4in' }
+      margin: { top: '0px', right: '0px', bottom: '0px', left: '0px' }
     })
 
     await browser.close()

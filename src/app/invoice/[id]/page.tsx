@@ -32,6 +32,8 @@ export default async function InvoicePage({
    // 1. Check if there's a logged-in user (Merchant)
    const { data: { user } } = await supabase.auth.getUser()
 
+   console.log(`[Invoice] Access Attempt - ID: ${id}, Token: ${token}, User: ${user?.id || 'GUEST'}`)
+
    // 2. Fetch Order + Items + Store Config in one go using RPC v2
    // We pass the token if available. If not, the RPC will check auth.uid()
    let { data: rows, error: rpcError } = await supabase.rpc('get_order_invoice_v2', {
@@ -41,6 +43,7 @@ export default async function InvoicePage({
 
    // 3. Fallback: If no data but user is logged in, try with Admin Client directly without RPC
    if ((!rows || rows.length === 0) && user) {
+      console.log('[Invoice] RPC returned empty for merchant, falling back to manual Admin fetch...')
       const { createAdminClient } = await import('@/lib/supabase/server')
       const adminSupabase = createAdminClient()
 
@@ -220,7 +223,7 @@ export default async function InvoicePage({
                   </div>
                   <div>
                      <h2 className="text-xl md:text-2xl font-black text-emerald-900">تم استلام طلبك بنجاح!</h2>
-                     <p className="mt-2 text-sm font-bold text-emerald-700/70">يرجى تنزيل الفاتورة والضغط على "تأكيد عبر واتساب" لإتمام الطلب 11111</p>
+                     <p className="mt-2 text-sm font-bold text-emerald-700/70">يرجى تنزيل الفاتورة والضغط على "تأكيد عبر واتساب" لإتمام الطلب</p>
                   </div>
                </div>
                <div className="flex flex-col items-center justify-center gap-4 w-full">

@@ -18,6 +18,9 @@ export default function InvoiceActions({ order, hasPdfInvoice = false, storeName
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
   // Debug log
+  useEffect(() => {
+    console.log('Invoice Permissions:', { storeName, hasPdfInvoice })
+  }, [hasPdfInvoice, storeName])
 
   useEffect(() => {
     setCurrentUrl(window.location.href)
@@ -45,8 +48,8 @@ export default function InvoiceActions({ order, hasPdfInvoice = false, storeName
       const token = urlObj.searchParams.get('token')
       
       const apiUrl = token 
-        ? `${window.location.origin}/api/invoice/${actualOrderId}/pdf?token=${token}`
-        : `${window.location.origin}/api/invoice/${actualOrderId}/pdf`
+        ? `/api/invoice/${actualOrderId}/pdf?token=${token}`
+        : `/api/invoice/${actualOrderId}/pdf`
 
       const response = await fetch(apiUrl)
       if (!response.ok) throw new Error('Failed to generate PDF')
