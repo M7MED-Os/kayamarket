@@ -58,7 +58,6 @@ export async function updateStoreBranding(formData: FormData) {
     }
 
     revalidatePath('/admin/settings')
-    revalidateTag('stores')
     return { success: true }
   } catch (error: any) {
     return { success: false, error: error.message || 'Unauthorized' }

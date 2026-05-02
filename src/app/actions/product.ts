@@ -118,7 +118,6 @@ export async function createProduct(formData: FormData) {
     }
 
     revalidatePath('/admin/products')
-    revalidateTag('stores')
     return { success: true }
   } catch (error: any) {
     return { success: false, error: error.message || 'Unauthorized' }
@@ -195,7 +194,6 @@ export async function updateProduct(id: string, formData: FormData) {
     }
 
     revalidatePath('/admin/products')
-    revalidateTag('stores')
     return { success: true }
   } catch (error: any) {
     return { success: false, error: error.message || 'Unauthorized' }
@@ -220,7 +218,6 @@ export async function deleteProduct(id: string) {
     }
 
     revalidatePath('/admin/products')
-    revalidateTag('stores')
     return { success: true }
   } catch (error: any) {
     return { success: false, error: error.message || 'Unauthorized' }

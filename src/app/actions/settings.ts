@@ -169,7 +169,6 @@ export async function updateStoreSettings(formData: FormData) {
 
     // Success: Revalidate once
     revalidatePath('/admin/settings')
-    revalidateTag('stores')
 
     return { success: true }
   } catch (error: any) {
