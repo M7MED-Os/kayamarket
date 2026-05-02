@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-cairo), ui-sans-serif, system-ui, sans-serif;
+  --color-primary-50: color-mix(in srgb, var(--store-primary, #e11d48) 5%, white);
+  --color-primary-100: color-mix(in srgb, var(--store-primary, #e11d48) 10%, white);
+  --color-primary-200: color-mix(in srgb, var(--store-primary, #e11d48) 30%, white);
+  --color-primary-300: color-mix(in srgb, var(--store-primary, #e11d48) 50%, white);
+  --color-primary-400: color-mix(in srgb, var(--store-primary, #e11d48) 70%, white);
+  --color-primary-500: color-mix(in srgb, var(--store-primary, #e11d48) 85%, white);
+  --color-primary-600: var(--store-primary, #e11d48);
+  --color-primary-700: color-mix(in srgb, var(--store-primary, #e11d48) 85%, black);
+  --color-primary-800: color-mix(in srgb, var(--store-primary, #e11d48) 70%, black);
+  --color-primary-900: color-mix(in srgb, var(--store-primary, #e11d48) 50%, black);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #fffbfc;
+  color: #1a1a2e;
+}
+
+@media print {
+  @page {
+    margin: 0; /* Removes browser headers and footers */
+    size: A4 portrait;
+  }
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    background-color: white !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
