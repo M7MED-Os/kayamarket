@@ -65,7 +65,7 @@ export default async function StoreProductPage({ params }: PageProps) {
   }
   if (product.images && product.images.length > 0) {
     // Avoid duplicating the main image if it's already in the images array
-    const additionalImages = product.images.filter(img => img !== product.image_url)
+    const additionalImages = product.images.filter((img: any) => img !== product.image_url)
     galleryImages.push(...additionalImages)
   }
 

@@ -88,10 +88,10 @@ export async function GET(
       : await chromium.executablePath()
 
     const browser = await puppeteer.launch({
-      args: isLocal ? [] : chromium.args,
-      defaultViewport: chromium.defaultViewport,
+      args: isLocal ? [] : (chromium as any).args,
+      defaultViewport: (chromium as any).defaultViewport,
       executablePath,
-      headless: isLocal ? true : chromium.headless,
+      headless: isLocal ? true : (chromium as any).headless,
     })
 
     const page = await browser.newPage()
@@ -105,7 +105,7 @@ export async function GET(
 
     await browser.close()
 
-    return new NextResponse(pdf, {
+    return new NextResponse(pdf as any, {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `attachment; filename="Invoice-${id.split('-')[0].toUpperCase()}.pdf"`,

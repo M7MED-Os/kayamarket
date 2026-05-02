@@ -87,7 +87,7 @@ export async function updateStoreSettings(formData: FormData) {
     if (storeUpdateError) throw new Error('فشل حفظ بيانات المتجر: ' + storeUpdateError.message)
 
     // --- Execute Branding Upsert ---
-    const { data: currentBranding } = await supabase.from('store_branding').select('primary_color, font_family').eq('store_id', storeId).single()
+    const { data: currentBranding } = await supabase.from('store_branding').select('primary_color, font_family, logo_url, banner_url').eq('store_id', storeId).single()
 
     const brandingData: any = {
       store_id: storeId,

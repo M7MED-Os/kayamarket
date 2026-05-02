@@ -40,7 +40,7 @@ export default function ProductForm({ initialData, plan = 'starter', config }: {
   useEffect(() => {
     import('@/app/actions/category').then(mod => {
       mod.getCategories().then(res => {
-        if (res.success) setAvailableCategories(res.data)
+        if (res.success) setAvailableCategories(res.data || [])
       })
     })
   }, [])

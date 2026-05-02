@@ -25,7 +25,7 @@ export default function CategoryManager({ isOpen, onClose }: { isOpen: boolean; 
     setLoading(true)
     const res = await getCategories()
     if (res.success) {
-      setCategories(res.data)
+      setCategories(res.data || [])
     }
     setLoading(false)
   }

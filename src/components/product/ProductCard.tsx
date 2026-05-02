@@ -8,6 +8,7 @@ import CountdownTimer from '../CountdownTimer'
 interface ProductCardProps {
   product: any
   slug: string
+  primaryColor?: string
 }
 
 // Static star display — uses product.rating if available, otherwise defaults to 4.5

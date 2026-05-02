@@ -124,7 +124,7 @@ export default async function InvoicePage({
 
    // --- Plan Enforcement ---
    const { getPlanConfig, getDynamicPlanConfigs } = await import('@/lib/subscription')
-   const plan = (storeInfo?.plan as any || 'starter')
+   const plan = (storeInfo?.plan as any || 'starter') as import('@/lib/subscription').PlanTier
    const dynamicConfigs = await getDynamicPlanConfigs(supabase)
    const config = dynamicConfigs[plan] || getPlanConfig(plan)
 

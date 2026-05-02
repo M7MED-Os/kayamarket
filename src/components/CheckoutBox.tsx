@@ -141,7 +141,7 @@ export default function CheckoutBox({ product, storeId, storeSlug }: CheckoutBox
     addItem({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: product.price ?? 0,
       original_price: product.original_price,
       image_url: product.image_url,
       description: product.description,

@@ -372,8 +372,8 @@ export default async function StorePage({ params, searchParams }: PageProps) {
   return (
     <div className="min-h-screen bg-white" dir="rtl" style={{ '--primary': primaryColor, '--secondary': secondaryColor, fontFamily } as any}>
       {/* 1. Announcement */}
-      {shown('announcement') && (branding?.announcement_enabled === true || branding?.announcement_enabled === 'true') && (
-        <AnnouncementBar text={branding?.announcement_text || ''} branding={branding} />
+      {shown('announcement') && ((branding as any)?.announcement_enabled === true || (branding as any)?.announcement_enabled === 'true') && (
+        <AnnouncementBar text={(branding as any)?.announcement_text || ''} branding={branding} />
       )}
       {/* 2. Header */}
       <StoreHeader store={store} branding={branding} slug={slug} />

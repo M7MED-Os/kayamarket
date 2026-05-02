@@ -33,7 +33,7 @@ import { submitUpgradeRequest } from '@/app/actions/subscription'
 
 export default function SettingsForm({ initialStore, initialBranding, initialSettings, plan = 'starter', allPlans, userEmail }: { initialStore: any, initialBranding: any, initialSettings: any, plan?: PlanTier, allPlans?: any, userEmail?: string }) {
    // Defensive check: if plan is invalid or not found in PLAN_CONFIG, fallback to starter
-   const currentPlan = (plan === 'free' ? 'starter' : plan) as PlanTier
+   const currentPlan = ((plan as string) === 'free' ? 'starter' : plan) as PlanTier
    const config = allPlans?.[currentPlan] || PLAN_CONFIG[currentPlan] || PLAN_CONFIG.starter
    const [upgradeModal, setUpgradeModal] = useState({ isOpen: false, name: '', description: '' })
    const [loading, setLoading] = useState(false)

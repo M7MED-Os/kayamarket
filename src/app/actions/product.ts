@@ -81,7 +81,7 @@ export async function createProduct(formData: FormData) {
 
     const parsed = productSchema.safeParse(rawData)
     if (!parsed.success) {
-      return { success: false, error: parsed.error.errors[0]?.message || 'بيانات غير صالحة' }
+      return { success: false, error: parsed.error.issues[0]?.message || 'بيانات غير صالحة' }
     }
 
     // 3. Ensure Category exists
@@ -157,7 +157,7 @@ export async function updateProduct(id: string, formData: FormData) {
 
     const parsed = productSchema.safeParse(rawData)
     if (!parsed.success) {
-      return { success: false, error: parsed.error.errors[0]?.message || 'بيانات غير صالحة' }
+      return { success: false, error: parsed.error.issues[0]?.message || 'بيانات غير صالحة' }
     }
 
     // Ensure Category exists

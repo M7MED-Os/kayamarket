@@ -59,14 +59,14 @@ export default function CartView({ params, storeData }: { params: { slug: string
                   
                   <div className="flex-1 min-w-0 text-right">
                     <h3 className="text-lg font-black text-zinc-900 truncate mb-0.5">{item.name}</h3>
-                    {item.description && (
-                      <p className="text-xs text-zinc-400 font-bold mb-3 line-clamp-1">{item.description}</p>
+                    {(item as any).description && (
+                      <p className="text-xs text-zinc-400 font-bold mb-3 line-clamp-1">{(item as any).description}</p>
                     )}
                     
                     <div className="flex items-center gap-2 mb-4">
                       <p className="text-sm font-black text-[var(--primary)]">{item.price.toLocaleString()} ج.م</p>
-                      {item.original_price && item.original_price > item.price && (
-                        <p className="text-[10px] text-zinc-300 line-through font-bold">{(item.original_price).toLocaleString()} ج.م</p>
+                      {(item as any).original_price && (item as any).original_price > item.price && (
+                        <p className="text-[10px] text-zinc-300 line-through font-bold">{((item as any).original_price).toLocaleString()} ج.م</p>
                       )}
                     </div>
                     

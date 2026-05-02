@@ -17,7 +17,8 @@ export default async function PrintPage({ params }: { params: Promise<{ id: stri
   if (!order) notFound()
 
   // Fetch Store & Branding Dynamically
-  const { store, branding, settings: storeSettings } = await getStoreById(order.store_id)
+  const { store, branding } = await getStoreById(order.store_id)
+  const { data: storeSettings } = await supabase.from('store_settings').select('*').eq('store_id', order.store_id).single()
   
   const storeName = store?.name || 'متجرنا'
   const primaryColor = branding?.primary_color || '#e11d48'

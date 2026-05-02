@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { assertMerchant } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import LogoutButton from '@/components/LogoutButton'
