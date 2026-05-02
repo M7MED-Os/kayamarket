@@ -142,9 +142,9 @@ export default function CheckoutBox({ product, storeId, storeSlug }: CheckoutBox
       id: product.id,
       name: product.name,
       price: product.price ?? 0,
-      original_price: product.original_price,
-      image_url: product.image_url,
-      description: product.description,
+      original_price: product.original_price ?? undefined,
+      image_url: product.image_url ?? undefined,
+      description: product.description ?? undefined,
       quantity: quantity
     })
     toast.success('تمت الإضافة للسلة')
