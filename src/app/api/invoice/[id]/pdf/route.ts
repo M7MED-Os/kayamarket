@@ -4,12 +4,6 @@ import puppeteer from 'puppeteer-core'
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { generateInvoiceHTML } from '@/templates/InvoiceHTML'
 
-// Create an admin client that bypasses RLS for this internal server task
-const supabaseAdmin = createSupabaseClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
 export const dynamic = 'force-dynamic'
 export const maxDuration = 30
 
@@ -20,6 +14,12 @@ export async function GET(
   try {
     const { id } = await params
     const token = req.nextUrl.searchParams.get('token')
+
+    // Initialize admin client inside handler to avoid build-time env var failures
+    const supabaseAdmin = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
 
     console.log(`[PDF] Generating for ID: ${id}, Token: ${token ? 'YES' : 'NO'}`)
 

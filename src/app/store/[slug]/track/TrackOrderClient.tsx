@@ -23,10 +23,10 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
 
   const [storeRating, setStoreRating] = useState(5)
   const [storeComment, setStoreComment] = useState('')
-  
+
   // Multiple products review state
   const [productReviews, setProductReviews] = useState<Record<string, { rating: number; comment: string }>>({})
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
 
@@ -45,7 +45,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
     if (res.success && res.order) {
       setOrder(res.order)
       setIsSubmitted(false)
-      
+
       // Initialize product reviews state
       const pReviews: any = {}
       if (res.order.order_items?.length > 0) {
@@ -112,7 +112,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 font-inter pb-20" dir="rtl" style={{ '--primary': primaryColor } as any}>
+    <div className="min-h-screen bg-slate-50 font-inter" dir="rtl" style={{ '--primary': primaryColor } as any}>
       <StoreHeader store={store} branding={branding} slug={slug} />
 
       <main className="max-w-4xl mx-auto px-6 py-12">
@@ -122,7 +122,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
               <h1 className="text-3xl font-black text-slate-900 mb-2">تتبع طلبك</h1>
               <p className="text-slate-500 font-medium">أدخل بيانات طلبك لمعرفة حالته وتقييم تجربتك</p>
             </div>
-            
+
             <form onSubmit={handleSearch} className="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 space-y-6">
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-2">كود الطلب</label>
@@ -146,7 +146,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                   dir="ltr"
                 />
               </div>
-              
+
               <button
                 type="submit"
                 disabled={isSearching || !orderId.trim() || !phone.trim()}
@@ -167,8 +167,8 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                   طلب رقم: <span className="font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded" dir="ltr">#{order.id.split('-')[0].toUpperCase()}</span>
                 </p>
               </div>
-              <button 
-                onClick={() => setOrder(null)} 
+              <button
+                onClick={() => setOrder(null)}
                 className="text-sm font-bold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 px-5 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-2 hover:bg-slate-50 active:scale-95"
               >
                 <ArrowRight className="h-4 w-4" /> تتبع طلب آخر
@@ -187,27 +187,26 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                 <div className="relative pt-2 sm:pt-4">
                   {/* Timeline Line - Fixed centering */}
                   <div className="absolute top-[46px] left-[9%] right-[9%] h-1.5 bg-slate-100 hidden sm:block rounded-full overflow-hidden">
-                    <div 
-                      className="absolute top-0 right-0 h-full transition-all duration-1000" 
-                      style={{ background: 'var(--primary)', width: `${(Math.max(0, STATUS_STEPS.findIndex(s => s.id === (order.status === 'paid' ? 'delivered' : order.status))) / (STATUS_STEPS.length - 1)) * 100}%` }} 
+                    <div
+                      className="absolute top-0 right-0 h-full transition-all duration-1000"
+                      style={{ background: 'var(--primary)', width: `${(Math.max(0, STATUS_STEPS.findIndex(s => s.id === (order.status === 'paid' ? 'delivered' : order.status))) / (STATUS_STEPS.length - 1)) * 100}%` }}
                     />
                   </div>
-                  
+
                   <div className="relative flex flex-col sm:flex-row justify-between gap-8 sm:gap-0">
                     {STATUS_STEPS.map((step, idx) => {
                       const currentStepIndex = STATUS_STEPS.findIndex(s => s.id === (order.status === 'paid' ? 'delivered' : order.status))
                       const Icon = step.icon
                       const isCompleted = currentStepIndex >= idx
                       const isCurrent = currentStepIndex === idx
-                      
+
                       return (
                         <div key={step.id} className="flex sm:flex-col items-center gap-4 sm:gap-4 relative z-10 w-full sm:w-auto">
-                          <div 
-                            className={`h-12 w-12 sm:h-16 sm:w-16 rounded-2xl flex items-center justify-center border-[3px] transition-all duration-500 bg-white ${
-                              isCompleted 
-                                ? 'text-white border-transparent shadow-lg' 
+                          <div
+                            className={`h-12 w-12 sm:h-16 sm:w-16 rounded-2xl flex items-center justify-center border-[3px] transition-all duration-500 bg-white ${isCompleted
+                                ? 'text-white border-transparent shadow-lg'
                                 : 'text-slate-300 border-slate-200'
-                            }`}
+                              }`}
                             style={isCompleted ? { background: 'var(--primary)', boxShadow: '0 8px 25px color-mix(in srgb, var(--primary) 30%, transparent)' } : {}}
                           >
                             <Icon className="h-6 w-6 sm:h-7 sm:w-7" strokeWidth={isCurrent ? 2.5 : 2} />
@@ -250,7 +249,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                   </div>
                 )}
               </div>
-              
+
               <div className="w-full sm:w-auto flex gap-8 sm:gap-12 justify-between sm:justify-end border-t sm:border-t-0 sm:border-r border-slate-100 pt-6 sm:pt-0 sm:pr-8">
                 <div className="text-right sm:text-center">
                   <h3 className="font-bold text-slate-400 text-sm mb-2">الإجمالي</h3>
@@ -270,18 +269,18 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                   <h2 className="text-2xl font-black text-slate-900 mb-2">كيف كانت تجربتك؟</h2>
                   <p className="text-slate-500 text-sm font-medium">تقييمك يساعدنا على تطوير خدمتنا ومنتجاتنا</p>
                 </div>
-                
+
                 {isSubmitted ? (
-                    <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 text-center max-w-2xl mx-auto">
-                      <div className="h-16 w-16 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto mb-4">
-                        <CheckCircle className="h-8 w-8" />
-                      </div>
-                      <h3 className="text-xl font-black text-slate-800 mb-2">شكراً لك!</h3>
-                      <p className="text-slate-500 text-sm font-medium">لقد استلمنا تقييمك بنجاح، نتمنى رؤيتك قريباً.</p>
+                  <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 text-center max-w-2xl mx-auto">
+                    <div className="h-16 w-16 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto mb-4">
+                      <CheckCircle className="h-8 w-8" />
                     </div>
+                    <h3 className="text-xl font-black text-slate-800 mb-2">شكراً لك!</h3>
+                    <p className="text-slate-500 text-sm font-medium">لقد استلمنا تقييمك بنجاح، نتمنى رؤيتك قريباً.</p>
+                  </div>
                 ) : (
                   <form onSubmit={handleCombinedReview} className="max-w-2xl mx-auto space-y-6">
-                    
+
                     <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6 sm:p-8">
                       {/* Store Review */}
                       <div>
@@ -321,7 +320,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                                     <button
                                       key={`prod-${item.id}-${star}`}
                                       type="button"
-                                      onClick={() => setProductReviews(prev => ({...prev, [item.product_id]: { ...prev[item.product_id], rating: star }}))}
+                                      onClick={() => setProductReviews(prev => ({ ...prev, [item.product_id]: { ...prev[item.product_id], rating: star } }))}
                                       className="focus:outline-none transition-transform hover:scale-110"
                                     >
                                       <Star className={`h-8 w-8 ${star <= r ? 'fill-yellow-400 text-yellow-400' : 'text-slate-200'}`} />
@@ -331,7 +330,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                               </div>
                               <textarea
                                 value={productReviews[item.product_id]?.comment || ''}
-                                onChange={(e) => setProductReviews(prev => ({...prev, [item.product_id]: { ...prev[item.product_id], comment: e.target.value }}))}
+                                onChange={(e) => setProductReviews(prev => ({ ...prev, [item.product_id]: { ...prev[item.product_id], comment: e.target.value } }))}
                                 placeholder="أخبرنا برأيك في هذا المنتج..."
                                 className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm font-medium text-slate-700 focus:outline-none focus:bg-white focus:border-[var(--primary)] resize-none h-20 transition-all"
                               />
@@ -347,7 +346,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                                   <button
                                     key={`prod-${order.product_id}-${star}`}
                                     type="button"
-                                    onClick={() => setProductReviews(prev => ({...prev, [order.product_id]: { ...prev[order.product_id], rating: star }}))}
+                                    onClick={() => setProductReviews(prev => ({ ...prev, [order.product_id]: { ...prev[order.product_id], rating: star } }))}
                                     className="focus:outline-none transition-transform hover:scale-110"
                                   >
                                     <Star className={`h-8 w-8 ${star <= r ? 'fill-yellow-400 text-yellow-400' : 'text-slate-200'}`} />
@@ -357,7 +356,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                             </div>
                             <textarea
                               value={productReviews[order.product_id]?.comment || ''}
-                              onChange={(e) => setProductReviews(prev => ({...prev, [order.product_id]: { ...prev[order.product_id], comment: e.target.value }}))}
+                              onChange={(e) => setProductReviews(prev => ({ ...prev, [order.product_id]: { ...prev[order.product_id], comment: e.target.value } }))}
                               placeholder="أخبرنا برأيك في هذا المنتج..."
                               className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm font-medium text-slate-700 focus:outline-none focus:bg-white focus:border-[var(--primary)] resize-none h-20 transition-all"
                             />

@@ -162,18 +162,20 @@ export default async function InvoicePage({
          `عنوان التوصيل: ${order.customer_address}`,
          '',
          `تفاصيل الطلب:`,
-         `وقت الطلب: ${new Date(order.created_at).toLocaleString('ar-EG', { dateStyle: 'medium', timeStyle: 'short' })}`,
+         `وقت الطلب: ${new Date(order.created_at).toLocaleString('ar-EG', { timeZone: 'Africa/Cairo', dateStyle: 'medium', timeStyle: 'short' })}`,
+         `طريقة الدفع: ${order.payment_method}`,
+         order.coupon_code ? `🎟️ الكوبون: ${order.coupon_code}\n💰 السعر قبل الخصم: ${productPrice.toLocaleString()} ج.م\n🎁 قيمة الخصم: ${((productPrice * discountPct) / 100).toLocaleString()} ج.م` : '',
          '',
          `المنتجات:`,
          itemsList,
          '',
-         `الإجمالي: ${finalPrice.toLocaleString('en-US')} ج.م`,
+         `الإجمالي النهائي: ${finalPrice.toLocaleString('en-US')} ج.م`,
          '',
          `رابط الفاتورة:`,
          invoiceLink,
          '',
          `شكراً لكم!`
-      ].join('\n').normalize('NFC')
+      ].filter(line => line !== '').join('\n').normalize('NFC')
    } else {
       waMessage = [
          `مرحباً، لقد قمت بإنشاء طلب جديد!`,
@@ -221,6 +223,7 @@ export default async function InvoicePage({
                   </div>
                   <div>
                      <h2 className="text-xl md:text-2xl font-black text-emerald-900">تم استلام طلبك بنجاح!</h2>
+                     <p className="mt-2 text-sm font-bold text-emerald-700/70">يرجى تنزيل الفاتورة والضغط على "تأكيد عبر واتساب" لإتمام الطلب</p>
                   </div>
                </div>
                <div className="flex flex-col items-center justify-center gap-4 w-full">
@@ -256,96 +259,132 @@ export default async function InvoicePage({
                   </div>
                </div>
 
-               <div className="p-8 md:p-12 grid grid-cols-1 md:grid-cols-2 gap-12">
-                  <div className="space-y-6">
-                     <div className="flex items-center gap-3 mb-2">
-                        <div className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--store-primary)' }} />
-                        <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest">بيانات العميل</h3>
+               <div className="p-8 md:p-12">
+                  {/* ── Customer & Payment Grid ─────────────────────────────────── */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
+                     {/* Customer Info */}
+                     <div className="space-y-6">
+                        <div className="flex items-center gap-3 mb-2">
+                           <div className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--store-primary)' }} />
+                           <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">بيانات العميل</h3>
+                        </div>
+                        <div className="grid gap-5">
+                           <div className="flex items-center gap-4">
+                              <div className="h-10 w-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400 shrink-0">
+                                 <User className="h-5 w-5" />
+                              </div>
+                              <div>
+                                 <p className="text-[10px] font-bold text-zinc-400 mb-0.5">الاسم الكامل</p>
+                                 <p className="text-sm font-black text-zinc-900 leading-none">{order.customer_name}</p>
+                              </div>
+                           </div>
+                           <div className="flex items-center gap-4">
+                              <div className="h-10 w-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400 shrink-0">
+                                 <Phone className="h-5 w-5" />
+                              </div>
+                              <div>
+                                 <p className="text-[10px] font-bold text-zinc-400 mb-0.5">رقم الهاتف</p>
+                                 <p className="text-sm font-black text-zinc-900 leading-none" dir="ltr">{order.customer_phone}</p>
+                              </div>
+                           </div>
+                           <div className="flex items-center gap-4">
+                              <div className="h-10 w-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400 shrink-0">
+                                 <MapPin className="h-5 w-5" />
+                              </div>
+                              <div>
+                                 <p className="text-[10px] font-bold text-zinc-400 mb-0.5">عنوان التوصيل</p>
+                                 <p className="text-sm font-black text-zinc-900 leading-tight">{order.customer_address}</p>
+                              </div>
+                           </div>
+                        </div>
                      </div>
-                     <div className="grid gap-6">
-                        <div className="flex items-center gap-4">
-                           <div className="h-10 w-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400">
-                              <User className="h-5 w-5" />
-                           </div>
-                           <div>
-                              <p className="text-[10px] font-bold text-zinc-400 mb-0.5">الاسم الكامل</p>
-                              <p className="text-sm font-black text-zinc-900">{order.customer_name}</p>
-                           </div>
+
+                     {/* Payment Info */}
+                     <div className="space-y-6">
+                        <div className="flex items-center gap-3 mb-2">
+                           <div className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--store-primary)' }} />
+                           <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">طريقة الدفع</h3>
                         </div>
-                        <div className="flex items-center gap-4">
-                           <div className="h-10 w-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400">
-                              <Phone className="h-5 w-5" />
+                        <div className="bg-transparent px-0 py-1 space-y-5">
+                           <div className="flex items-center gap-4">
+                              <div className="h-12 w-12 rounded-2xl bg-zinc-50 flex items-center justify-center text-zinc-900 shadow-sm border border-zinc-100 shrink-0">
+                                 <Wallet className="h-6 w-6" />
+                              </div>
+                              <div>
+                                 <p className="text-[10px] font-bold text-zinc-400 mb-0.5">الوسيلة المختارة</p>
+                                 <p className="text-base font-black text-zinc-900">
+                                    {order.payment_method}
+                                    {depositAmount > 0 && order.payment_method === 'الدفع عند الاستلام' && ' (بمقدم)'}
+                                 </p>
+                              </div>
                            </div>
-                           <div>
-                              <p className="text-[10px] font-bold text-zinc-400 mb-0.5">رقم الهاتف</p>
-                              <p className="text-sm font-black text-zinc-900" dir="ltr">{order.customer_phone}</p>
-                           </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                           <div className="h-10 w-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400">
-                              <MapPin className="h-5 w-5" />
-                           </div>
-                           <div>
-                              <p className="text-[10px] font-bold text-zinc-400 mb-0.5">عنوان التوصيل</p>
-                              <p className="text-sm font-black text-zinc-900">{order.customer_address}</p>
-                           </div>
+
+                           {depositAmount > 0 && order.payment_method === 'الدفع عند الاستلام' && (
+                              <div className="pt-4 border-t border-zinc-100 flex flex-wrap gap-x-8 gap-y-4">
+                                 <div>
+                                    <p className="text-[10px] font-bold text-amber-600 mb-0.5 uppercase tracking-wider">المبلغ المقدم</p>
+                                    <p className="text-xl font-black text-amber-600 leading-none">{depositAmount.toLocaleString()} ج.م</p>
+                                 </div>
+                                 <div>
+                                    <p className="text-[10px] font-bold text-zinc-400 mb-0.5 uppercase tracking-wider">المتبقي عند الاستلام</p>
+                                    <p className="text-xl font-black text-zinc-900 leading-none">{(finalPrice - depositAmount).toLocaleString()} ج.م</p>
+                                 </div>
+                              </div>
+                           )}
                         </div>
                      </div>
                   </div>
 
-                  <div className="space-y-6">
+                  {/* ── Order Summary Section ───────────────────────────────────── */}
+                  <div className="space-y-6 pt-10 border-t border-zinc-50">
                      <div className="flex items-center gap-3 mb-2">
                         <div className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--store-primary)' }} />
-                        <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest">تفاصيل الطلب</h3>
+                        <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">تفاصيل الطلب والأسعار</h3>
                      </div>
-                     <div className="bg-zinc-50 rounded-3xl p-8 space-y-4">
-                        <div className="space-y-4 mb-6">
+
+                     <div className="bg-transparent px-0 py-2">
+                        <div className="space-y-5 mb-8">
                            {items && items.length > 0 ? (
                               items.map((item: any) => (
-                                 <div key={item.id} className="flex justify-between items-center text-sm font-bold">
-                                    <div className="flex gap-2 items-center">
-                                       <span className="text-zinc-400">{item.quantity}x</span>
-                                       <span className="text-zinc-900">{item.product_name}</span>
+                                 <div key={item.id} className="flex justify-between items-start text-sm md:text-base font-black group">
+                                    <div className="flex gap-4 items-start">
+                                       <span className="text-zinc-400 bg-zinc-50 px-2 py-0.5 rounded-lg border border-zinc-100 text-[11px] min-w-[32px] text-center">{item.quantity}x</span>
+                                       <span className="text-zinc-900 flex-1 leading-tight">{item.product_name}</span>
                                     </div>
-                                    <span className="text-zinc-600">{(Number(item.product_price) * item.quantity).toLocaleString()} ج.م</span>
+                                    <span className="text-zinc-900 shrink-0">{(Number(item.product_price) * item.quantity).toLocaleString()} ج.م</span>
                                  </div>
                               ))
                            ) : (
-                              <div className="flex justify-between items-center text-sm font-bold">
+                              <div className="flex justify-between items-center text-base font-black">
                                  <span className="text-zinc-900">{order.product_name}</span>
-                                 <span className="text-zinc-600">{Number(order.product_price).toLocaleString()} ج.م</span>
+                                 <span className="text-zinc-900">{Number(order.product_price).toLocaleString()} ج.م</span>
                               </div>
                            )}
                         </div>
 
-                        <div className="h-px bg-zinc-200/50 my-2" />
-
-                        <div className="space-y-3">
-                           <div className="flex justify-between text-xs font-bold text-zinc-500">
+                        <div className="space-y-4 pt-6 border-t border-zinc-100/80">
+                           <div className="flex justify-between text-xs font-bold text-zinc-400 uppercase tracking-widest">
                               <span>المجموع الفرعي</span>
                               <span>{productPrice.toLocaleString()} ج.م</span>
                            </div>
+
                            {discountPct > 0 && (
-                              <div className="flex justify-between text-xs font-bold text-emerald-600">
-                                 <span>خصم ({order.coupon_code || discountPct + '%'})</span>
+                              <div className="flex justify-between text-sm font-black text-emerald-600 bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100/50">
+                                 <div className="flex items-center gap-2">
+                                    <div className="h-6 w-6 rounded-lg bg-emerald-100 flex items-center justify-center text-[10px]">%</div>
+                                    <span>خصم الكوبون ({order.coupon_code || discountPct + '%'})</span>
+                                 </div>
                                  <span dir="ltr">-{((productPrice * discountPct) / 100).toLocaleString()} ج.م</span>
                               </div>
                            )}
-                        </div>
 
-                        <div className="h-px bg-zinc-200/50 my-2" />
-                        <div className="flex justify-between items-center">
-                           <span className="text-lg font-black text-zinc-900">الإجمالي</span>
-                           <span className="text-3xl font-black" style={{ color: 'var(--store-primary)' }}>{finalPrice.toLocaleString()} <span className="text-xs mr-1">ج.م</span></span>
-                        </div>
-
-                        {depositAmount > 0 && order.payment_method === 'الدفع عند الاستلام' && (
-                           <div className="mt-6 p-5 bg-amber-100/50 rounded-2xl border border-amber-200 border-dashed text-center">
-                              <p className="text-[10px] font-black text-amber-600 uppercase mb-1">مطلوب دفع عربون الآن</p>
-                              <p className="text-2xl font-black text-amber-900">{depositAmount.toLocaleString()} ج.م</p>
-                              <div className="mt-2 text-[10px] font-bold text-amber-700/60">الباقي عند الاستلام: {(finalPrice - depositAmount).toLocaleString()} ج.م</div>
+                           <div className="flex justify-between items-center pt-6 border-t border-zinc-200">
+                              <span className="text-xl font-black text-zinc-900">الإجمالي النهائي</span>
+                              <span className="text-3xl md:text-4xl font-black tracking-tight" style={{ color: 'var(--store-primary)' }}>
+                                 {finalPrice.toLocaleString()} <span className="text-xs mr-1 font-bold opacity-60 uppercase">ج.م</span>
+                              </span>
                            </div>
-                        )}
+                        </div>
                      </div>
                   </div>
                </div>
@@ -353,7 +392,7 @@ export default async function InvoicePage({
                <div className="px-8 md:px-12 pb-12">
                   <div className="flex items-center gap-3 mb-8">
                      <div className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--store-primary)' }} />
-                     <h3 className="text-xs font-black text-zinc-400 uppercase tracking-widest">طرق الدفع والتحويل</h3>
+                     <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">بيانات التحويل البنكي</h3>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                      <div className="p-6 rounded-[2rem] border-2 border-zinc-50 bg-zinc-50/30 flex flex-col items-center text-center group hover:border-[var(--store-primary)]/30 transition-all">
