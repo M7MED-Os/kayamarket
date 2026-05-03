@@ -117,7 +117,7 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
               <span className="text-4xl font-light text-zinc-900 tracking-tighter">
                 {Number(finalPrice).toLocaleString()} ج.م
               </span>
-              {((product.original_price && product.original_price > product.price) || discount > 0) && (
+              {(product.price && ((product.original_price && product.original_price > product.price) || discount > 0)) && (
                 <span className="text-xl line-through text-zinc-300 font-light italic">
                   {Number(product.original_price || product.price).toLocaleString()}
                 </span>
@@ -229,7 +229,7 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
                   <span className="text-5xl font-black text-primary-600">
                     {Number(finalPrice).toFixed(2)}
                   </span>
-                  {((product.original_price && product.original_price > product.price) || discount > 0) && (
+                  {(product.price && ((product.original_price && product.original_price > product.price) || discount > 0)) && (
                     <span className="text-2xl line-through text-zinc-400 font-bold">
                       {Number(product.original_price || product.price).toFixed(2)}
                     </span>

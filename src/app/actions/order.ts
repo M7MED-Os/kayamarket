@@ -30,7 +30,7 @@ export async function createOrder(
   
   return createOrderMulti(
     items,
-    couponCode,
+    couponCode?.trim() || '',
     customerName,
     customerAddress,
     customerPhone,
@@ -63,7 +63,7 @@ export async function createOrderMulti(
 
     const { data, error } = await supabase.rpc('create_order_multi_v1', {
       p_items: formattedItems,
-      p_coupon_code: couponCode,
+      p_coupon_code: couponCode?.trim() || null,
       p_customer_name: customerName,
       p_customer_address: customerAddress,
       p_customer_phone: customerPhone,
