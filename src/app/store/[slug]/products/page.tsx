@@ -4,9 +4,14 @@ import ProductCard from '@/components/product/ProductCard'
 import ProductFilters from '@/components/product/ProductFilters'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowRight, ShoppingBag } from 'lucide-react'
+import { ArrowRight, ShoppingBag, ArrowLeft } from 'lucide-react'
 import StoreHeader from '@/components/StoreHeader'
 import StoreFooter from '@/components/StoreFooter'
+import { 
+  ElegantHeader, 
+  ElegantFooter, 
+  ElegantProductCard 
+} from '@/components/store/themes/ElegantTheme'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -46,8 +51,12 @@ export default async function AllProductsPage({ params, searchParams }: PageProp
   const categories = Array.from(new Set(productsWithRatings.map(p => p.category).filter(Boolean) as string[]))
 
   let products = productsWithRatings
-  if (typeof currentCategory === 'string') {
-    products = products.filter(p => p.category === currentCategory)
+  const catFilter = typeof currentCategory === 'string' ? currentCategory : Array.isArray(currentCategory) ? currentCategory[0] : null;
+  
+  if (catFilter) {
+    products = products.filter(p => 
+      p.category?.toString().trim().toLowerCase() === catFilter.trim().toLowerCase()
+    )
   }
   if (typeof searchQuery === 'string' && searchQuery.trim().length > 0) {
     const q = searchQuery.toLowerCase().trim()
@@ -59,9 +68,43 @@ export default async function AllProductsPage({ params, searchParams }: PageProp
   const primaryColor = branding?.primary_color || '#e11d48'
   const secondaryColor = branding?.secondary_color || '#f8fafc'
   const fontFamily = branding?.font_family || 'Cairo'
+  const selectedTheme = (branding as any)?.selected_theme || 'default'
 
+  const commonStyles = { '--primary': primaryColor, '--secondary': secondaryColor, fontFamily } as any
+
+  // ─── THEME: ELEGANT ────────────────────────────────────────────────────────
+  if (selectedTheme === 'elegant') {
+    return (
+      <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
+        <ElegantHeader store={store} branding={branding} slug={slug} />
+        <main className="mx-auto max-w-7xl px-6 py-20">
+          <div className="text-center mb-20 space-y-4">
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">المتجر</span>
+            <h1 className="text-5xl font-light text-zinc-900 tracking-tighter">كل <span className="font-bold underline decoration-zinc-200 underline-offset-8">المنتجات</span></h1>
+          </div>
+
+          <ProductFilters categories={categories} currentCategory={currentCategory as string} slug={`${slug}/products`} searchQuery={searchQuery as string} />
+
+          {products.length === 0 ? (
+            <div className="text-center py-32 border border-zinc-100 bg-zinc-50/50 mt-12">
+              <p className="text-lg font-light italic text-zinc-400">عذراً، لم نجد أي قطع تطابق بحثك</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-16 mt-12">
+              {products.map((product) => (
+                <ElegantProductCard key={product.id} product={product} slug={slug} />
+              ))}
+            </div>
+          )}
+        </main>
+        <ElegantFooter store={store} branding={branding} />
+      </div>
+    )
+  }
+
+  // ─── THEME: DEFAULT ────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-white" dir="rtl" style={{ '--primary': primaryColor, '--secondary': secondaryColor, fontFamily } as any}>
+    <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
       <StoreHeader store={store} branding={branding} slug={slug} />
 
       <main className="mx-auto max-w-7xl px-6 py-10">

@@ -52,10 +52,10 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col xl:flex-row font-sans selection:bg-sky-100 selection:text-sky-900" dir="rtl">
-      
+
       {/* ── Sidebar (Desktop) ───────────────────────────────────────────── */}
       <aside className="hidden xl:flex w-80 bg-white border-l border-slate-200 flex-col shrink-0 sticky top-0 h-screen z-40 overflow-y-auto no-scrollbar">
-        
+
         {/* Brand Header */}
         <div className="p-8 border-b border-slate-50 flex flex-col items-start gap-10">
           <div className="flex items-center gap-4 text-sky-500">
@@ -82,7 +82,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         {/* Navigation Area */}
         <div className="flex-1 flex flex-col">
           <AdminNav storeSlug={storeSlug} />
-          
+
           <div className="p-8 mt-auto border-t border-slate-50">
             <LogoutButton className="flex items-center justify-center gap-3 w-full px-4 py-5 rounded-2xl font-black text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all border border-transparent hover:border-rose-100 group shadow-sm hover:shadow-md">
               <LogOut className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
@@ -98,31 +98,9 @@ export default async function AdminLayout({ children }: { children: ReactNode })
           <KayaLogo className="h-8 w-8" />
           <span className="text-xl font-black font-poppins text-slate-900 tracking-tighter">KayaMarket</span>
         </div>
-        {storeSlug ? (
-          <>
-            <style>{`
-              @keyframes storePulse {
-                0% { background-color: #f8fafc; color: #0ea5e9; box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4); }
-                50% { background-color: #0ea5e9; color: #ffffff; box-shadow: 0 0 0 8px rgba(14, 165, 233, 0); transform: scale(1.05); }
-                100% { background-color: #f8fafc; color: #0ea5e9; box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
-              }
-            `}</style>
-            <a 
-              href={`/store/${storeSlug}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              title="زيارة المتجر"
-              className="group relative h-10 w-10 rounded-full border border-sky-200 flex items-center justify-center overflow-hidden active:scale-90 shadow-sm"
-              style={{ animation: 'storePulse 3s infinite' }}
-            >
-               <Store className="h-5 w-5 relative z-10" />
-            </a>
-          </>
-        ) : (
-          <div className="h-10 w-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600">
-             <Store className="h-5 w-5" />
-          </div>
-        )}
+        <div className="h-10 w-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600">
+          <Store className="h-5 w-5" />
+        </div>
       </header>
 
       {/* ── Main Content ─────────────────────────────────────────────────── */}

@@ -17,9 +17,10 @@ interface CheckoutBoxProps {
   storeId?: string
   /** Multi-tenant: slug used to build the back-link after order. */
   storeSlug?: string
+  selectedTheme?: string
 }
 
-export default function CheckoutBox({ product, storeId, storeSlug }: CheckoutBoxProps) {
+export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme = 'default' }: CheckoutBoxProps) {
   const [customerName, setCustomerName] = useState('')
   const [customerAddress, setCustomerAddress] = useState('')
   const [customerPhone, setCustomerPhone] = useState('')
@@ -30,15 +31,14 @@ export default function CheckoutBox({ product, storeId, storeSlug }: CheckoutBox
   const [quantity, setQuantity] = useState(1)
   const { addItem } = useCart()
   const [settings, setSettings] = useState<{ cod_enabled: boolean; cod_deposit_required: boolean; deposit_percentage: number; policies?: string }>({ cod_enabled: true, cod_deposit_required: false, deposit_percentage: 50 })
-  // Idempotency key: generated once per checkout session, reused on retries.
   const [idempotencyKey, setIdempotencyKey] = useState<string>(() => crypto.randomUUID())
   const router = useRouter()
-
   const supabase = createClient()
+
+  const isElegant = selectedTheme === 'elegant'
 
   useEffect(() => {
     async function fetchSettings() {
-      // ── Fix: always filter by store_id to prevent cross-tenant data leaks ───
       let query = supabase.from('store_settings').select('*')
       if (storeId) {
         query = query.eq('store_id', storeId) as typeof query
@@ -52,43 +52,27 @@ export default function CheckoutBox({ product, storeId, storeSlug }: CheckoutBox
       }
     }
     fetchSettings()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storeId])
 
   const applyCoupon = async () => {
     if (!couponCode) return
     setLoading(true)
-
     try {
       if (storeId) {
-        // ── Multi-tenant path: use DB-level validate_coupon() RPC ──────────
-        // This function handles brute-force lockout, expiry, max_uses, and
-        // increments current_uses atomically on success.
-        const { data, error } = await supabase
-          .rpc('validate_coupon', {
-            p_store_id: storeId,
-            p_code: couponCode.trim(),
-          })
-
+        const { data, error } = await supabase.rpc('validate_coupon', { p_store_id: storeId, p_code: couponCode.trim() })
         if (error) {
           setDiscount(0)
-          toast.error('تعذّر التحقق من الكوبون، حاول مرة أخرى')
+          toast.error('تعذّر التحقق من الكوبون')
         } else if (data && data[0]?.is_valid) {
           setDiscount(data[0].discount_percentage)
-          toast.success(`تم تفعيل خصم ${data[0].discount_percentage}% بنجاح!`)
+          toast.success(`تم تفعيل خصم ${data[0].discount_percentage}%`)
         } else {
           setDiscount(0)
-          toast.error(data?.[0]?.error_message || 'كود الخصم غير صحيح أو منتهي الصلاحية')
+          toast.error(data?.[0]?.error_message || 'كود غير صحيح')
         }
-      } else {
-        // SECURITY: storeId is required to validate coupons safely.
-        // Querying by coupon code alone risks cross-tenant leakage
-        // where a coupon from Store A could be used in Store B.
-        setDiscount(0)
-        toast.error('تعذّر التحقق من الكوبون: معرّف المتجر مفقود')
       }
     } catch {
-      toast.error('حدث خطأ أثناء التحقق من الكوبون')
+      toast.error('حدث خطأ')
     } finally {
       setLoading(false)
     }
@@ -98,56 +82,139 @@ export default function CheckoutBox({ product, storeId, storeSlug }: CheckoutBox
 
   const handleOrder = async () => {
     if (!customerName.trim() || !customerAddress.trim()) {
-      toast.error('برجاء إدخال الاسم والعنوان لإتمام الطلب')
+      toast.error('برجاء إدخال الاسم والعنوان')
       return
     }
-
     setLoading(true)
     try {
-      const finalPaymentMethod = (paymentMethod === 'الدفع عند الاستلام' && settings.cod_deposit_required)
-        ? 'الدفع عند الاستلام (عربون)'
-        : paymentMethod
-
-      const result = await createOrder(
-        product,
-        couponCode,
-        customerName.trim(),
-        customerAddress.trim(),
-        customerPhone.trim(),
-        finalPaymentMethod,
-        storeId,
-        idempotencyKey,
-        quantity
-      )
+      const finalPaymentMethod = (paymentMethod === 'الدفع عند الاستلام' && settings.cod_deposit_required) ? 'الدفع عند الاستلام (عربون)' : paymentMethod
+      const result = await createOrder(product, couponCode, customerName.trim(), customerAddress.trim(), customerPhone.trim(), finalPaymentMethod, storeId, idempotencyKey, quantity)
       if (result.success && result.orderId) {
-        toast.success('تم تسجيل طلبكم بنجاح! جاري تحويلكم للفاتورة...')
-        // Rotate the key so the next order gets a fresh one
+        toast.success('تم تسجيل الطلب بنجاح!')
         setIdempotencyKey(crypto.randomUUID())
-        const invoicePath = result.publicToken
-          ? `/invoice/${result.orderId}?token=${result.publicToken}`
-          : `/invoice/${result.orderId}`
+        const invoicePath = result.publicToken ? `/invoice/${result.orderId}?token=${result.publicToken}` : `/invoice/${result.orderId}`
         router.push(invoicePath)
       } else {
-        toast.error(result.error || 'حدث خطأ أثناء إنشاء الطلب')
+        toast.error(result.error || 'حدث خطأ')
         setLoading(false)
       }
     } catch {
-      toast.error('حدث خطأ غير متوقع')
+      toast.error('حدث خطأ')
       setLoading(false)
     }
   }
 
   const handleAddToCart = () => {
-    addItem({
-      id: product.id,
-      name: product.name,
-      price: product.price ?? 0,
-      original_price: product.original_price ?? undefined,
-      image_url: product.image_url ?? undefined,
-      description: product.description ?? undefined,
-      quantity: quantity
-    })
+    addItem({ id: product.id, name: product.name, price: product.price ?? 0, original_price: product.original_price ?? undefined, image_url: product.image_url ?? undefined, description: product.description ?? undefined, quantity })
     toast.success('تمت الإضافة للسلة')
+  }
+
+  if (isElegant) {
+    return (
+      <div className="space-y-10">
+        <div className="space-y-2">
+           <div className="flex items-baseline gap-3">
+              <span className="text-4xl font-light text-zinc-900 tracking-tighter">
+                {Number(finalPrice).toLocaleString()} ج.م
+              </span>
+              {((product.original_price && product.original_price > product.price) || discount > 0) && (
+                <span className="text-xl line-through text-zinc-300 font-light italic">
+                  {Number(product.original_price || product.price).toLocaleString()}
+                </span>
+              )}
+           </div>
+
+           {/* Countdown Timer (Themed) */}
+           {product.sale_end_date && new Date(product.sale_end_date) > new Date() && (
+             <div className="py-4 border-y border-zinc-50 flex items-center gap-6">
+               <span className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-300 rotate-180 [writing-mode:vertical-lr]">تنتهي قريباً</span>
+               <CountdownTimer endDate={product.sale_end_date} selectedTheme={selectedTheme} />
+             </div>
+           )}
+
+           {product.stock !== null && (
+              <div className="flex items-center gap-2">
+                 <div className={`h-1 w-1 rounded-full ${product.stock > 0 ? 'bg-zinc-900' : 'bg-zinc-200'}`} />
+                 <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                    {product.stock > 0 ? `متوفر: ${product.stock} قطعة` : 'نفذت الكمية'}
+                 </span>
+              </div>
+           )}
+        </div>
+
+        <div className="space-y-6">
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                 <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">الاسم</label>
+                 <input value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-zinc-900 transition-all" placeholder="الاسم بالكامل..." />
+              </div>
+              <div className="space-y-1">
+                 <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">رقم الهاتف</label>
+                 <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-zinc-900 transition-all text-right" dir="ltr" placeholder="01234567890" />
+              </div>
+           </div>
+           <div className="space-y-1">
+              <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">العنوان</label>
+              <input value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-zinc-900 transition-all" placeholder="المدينة، الشارع، رقم المنزل..." />
+           </div>
+
+            <div className="space-y-4">
+              <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">طريقة الدفع</label>
+              <div className="flex flex-col sm:flex-row gap-4">
+                 {['الدفع عند الاستلام', 'تحويل بنكي / محافظ إلكترونية'].map(m => (
+                    <button key={m} onClick={() => setPaymentMethod(m)} className={`flex-1 p-4 text-[10px] font-black uppercase tracking-widest border transition-all duration-500 ${paymentMethod === m ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-100 text-zinc-400 hover:border-zinc-300'}`}>
+                       {m}
+                    </button>
+                 ))}
+              </div>
+              {paymentMethod === 'الدفع عند الاستلام' && settings.cod_deposit_required && (
+                <div className="p-4 bg-zinc-50 border border-zinc-100 text-[10px] font-black uppercase tracking-widest text-zinc-900 flex justify-between items-center">
+                  <span>مقدم مطلوب ({settings.deposit_percentage}%)</span>
+                  <span>{finalPrice ? ((finalPrice * settings.deposit_percentage) / 100).toLocaleString() : '0'} ج.م</span>
+                </div>
+              )}
+            </div>
+
+           {/* Coupon Section */}
+           <div className="space-y-4 pt-4 border-t border-zinc-100">
+              <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">كوبون الخصم</label>
+              <div className="flex gap-4">
+                 <input 
+                   value={couponCode} 
+                   onChange={e => setCouponCode(e.target.value)} 
+                   className="flex-1 bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-zinc-900 transition-all uppercase tracking-widest" 
+                   placeholder="أدخل الكود..." 
+                 />
+                 <button 
+                   onClick={applyCoupon} 
+                   disabled={loading || !couponCode}
+                   className="px-8 bg-zinc-900 text-white text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-all disabled:opacity-50"
+                 >
+                   تطبيق
+                 </button>
+              </div>
+              {discount > 0 && <p className="text-[10px] font-black text-emerald-600">تم تطبيق خصم {discount}%</p>}
+           </div>
+
+           <div className="pt-6 space-y-4">
+              <div className="flex gap-4">
+                 <div className="flex items-center bg-zinc-50 px-2 py-2 gap-2">
+                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 flex items-center justify-center text-zinc-400 hover:text-zinc-900 transition-colors"><Minus className="h-4 w-4" /></button>
+                    <span className="text-base font-black w-8 text-center">{quantity}</span>
+                    <button onClick={() => setQuantity(quantity + 1)} className="w-12 h-12 flex items-center justify-center text-zinc-400 hover:text-zinc-900 transition-colors"><Plus className="h-4 w-4" /></button>
+                 </div>
+                 <button onClick={handleAddToCart} className="flex-1 bg-white border border-zinc-900 text-zinc-900 h-14 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-zinc-900 hover:text-white transition-all duration-500">
+                    <ShoppingCart className="h-4 w-4" />
+                    إضافة للسلة
+                 </button>
+              </div>
+              <button onClick={handleOrder} disabled={loading} className="w-full bg-zinc-900 text-white h-16 flex items-center justify-center text-[10px] font-black uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors shadow-lg disabled:opacity-50">
+                 {loading ? 'جاري التنفيذ...' : 'تأكيد الطلب الآن'}
+              </button>
+           </div>
+        </div>
+      </div>
+    )
   }
 
   return (

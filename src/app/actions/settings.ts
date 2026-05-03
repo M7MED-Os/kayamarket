@@ -118,6 +118,7 @@ export async function updateStoreSettings(formData: FormData) {
       footer_description: footerDescription || null,
       show_hero_mobile: showHeroMobile,
       faq_data: formData.get('faq_data') ? JSON.parse(formData.get('faq_data') as string) : null,
+      selected_theme: formData.get('selected_theme') as string || 'default',
       updated_at: new Date().toISOString()
     }
 

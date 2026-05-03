@@ -5,8 +5,10 @@ import { CheckCircle, Clock, Package, PackageCheck, XCircle, Star, Search, Arrow
 import { submitStoreReview, submitProductReview } from '@/app/actions/reviews'
 import { fetchOrderForTracking } from '@/app/actions/track'
 import toast from 'react-hot-toast'
-import StoreHeader from '@/components/StoreHeader'
-import StoreFooter from '@/components/StoreFooter'
+import { 
+  ElegantHeader, 
+  ElegantFooter 
+} from '@/components/store/themes/ElegantTheme'
 
 const STATUS_STEPS = [
   { id: 'pending', label: 'قيد المراجعة', icon: Clock },
@@ -31,6 +33,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
   const [isSubmitted, setIsSubmitted] = useState(false)
 
   const primaryColor = branding?.primary_color || '#0ea5e9'
+  const selectedTheme = (branding as any)?.selected_theme || 'default'
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -46,7 +49,6 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
       setOrder(res.order)
       setIsSubmitted(false)
 
-      // Initialize product reviews state
       const pReviews: any = {}
       if (res.order.order_items?.length > 0) {
         res.order.order_items.forEach((item: any) => {
@@ -64,53 +66,196 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
   const handleCombinedReview = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-
-    const promises = [
-      submitStoreReview(store.id, order.customer_name, storeRating, storeComment)
-    ]
-
+    const promises = [submitStoreReview(store.id, order.customer_name, storeRating, storeComment)]
     Object.keys(productReviews).forEach(pid => {
-      promises.push(
-        submitProductReview(store.id, pid, order.customer_name, productReviews[pid].rating, productReviews[pid].comment)
-      )
+      promises.push(submitProductReview(store.id, pid, order.customer_name, productReviews[pid].rating, productReviews[pid].comment))
     })
-
     const results = await Promise.all(promises)
     const storeRes = results[0]
     const productSuccess = Object.keys(productReviews).length === 0 || results.slice(1).every(r => r.success)
-
     setIsSubmitting(false)
-
     if (storeRes.success && productSuccess) {
-      toast.success('تم إرسال التقييمات بنجاح! بانتظار المراجعة.')
+      toast.success('تم إرسال التقييمات بنجاح!')
       setIsSubmitted(true)
     } else {
-      toast.error(storeRes.error || 'حدث خطأ أثناء إرسال بعض التقييمات')
-      if (storeRes.success || productSuccess) {
-        setIsSubmitted(true)
-      }
+      toast.error('حدث خطأ أثناء إرسال التقييمات')
+      if (storeRes.success || productSuccess) setIsSubmitted(true)
     }
   }
 
-  const renderStars = (rating: number, setRating: (r: number) => void) => {
+  // ─── THEME: ELEGANT ────────────────────────────────────────────────────────
+  if (selectedTheme === 'elegant') {
     return (
-      <div className="flex items-center gap-2 mb-4 justify-center" dir="rtl">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <button
-            key={star}
-            type="button"
-            onClick={() => setRating(star)}
-            className="focus:outline-none transition-transform hover:scale-110"
-          >
-            <Star
-              className={`h-10 w-10 ${star <= rating ? 'fill-yellow-400 text-yellow-400 drop-shadow-sm' : 'text-slate-200'}`}
-            />
-          </button>
-        ))}
+      <div className="min-h-screen bg-white" dir="rtl" style={{ '--primary': primaryColor } as any}>
+        <ElegantHeader store={store} branding={branding} slug={slug} />
+        <main className="mx-auto max-w-4xl px-6 py-20">
+          {!order ? (
+            <div className="max-w-md mx-auto space-y-12">
+               <div className="text-center space-y-4">
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">تتبع الطلب</span>
+                  <h1 className="text-4xl font-light text-zinc-900 tracking-tighter">أين <span className="font-bold">طلبك؟</span></h1>
+               </div>
+               <form onSubmit={handleSearch} className="space-y-6">
+                  <div className="space-y-1">
+                     <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">كود الطلب</label>
+                     <input value={orderId} onChange={e => setOrderId(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm focus:ring-1 focus:ring-zinc-900 transition-all uppercase" placeholder="مثال: ABC-123" />
+                  </div>
+                  <div className="space-y-1">
+                     <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">رقم الهاتف</label>
+                     <input value={phone} onChange={e => setPhone(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm focus:ring-1 focus:ring-zinc-900 transition-all text-right" dir="ltr" placeholder="01234567890" />
+                  </div>
+                  <button type="submit" disabled={isSearching} className="w-full h-16 bg-zinc-900 text-white flex items-center justify-center text-[10px] font-black uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors shadow-lg disabled:opacity-50">
+                     {isSearching ? 'جاري البحث...' : 'تتبع الآن'}
+                  </button>
+               </form>
+            </div>
+          ) : (
+            <div className="space-y-16 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+               <div className="flex justify-between items-end border-b border-zinc-100 pb-8">
+                  <div className="space-y-2">
+                     <h2 className="text-3xl font-light text-zinc-900 tracking-tighter">حالة <span className="font-bold">الطلب</span></h2>
+                     <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">كود: {order.id.split('-')[0].toUpperCase()}</p>
+                  </div>
+                  <button onClick={() => setOrder(null)} className="text-[10px] font-black uppercase tracking-widest text-zinc-900 flex items-center gap-2 hover:opacity-60 transition-opacity">
+                     <ArrowRight className="h-3 w-3" /> بحث جديد
+                  </button>
+               </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
+                  {STATUS_STEPS.map((step, idx) => {
+                    const currentStepIndex = STATUS_STEPS.findIndex(s => s.id === (order.status === 'paid' ? 'delivered' : order.status))
+                    const isCompleted = currentStepIndex >= idx
+                    const isCurrent = currentStepIndex === idx
+                    return (
+                      <div key={step.id} className="space-y-6">
+                         <div className={`h-[2px] w-full transition-all duration-1000 ${isCompleted ? 'bg-zinc-900' : 'bg-zinc-100'}`} />
+                         <div className="flex flex-col gap-2">
+                            <span className={`text-[10px] font-black uppercase tracking-[0.3em] ${isCompleted ? 'text-zinc-900' : 'text-zinc-300'}`}>0{idx + 1}</span>
+                            <span className={`text-xs font-bold uppercase tracking-wider ${isCompleted ? 'text-zinc-900' : 'text-zinc-300'}`}>{step.label}</span>
+                            {isCurrent && <div className="h-1 w-1 rounded-full bg-zinc-900 animate-pulse" />}
+                         </div>
+                      </div>
+                    )
+                  })}
+               </div>
+
+               <div className="bg-zinc-50/50 border border-zinc-100 p-12 space-y-12">
+                  <div className="space-y-8">
+                     <div className="flex items-center gap-4">
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-900">محتويات الطلب</h3>
+                        <div className="h-px flex-1 bg-zinc-100" />
+                     </div>
+                     <div className="space-y-6">
+                        {(order.order_items || []).map((item: any) => (
+                           <div key={item.id} className="flex justify-between items-end pb-4 border-b border-zinc-50 last:border-0">
+                              <div className="space-y-1">
+                                 <p className="text-sm font-bold text-zinc-900">{item.product_name}</p>
+                                 <p className="text-[10px] text-zinc-400 font-black uppercase tracking-widest">الكمية: {item.quantity}</p>
+                              </div>
+                              <span className="text-sm font-light text-zinc-900">{(item.price * item.quantity).toLocaleString()} ج.م</span>
+                           </div>
+                        ))}
+                     </div>
+                  </div>
+
+                  <div className="flex flex-col md:flex-row justify-between gap-12 pt-8 border-t border-zinc-100">
+                     <div className="space-y-2">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400">الإجمالي النهائي</span>
+                        <p className="text-4xl font-light tracking-tighter text-zinc-900">{order.final_price} ج.م</p>
+                     </div>
+                     <div className="space-y-2 md:text-left">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400">تاريخ الطلب</span>
+                        <p className="text-sm font-bold text-zinc-900 uppercase tracking-widest">{new Date(order.created_at).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                     </div>
+                  </div>
+               </div>
+
+               {/* Feedback in Elegant */}
+               {(order.status === 'delivered' || order.status === 'paid') && (
+                 <div className="pt-24 border-t border-zinc-100 space-y-16">
+                    <div className="text-center space-y-4">
+                       <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">نود معرفة رأيك</span>
+                       <h3 className="text-4xl font-light text-zinc-900 tracking-tighter">تجربة <span className="font-bold italic">استثنائية؟</span></h3>
+                    </div>
+
+                    {isSubmitted ? (
+                      <div className="text-center py-20 bg-zinc-50 border border-zinc-100 animate-in zoom-in duration-700">
+                         <div className="h-12 w-12 rounded-full border border-zinc-900 flex items-center justify-center mx-auto mb-6">
+                            <CheckCircle className="h-5 w-5 text-zinc-900" />
+                         </div>
+                         <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-900">شكراً لمشاركتك قصتك معنا</p>
+                      </div>
+                    ) : (
+                      <form onSubmit={handleCombinedReview} className="max-w-xl mx-auto space-y-16">
+                         <div className="space-y-10">
+                            {/* Store Review */}
+                            <div className="space-y-6 text-center">
+                               <p className="text-xs font-bold uppercase tracking-widest text-zinc-400">كيف كانت تجربة المتجر؟</p>
+                               <div className="flex justify-center gap-2">
+                                  {[1, 2, 3, 4, 5].map(s => (
+                                    <button 
+                                      key={s} 
+                                      type="button" 
+                                      onClick={() => setStoreRating(s)} 
+                                      className={`h-10 w-10 flex items-center justify-center transition-all duration-500 ${s <= storeRating ? 'bg-zinc-900 text-white' : 'bg-zinc-50 text-zinc-300 hover:bg-zinc-100'}`}
+                                    >
+                                       <Star className={`h-4 w-4 ${s <= storeRating ? 'fill-current' : ''}`} strokeWidth={1} />
+                                    </button>
+                                  ))}
+                               </div>
+                               <textarea 
+                                 value={storeComment} 
+                                 onChange={e => setStoreComment(e.target.value)} 
+                                 className="w-full bg-zinc-50 border-none p-6 text-xs h-32 focus:ring-1 focus:ring-zinc-900 transition-all italic" 
+                                 placeholder="أخبرنا بالمزيد عن تجربتك..." 
+                               />
+                            </div>
+
+                            {/* Product Reviews */}
+                            {Object.keys(productReviews).map(pid => {
+                               const productItem = order.order_items?.find((i: any) => i.product_id === pid) || { product_name: order.product_name }
+                               return (
+                                 <div key={pid} className="space-y-6 text-center pt-10 border-t border-zinc-50">
+                                    <p className="text-xs font-bold uppercase tracking-widest text-zinc-400">تقييمك لـ {productItem.product_name}</p>
+                                    <div className="flex justify-center gap-2">
+                                       {[1, 2, 3, 4, 5].map(s => (
+                                          <button 
+                                            key={s} 
+                                            type="button" 
+                                            onClick={() => setProductReviews(prev => ({ ...prev, [pid]: { ...prev[pid], rating: s } }))} 
+                                            className={`h-10 w-10 flex items-center justify-center transition-all duration-500 ${s <= productReviews[pid].rating ? 'bg-zinc-900 text-white' : 'bg-zinc-50 text-zinc-300'}`}
+                                          >
+                                             <Star className={`h-4 w-4 ${s <= productReviews[pid].rating ? 'fill-current' : ''}`} strokeWidth={1} />
+                                          </button>
+                                       ))}
+                                    </div>
+                                    <textarea 
+                                      value={productReviews[pid].comment} 
+                                      onChange={e => setProductReviews(prev => ({ ...prev, [pid]: { ...prev[pid], comment: e.target.value } }))} 
+                                      className="w-full bg-zinc-50 border-none p-6 text-xs h-32 focus:ring-1 focus:ring-zinc-900 transition-all italic" 
+                                      placeholder={`رأيك في المنتج...`} 
+                                    />
+                                 </div>
+                               )
+                            })}
+                         </div>
+
+                         <button type="submit" disabled={isSubmitting} className="w-full h-16 bg-zinc-900 text-white flex items-center justify-center text-[10px] font-black uppercase tracking-[0.3em] hover:bg-zinc-800 transition-all shadow-xl disabled:opacity-50">
+                            {isSubmitting ? 'جاري الإرسال...' : 'إرسال التقييمات'}
+                         </button>
+                      </form>
+                    )}
+                 </div>
+               )}
+            </div>
+          )}
+        </main>
+        <ElegantFooter store={store} branding={branding} />
       </div>
     )
   }
 
+  // ─── THEME: DEFAULT ────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-slate-50 font-inter" dir="rtl" style={{ '--primary': primaryColor } as any}>
       <StoreHeader store={store} branding={branding} slug={slug} />

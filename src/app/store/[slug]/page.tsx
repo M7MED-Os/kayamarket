@@ -64,47 +64,35 @@ function Hero({ branding, store, slug }: { branding: any; store: any; slug: stri
   const bannerUrl = branding?.banner_url || null
   const heroTitle = branding?.hero_title || store.name
   const heroDescription = branding?.hero_description || branding?.tagline || `تسوق من ${store.name} بكل سهولة`
-  const ctaText = branding?.hero_cta_text || 'تسوق الآن'
   const overlayOpacity = branding?.banner_overlay_opacity ?? 50
   const sideImage = branding?.hero_image_url || null
-  const alignment = branding?.hero_alignment || 'right'
   const hasImage = !!sideImage
-  const eff = hasImage ? (alignment === 'center' ? 'right' : alignment) : 'center'
-  const isR = eff === 'right'; const isL = eff === 'left'; const isC = eff === 'center'
-  const textAlign = isR ? 'lg:text-right text-center' : isL ? 'lg:text-left text-center' : 'text-center'
-  const itemsAlign = isR ? 'lg:items-start items-center' : isL ? 'lg:items-end items-center' : 'items-center'
-  const justifyAlign = isR ? 'lg:justify-start justify-center' : isL ? 'lg:justify-end justify-center' : 'justify-center'
-  const rowDir = isR ? 'lg:flex-row' : 'lg:flex-row-reverse'
-  const imgJustify = isR ? 'justify-end' : 'justify-start'
 
-  const textContent = (textClass = '') => {
+  const TextBlock = ({ isWhite = false }: { isWhite?: boolean }) => {
     const words = heroTitle.trim().split(/\s+/);
     const splitIndex = words.length <= 2 ? 1 : Math.ceil(words.length / 2);
     const firstPart = words.slice(0, splitIndex).join(' ');
     const secondPart = words.slice(splitIndex).join(' ');
-    const isWhite = textClass.includes('white');
 
     return (
-      <div className={`relative flex-1 flex flex-col ${itemsAlign} ${textAlign} animate-in fade-in slide-in-from-bottom-8 duration-1000 ${isC ? 'max-w-4xl mx-auto' : 'max-w-2xl'}`}>
-        <div className={`flex flex-col ${itemsAlign} ${textAlign}`}>
-          <h1 className={`text-4xl sm:text-6xl font-extrabold leading-tight drop-shadow-sm ${textAlign}`}>
-            <span className={isWhite ? 'text-white' : 'text-zinc-900'}>{firstPart}</span>
-            {secondPart && (
-              <>
-                <br />
-                <span style={{ color: 'var(--primary)' }}>{secondPart}</span>
-              </>
-            )}
-          </h1>
-          <p className={`mx-auto mt-6 max-w-xl text-base sm:text-lg leading-relaxed ${isWhite ? 'text-white/90' : 'text-zinc-500'} ${textAlign}`}>
-            {heroDescription}
-          </p>
-        </div>
+      <div className={`flex flex-col items-center text-center ${hasImage ? 'lg:items-start lg:text-right' : ''} animate-in fade-in slide-in-from-bottom-8 duration-1000`}>
+        <h1 className={`text-4xl sm:text-6xl font-extrabold leading-tight drop-shadow-sm`}>
+          <span className={isWhite ? 'text-white' : 'text-zinc-900'}>{firstPart}</span>
+          {secondPart && (
+            <>
+              <br />
+              <span style={{ color: 'var(--primary)' }}>{secondPart}</span>
+            </>
+          )}
+        </h1>
+        <p className={`mt-6 max-w-xl text-base sm:text-lg leading-relaxed ${isWhite ? 'text-white/90' : 'text-zinc-500'}`}>
+          {heroDescription}
+        </p>
 
-        <div className={`mt-10 flex flex-row items-center ${justifyAlign} gap-3 sm:gap-4 w-full px-2`}>
+        <div className={`mt-10 flex flex-row items-center justify-center gap-3 sm:gap-4 w-full ${hasImage ? 'lg:justify-start' : ''}`}>
           <Link
             href={`/store/${slug}/products`}
-            className="group relative inline-flex flex-1 sm:flex-initial items-center justify-center gap-2 rounded-2xl px-5 sm:px-8 py-3.5 sm:py-4 text-sm sm:text-base font-bold text-white transition-all hover:-translate-y-0.5 active:scale-95 shadow-lg whitespace-nowrap"
+            className="group relative inline-flex items-center justify-center gap-2 rounded-2xl px-8 py-4 text-base font-bold text-white transition-all hover:-translate-y-0.5 active:scale-95 shadow-lg whitespace-nowrap"
             style={{
               background: 'var(--primary)',
               boxShadow: '0 10px 25px -5px color-mix(in srgb, var(--primary) 40%, transparent)'
@@ -114,16 +102,16 @@ function Hero({ branding, store, slug }: { branding: any; store: any; slug: stri
           </Link>
           <a
             href={`#contact`}
-            className={`inline-flex flex-1 sm:flex-initial items-center justify-center gap-2 rounded-2xl border-2 px-5 sm:px-8 py-3.5 sm:py-4 text-sm sm:text-base font-bold transition-all hover:-translate-y-0.5 active:scale-95 whitespace-nowrap ${isWhite
+            className={`inline-flex items-center justify-center gap-2 rounded-2xl border-2 px-8 py-4 text-base font-bold transition-all hover:-translate-y-0.5 active:scale-95 whitespace-nowrap ${isWhite
               ? 'bg-white/10 text-white border-white/20 hover:bg-white/20'
-              : 'bg-white/40 text-zinc-900 border-zinc-200/60 hover:border-[var(--primary)] hover:text-[var(--primary)] shadow-sm'
+              : 'bg-white/40 text-zinc-900 border-zinc-200/60 hover:border-[var(--primary)] shadow-sm'
               }`}
           >
             تواصل معنا
           </a>
         </div>
       </div>
-    );
+    )
   }
 
   if (bannerUrl) {
@@ -135,13 +123,15 @@ function Hero({ branding, store, slug }: { branding: any; store: any; slug: stri
             <div className="absolute inset-0 bg-zinc-950" style={{ opacity: overlayOpacity / 100 }} />
             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/70 via-transparent to-zinc-950/30" />
           </div>
-          <div className={`relative z-10 mx-auto max-w-7xl px-6 py-20 w-full`}>
-            <div className={`flex flex-col ${rowDir} items-center gap-16 ${isC ? 'justify-center text-center' : ''}`}>
-              {textContent('text-white')}
-              {hasImage && !isC && (
-                <div className={`${branding?.show_hero_mobile !== false ? 'flex' : 'hidden lg:flex'} lg:flex-1 w-full ${imgJustify} animate-in fade-in zoom-in duration-1000`}>
-                  <div className={`relative aspect-square lg:aspect-[4/5] w-full max-w-[340px] lg:max-w-md mx-auto lg:mx-0 rounded-[3.5rem] overflow-hidden shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] ${isR ? 'lg:-rotate-3' : 'lg:rotate-3'} hover:rotate-0 transition-all duration-700 border-8 border-white/10 backdrop-blur-lg`}>
-                    <Image src={sideImage} alt="Featured" fill className="object-cover scale-110 hover:scale-100 transition-transform duration-1000" />
+          <div className="relative z-10 mx-auto max-w-7xl px-6 py-20 w-full">
+            <div className={`flex flex-col lg:flex-row items-center justify-between gap-16`}>
+              <div className="flex-1 w-full">
+                <TextBlock isWhite />
+              </div>
+              {hasImage && (
+                <div className="flex-1 w-full flex justify-center lg:justify-end animate-in fade-in zoom-in duration-1000">
+                  <div className="relative aspect-square lg:aspect-[4/5] w-full max-w-[400px] rounded-[3.5rem] overflow-hidden shadow-[0_48px_96px_-24px_rgba(0,0,0,0.3)] ring-1 ring-white/20 transition-all duration-700 hover:scale-[1.02] lg:-rotate-3 hover:rotate-0">
+                    <Image src={sideImage} alt="Featured" fill className="object-cover" />
                   </div>
                 </div>
               )}
@@ -154,36 +144,22 @@ function Hero({ branding, store, slug }: { branding: any; store: any; slug: stri
 
   return (
     <section className="relative overflow-hidden flex flex-col justify-center min-h-[calc(100vh-116px)]" dir="rtl">
-      {/* Premium Multi-Layered Mesh Background */}
+      {/* Backgrounds */}
       <div className="absolute inset-0 bg-white" />
-      <div
-        className="absolute inset-0 opacity-[0.45] blur-[120px] mix-blend-multiply"
-        style={{
-          backgroundImage: `
-            radial-gradient(at 20% 20%, var(--primary) 0, transparent 45%),
-            radial-gradient(at 80% 80%, var(--primary) 0, transparent 45%),
-            radial-gradient(at 100% 0%, color-mix(in srgb, var(--primary), white) 0, transparent 40%),
-            radial-gradient(at 0% 100%, color-mix(in srgb, var(--primary), black 10%) 0, transparent 40%)
-          `
-        }}
-      />
+      <div className="absolute inset-0 opacity-[0.45] blur-[120px] mix-blend-multiply" style={{ backgroundImage: `radial-gradient(at 20% 20%, var(--primary) 0, transparent 45%), radial-gradient(at 80% 80%, var(--primary) 0, transparent 45%)` }} />
+      <div className="absolute -top-[10%] -right-[5%] w-[900px] h-[900px] rounded-full opacity-[0.2] blur-[180px] animate-pulse" style={{ background: 'var(--primary)' }} />
+      <div className="absolute -bottom-[10%] -left-[5%] w-[800px] h-[800px] rounded-full opacity-[0.15] blur-[150px]" style={{ background: 'var(--primary)' }} />
 
-      {/* Artistic Blurred Auroras */}
-      <div className="absolute -top-[10%] -right-[5%] w-[900px] h-[900px] rounded-full opacity-[0.25] blur-[180px] animate-pulse" style={{ background: 'var(--primary)' }} />
-      <div className="absolute -bottom-[10%] -left-[5%] w-[800px] h-[800px] rounded-full opacity-[0.2] blur-[150px]" style={{ background: 'var(--primary)' }} />
-
-      {/* Glassy Finish Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-white/40 via-transparent to-white/40 pointer-events-none" />
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/p6.png')]" />
-
-      <div className="relative z-10 mx-auto max-w-7xl px-6 py-20">
-        <div className={`flex flex-col ${rowDir} items-center gap-16 lg:gap-28 ${isC ? 'justify-center' : ''}`}>
-          {textContent()}
+      <div className="relative z-10 mx-auto max-w-7xl px-6 py-20 w-full">
+        <div className={`flex flex-col lg:flex-row items-center ${hasImage ? 'lg:justify-between gap-16' : 'justify-center text-center'}`}>
+          <div className={`${hasImage ? 'flex-1 w-full' : 'w-fit max-w-3xl'}`}>
+            <TextBlock />
+          </div>
           {hasImage && (
-            <div className={`${branding?.show_hero_mobile !== false ? 'flex' : 'hidden lg:flex'} lg:flex-1 w-full ${imgJustify} animate-in fade-in zoom-in duration-1000`}>
-              <div className={`relative aspect-square lg:aspect-[4/5] w-full max-w-[340px] lg:max-w-md mx-auto lg:mx-0 rounded-[4rem] overflow-hidden shadow-[0_48px_96px_-24px_rgba(0,0,0,0.12)] ${isR ? 'lg:-rotate-6' : 'lg:rotate-6'} hover:rotate-0 transition-all duration-1000 border-[16px] border-white group`}>
+            <div className="hidden lg:flex flex-1 w-full justify-center lg:justify-end animate-in fade-in zoom-in duration-1000">
+              <div className="relative aspect-square lg:aspect-[4/5] w-full max-w-[440px] rounded-[4.5rem] overflow-hidden shadow-[0_64px_128px_-24px_rgba(0,0,0,0.15)] ring-1 ring-black/5 transition-all duration-1000 hover:scale-[1.03] hover:rotate-0 group animate-float">
                 <Image src={sideImage} alt="Featured" fill className="object-cover scale-110 group-hover:scale-100 transition-transform duration-1000" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
               </div>
             </div>
           )}
@@ -192,6 +168,7 @@ function Hero({ branding, store, slug }: { branding: any; store: any; slug: stri
     </section>
   )
 }
+
 
 // ─── Categories ───────────────────────────────────────────────────────
 function CategoryHighlights({ categories, slug, branding }: { categories: any[]; slug: string; branding: any }) {
@@ -203,7 +180,7 @@ function CategoryHighlights({ categories, slug, branding }: { categories: any[];
         <SectionHeader title="تصفح الأقسام" subtitle="اكتشف مجموعاتنا" />
         <div className="flex flex-wrap justify-center gap-8 md:gap-14 pb-4">
           {categories.map((cat, idx) => (
-            <Link key={idx} href={`/store/${slug}/products?category=${cat.id}`} className="shrink-0 flex flex-col items-center gap-6 group">
+            <Link key={idx} href={`/store/${slug}/products?category=${cat.name}`} className="shrink-0 flex flex-col items-center gap-6 group">
               <div className="h-32 w-32 md:h-48 md:w-48 rounded-full bg-zinc-50 border border-zinc-100 group-hover:border-[var(--primary)]/30 flex items-center justify-center transition-all duration-700 group-hover:scale-110 group-hover:shadow-[0_32px_64px_-16px_rgba(0,0,0,0.15)] relative overflow-hidden">
                 {cat.image_url ? (
                   <Image src={cat.image_url} alt={cat.name} fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
@@ -321,6 +298,16 @@ interface PageProps {
 }
 
 import StoreFooter from '@/components/StoreFooter'
+import { 
+  ElegantHeader, 
+  ElegantHero, 
+  ElegantCategories, 
+  ElegantBestsellers, 
+  ElegantFeatures, 
+  ElegantTestimonials,
+  ElegantFooter,
+  ElegantFAQ
+} from '@/components/store/themes/ElegantTheme'
 
 export default async function StorePage({ params, searchParams }: PageProps) {
   const { slug } = await params
@@ -359,6 +346,7 @@ export default async function StorePage({ params, searchParams }: PageProps) {
   const primaryColor = branding?.primary_color || '#e11d48'
   const secondaryColor = branding?.secondary_color || '#f8fafc'
   const fontFamily = branding?.font_family || 'Cairo'
+  const selectedTheme = (branding as any)?.selected_theme || 'default'
 
   // Fixed order — only check enabled from DB sections
   const shown = (id: string) => isSectionEnabled(branding, id)
@@ -369,8 +357,34 @@ export default async function StorePage({ params, searchParams }: PageProps) {
     .select('*')
     .eq('store_id', store.id)
 
+  const commonStyles = { '--primary': primaryColor, '--secondary': secondaryColor, fontFamily } as any
+
+  // ─── THEME: ELEGANT ────────────────────────────────────────────────────────
+  if (selectedTheme === 'elegant') {
+    return (
+      <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
+        {shown('announcement') && ((branding as any)?.announcement_enabled === true || (branding as any)?.announcement_enabled === 'true') && (
+          <AnnouncementBar text={(branding as any)?.announcement_text || ''} branding={branding} />
+        )}
+        <ElegantHeader store={store} branding={branding} slug={slug} />
+        <ElegantHero branding={branding} store={store} slug={slug} />
+        <ElegantCategories categories={dbCategories || []} slug={slug} />
+        <ElegantBestsellers products={productsWithRatings} slug={slug} branding={branding} />
+        <ElegantFeatures />
+        
+        {shown('testimonials') && (
+          <ElegantTestimonials reviews={storeReviews || []} />
+        )}
+
+        {shown('faq') && <ElegantFAQ branding={branding} />}
+        {shown('footer') && <ElegantFooter store={store} branding={branding} />}
+      </div>
+    )
+  }
+
+  // ─── THEME: DEFAULT (MESH) ─────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-white" dir="rtl" style={{ '--primary': primaryColor, '--secondary': secondaryColor, fontFamily } as any}>
+    <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
       {/* 1. Announcement */}
       {shown('announcement') && ((branding as any)?.announcement_enabled === true || (branding as any)?.announcement_enabled === 'true') && (
         <AnnouncementBar text={(branding as any)?.announcement_text || ''} branding={branding} />

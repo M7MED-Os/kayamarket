@@ -1,10 +1,16 @@
 'use client'
 
 import { useWishlist } from '@/context/WishlistContext'
-import StoreHeader from '@/components/StoreHeader'
-import { Heart, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
+import { Heart, ArrowRight } from 'lucide-react'
+import StoreHeader from '@/components/StoreHeader'
+import StoreFooter from '@/components/StoreFooter'
 import ProductCard from '@/components/product/ProductCard'
+import { 
+  ElegantHeader, 
+  ElegantFooter,
+  ElegantProductCard 
+} from '@/components/store/themes/ElegantTheme'
 
 export default function WishlistView({ params, storeData }: { params: { slug: string }, storeData: any }) {
   const { slug } = params
@@ -14,9 +20,44 @@ export default function WishlistView({ params, storeData }: { params: { slug: st
 
   const { store, branding } = storeData
   const primaryColor = branding?.primary_color || '#e11d48'
+  const selectedTheme = (branding as any)?.selected_theme || 'default'
 
+  const commonStyles = { '--primary': primaryColor } as any
+
+  // ─── THEME: ELEGANT ────────────────────────────────────────────────────────
+  if (selectedTheme === 'elegant') {
+    return (
+      <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
+        <ElegantHeader store={store} branding={branding} slug={slug} />
+        <main className="mx-auto max-w-7xl px-6 py-20">
+          <div className="text-center mb-16 space-y-4">
+             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">قائمتك</span>
+             <h1 className="text-4xl font-light text-zinc-900 tracking-tighter">المنتجات <span className="font-bold underline decoration-zinc-200 underline-offset-8">المفضلة</span></h1>
+          </div>
+
+          {items.length === 0 ? (
+            <div className="text-center py-32 border border-zinc-100 bg-zinc-50/50">
+              <p className="text-lg font-light italic text-zinc-400 mb-8">قائمة المفضلات فارغة</p>
+              <Link href={`/store/${slug}`} className="text-xs font-black uppercase tracking-widest text-zinc-900 border border-zinc-900 px-10 py-4 hover:bg-zinc-900 hover:text-white transition-all duration-500">
+                استكشف المنتجات
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-16">
+              {items.map((item) => (
+                <ElegantProductCard key={item.id} product={item} slug={slug} />
+              ))}
+            </div>
+          )}
+        </main>
+        <ElegantFooter store={store} branding={branding} />
+      </div>
+    )
+  }
+
+  // ─── THEME: DEFAULT ────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-zinc-50 font-inter" dir="rtl" style={{ '--primary': primaryColor } as any}>
+    <div className="min-h-screen bg-zinc-50 font-inter" dir="rtl" style={commonStyles}>
       <StoreHeader store={store} branding={branding} slug={slug} />
 
       <main className="mx-auto max-w-7xl px-6 py-12">
@@ -48,6 +89,7 @@ export default function WishlistView({ params, storeData }: { params: { slug: st
           </div>
         )}
       </main>
+      <StoreFooter store={store} branding={branding} slug={slug} />
     </div>
   )
 }

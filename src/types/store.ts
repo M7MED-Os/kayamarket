@@ -25,6 +25,8 @@ export interface StoreBranding {
   footer_text: string | null;
   invoice_instapay: string | null;
   invoice_wallet: string | null;
+  selected_theme: string | null;
+  theme_config: any | null;
   updated_at: string;
 }
 

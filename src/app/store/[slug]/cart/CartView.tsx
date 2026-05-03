@@ -2,9 +2,14 @@
 
 import { useCart } from '@/context/CartContext'
 import StoreHeader from '@/components/StoreHeader'
+import StoreFooter from '@/components/StoreFooter'
 import { ShoppingBag, Trash2, Plus, Minus, ArrowRight, CreditCard } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { 
+  ElegantHeader, 
+  ElegantFooter 
+} from '@/components/store/themes/ElegantTheme'
 
 export default function CartView({ params, storeData }: { params: { slug: string }, storeData: any }) {
   const { slug } = params
@@ -15,9 +20,94 @@ export default function CartView({ params, storeData }: { params: { slug: string
 
   const { store, branding } = storeData
   const primaryColor = branding?.primary_color || '#e11d48'
+  const selectedTheme = (branding as any)?.selected_theme || 'default'
 
+  const commonStyles = { '--primary': primaryColor } as any
+
+  // ─── THEME: ELEGANT ────────────────────────────────────────────────────────
+  if (selectedTheme === 'elegant') {
+    return (
+      <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
+        <ElegantHeader store={store} branding={branding} slug={slug} />
+        <main className="mx-auto max-w-5xl px-6 py-20">
+          <div className="text-center mb-16 space-y-4">
+             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">سلتك</span>
+             <h1 className="text-4xl font-light text-zinc-900 tracking-tighter">مراجعة <span className="font-bold underline decoration-zinc-200 underline-offset-8">المشتريات</span></h1>
+          </div>
+
+          {items.length === 0 ? (
+            <div className="text-center py-32 border border-zinc-100 bg-zinc-50/50">
+              <p className="text-lg font-light italic text-zinc-400 mb-8">سلتك فارغة حالياً</p>
+              <Link href={`/store/${slug}`} className="text-xs font-black uppercase tracking-widest text-zinc-900 border border-zinc-900 px-10 py-4 hover:bg-zinc-900 hover:text-white transition-all duration-500">
+                تصفح المنتجات
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
+               <div className="lg:col-span-2 space-y-12">
+                   {items.map((item) => (
+                    <div key={item.id} className="flex gap-10 items-start pb-10 border-b border-zinc-100 group">
+                       <div className="relative h-40 w-32 bg-zinc-50 border border-zinc-50 overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-700">
+                          {item.image_url && <img src={item.image_url} alt={item.name} className="h-full w-full object-cover scale-110 group-hover:scale-100 transition-transform duration-700" />}
+                       </div>
+                       <div className="flex-1 space-y-6">
+                          <div className="flex justify-between items-start">
+                             <div className="space-y-1">
+                                <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-widest">{item.name}</h3>
+                                <div className="flex items-center gap-3">
+                                   <div className="text-lg font-light text-zinc-900">{item.price.toLocaleString()} ج.م</div>
+                                   {(item as any).original_price && (item as any).original_price > item.price && (
+                                     <div className="text-xs font-light text-zinc-300 line-through italic">{(item as any).original_price.toLocaleString()} ج.م</div>
+                                   )}
+                                </div>
+                             </div>
+                             <button onClick={() => removeItem(item.id)} className="text-zinc-200 hover:text-zinc-900 transition-colors">
+                                <Trash2 className="h-4 w-4" strokeWidth={1} />
+                             </button>
+                          </div>
+                          
+                          <div className="flex items-center justify-between pt-4">
+                             <div className="flex items-center bg-zinc-50 px-4 py-2 gap-6">
+                                <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="text-zinc-400 hover:text-zinc-900 transition-colors">
+                                   <Minus className="h-3 w-3" />
+                                </button>
+                                <span className="text-sm font-black w-4 text-center">{item.quantity}</span>
+                                <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="text-zinc-400 hover:text-zinc-900 transition-colors">
+                                   <Plus className="h-3 w-3" />
+                                </button>
+                             </div>
+                             <span className="text-sm font-bold text-zinc-900 uppercase tracking-widest">
+                                الإجمالي: {(item.price * item.quantity).toLocaleString()} ج.م
+                             </span>
+                          </div>
+                       </div>
+                    </div>
+                   ))}
+                </div>
+               
+               <div className="lg:col-span-1">
+                  <div className="bg-zinc-50 p-10 space-y-8 sticky top-28">
+                     <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">ملخص الطلب</h3>
+                     <div className="flex justify-between items-end border-b border-zinc-200 pb-4">
+                        <span className="text-xs font-bold text-zinc-400 uppercase">الإجمالي</span>
+                        <span className="text-3xl font-light text-zinc-900 tracking-tighter">{totalPrice.toLocaleString()} ج.م</span>
+                     </div>
+                     <Link href={`/store/${slug}/checkout`} className="w-full h-16 bg-zinc-900 text-white flex items-center justify-center text-xs font-black uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors shadow-lg">
+                        إتمام الطلب
+                     </Link>
+                  </div>
+               </div>
+            </div>
+          )}
+        </main>
+        <ElegantFooter store={store} branding={branding} />
+      </div>
+    )
+  }
+
+  // ─── THEME: DEFAULT ────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-zinc-50 font-inter" dir="rtl" style={{ '--primary': primaryColor } as any}>
+    <div className="min-h-screen bg-zinc-50 font-inter" dir="rtl" style={commonStyles}>
       <StoreHeader store={store} branding={branding} slug={slug} />
 
       <main className="mx-auto max-w-5xl px-6 py-12">
@@ -132,6 +222,7 @@ export default function CartView({ params, storeData }: { params: { slug: string
           </div>
         )}
       </main>
+      <StoreFooter store={store} branding={branding} slug={slug} />
     </div>
   )
 }

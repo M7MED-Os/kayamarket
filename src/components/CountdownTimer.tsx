@@ -5,11 +5,14 @@ import { Timer } from 'lucide-react'
 
 interface CountdownTimerProps {
   endDate: string | Date
+  selectedTheme?: string
 }
 
-export default function CountdownTimer({ endDate }: CountdownTimerProps) {
+export default function CountdownTimer({ endDate, selectedTheme = 'default' }: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState<{ days: number; hours: number; minutes: number; seconds: number } | null>(null)
   const [isExpired, setIsExpired] = useState(false)
+
+  const isElegant = selectedTheme === 'elegant'
 
   useEffect(() => {
     const target = new Date(endDate).getTime()
@@ -37,6 +40,27 @@ export default function CountdownTimer({ endDate }: CountdownTimerProps) {
 
   if (isExpired || !timeLeft) return null
 
+  if (isElegant) {
+    return (
+      <div className="flex flex-col items-start justify-center gap-2 w-full" dir="rtl">
+        <div className="flex items-center justify-center gap-1.5 text-zinc-900">
+          <Timer className="h-3.5 w-3.5" />
+          <span className="text-[10px] font-black uppercase tracking-widest">ينتهي خلال:</span>
+        </div>
+        
+        <div className="flex items-center gap-4" dir="ltr">
+          <TimeUnit value={timeLeft.days} label="يوم" isElegant={true} />
+          <span className="text-zinc-200 font-light">:</span>
+          <TimeUnit value={timeLeft.hours} label="ساعة" isElegant={true} />
+          <span className="text-zinc-200 font-light">:</span>
+          <TimeUnit value={timeLeft.minutes} label="دقيقة" isElegant={true} />
+          <span className="text-zinc-200 font-light">:</span>
+          <TimeUnit value={timeLeft.seconds} label="ثانية" isElegant={true} />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col items-center justify-center gap-1 w-full bg-zinc-900/80 backdrop-blur-md rounded-[1.25rem] py-2 px-3 shadow-2xl border border-white/10">
       <div className="flex items-center justify-center gap-1.5 text-white mb-0.5">
@@ -57,13 +81,13 @@ export default function CountdownTimer({ endDate }: CountdownTimerProps) {
   )
 }
 
-function TimeUnit({ value, label }: { value: number; label: string }) {
+function TimeUnit({ value, label, isElegant }: { value: number; label: string; isElegant?: boolean }) {
   return (
     <div className="flex flex-col items-center min-w-[32px]">
-      <span className="text-lg font-black text-white leading-none tracking-tight">
+      <span className={`text-xl font-light leading-none tracking-tight ${isElegant ? 'text-zinc-900' : 'text-white font-black'}`}>
         {value.toString().padStart(2, '0')}
       </span>
-      <span className="text-[9px] font-bold text-zinc-400 mt-1">{label}</span>
+      <span className={`text-[9px] font-bold mt-1 ${isElegant ? 'text-zinc-400' : 'text-zinc-400'}`}>{label}</span>
     </div>
   )
 }

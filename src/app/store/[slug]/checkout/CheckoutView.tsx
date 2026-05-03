@@ -1,7 +1,6 @@
 'use client'
 
 import { useCart } from '@/context/CartContext'
-import StoreHeader from '@/components/StoreHeader'
 import { CreditCard, Banknote, CheckCircle2, Loader2, Ticket, Phone, User, MapPin } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
@@ -9,6 +8,12 @@ import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 import { createOrderMulti } from '@/app/actions/order'
 import { validateCoupon } from '@/app/actions/coupons'
+import StoreHeader from '@/components/StoreHeader'
+import StoreFooter from '@/components/StoreFooter'
+import { 
+  ElegantHeader, 
+  ElegantFooter 
+} from '@/components/store/themes/ElegantTheme'
 
 export default function CheckoutView({ params, storeData }: { params: { slug: string }, storeData: any }) {
   const { slug } = params
@@ -51,7 +56,10 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
 
   const { store, branding } = storeData
   const primaryColor = branding?.primary_color || '#e11d48'
+  const selectedTheme = (branding as any)?.selected_theme || 'default'
   const finalPrice = totalPrice - (totalPrice * discount / 100)
+
+  const commonStyles = { '--primary': primaryColor } as any
 
   const handleApplyCoupon = async () => {
     if (!couponInput.trim()) return
@@ -123,8 +131,132 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
     }
   }
 
+  // ─── THEME: ELEGANT ────────────────────────────────────────────────────────
+  if (selectedTheme === 'elegant') {
+    return (
+      <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
+        <ElegantHeader store={store} branding={branding} slug={slug} />
+        <main className="mx-auto max-w-5xl px-6 py-20">
+          <div className="text-center mb-16 space-y-4">
+             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">الدفع</span>
+             <h1 className="text-4xl font-light text-zinc-900 tracking-tighter">إكمال <span className="font-bold underline decoration-zinc-200 underline-offset-8">الطلب</span></h1>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
+             {/* Form */}
+             <div className="space-y-12">
+                <div className="space-y-8">
+                   <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">بيانات التوصيل</h3>
+                   <div className="space-y-6">
+                      <div className="space-y-2">
+                         <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">الاسم بالكامل</label>
+                         <input value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm focus:ring-1 focus:ring-zinc-900 transition-all" placeholder="الاسم هنا..." />
+                         {errors.name && <p className="text-[10px] font-bold text-rose-500 pt-1">{errors.name}</p>}
+                      </div>
+                      <div className="space-y-2">
+                         <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">رقم الهاتف</label>
+                         <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm focus:ring-1 focus:ring-zinc-900 transition-all text-right" dir="ltr" placeholder="01234567890" />
+                         {errors.phone && <p className="text-[10px] font-bold text-rose-500 pt-1">{errors.phone}</p>}
+                      </div>
+                      <div className="space-y-2">
+                         <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">العنوان بالتفصيل</label>
+                         <textarea value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm h-32 focus:ring-1 focus:ring-zinc-900 transition-all resize-none" placeholder="المدينة، الشارع، رقم المنزل..." />
+                         {errors.address && <p className="text-[10px] font-bold text-rose-500 pt-1">{errors.address}</p>}
+                      </div>
+                   </div>
+                </div>
+
+                <div className="space-y-8">
+                   <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">طريقة الدفع</h3>
+                   <div className="grid grid-cols-1 gap-4">
+                      {['الدفع عند الاستلام', 'تحويل بنكي / محافظ إلكترونية'].map(method => {
+                        const isCOD = method === 'الدفع عند الاستلام';
+                        const showDeposit = isCOD && settings?.cod_deposit_required;
+                        return (
+                          <button key={method} onClick={() => setPaymentMethod(method)} className={`p-6 text-right border transition-all duration-500 ${paymentMethod === method ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-100 text-zinc-400 hover:border-zinc-300'}`}>
+                             <div className="flex flex-col gap-1">
+                                <span className="text-xs font-black uppercase tracking-widest">{method}</span>
+                                {showDeposit && (
+                                   <span className={`text-[9px] font-bold uppercase ${paymentMethod === method ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                                      مطلوب مقدم {settings.deposit_percentage}% ({(finalPrice * settings.deposit_percentage / 100).toLocaleString()} ج.م)
+                                   </span>
+                                )}
+                             </div>
+                          </button>
+                        );
+                      })}
+                   </div>
+                </div>
+             </div>
+
+             {/* Summary */}
+             <div className="space-y-12">
+                <div className="bg-zinc-50 p-6 sm:p-10 space-y-10">
+                   <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">ملخص الطلب</h3>
+                   <div className="space-y-6">
+                      {items.map(item => (
+                        <div key={item.id} className="flex justify-between items-center group">
+                           <div className="flex items-center gap-4">
+                              <span className="text-[10px] font-bold text-zinc-400 italic">{item.quantity}x</span>
+                              <span className="text-sm font-bold text-zinc-900 uppercase tracking-wide truncate max-w-[120px] sm:max-w-[150px]">{item.name}</span>
+                           </div>
+                           <span className="text-sm font-light text-zinc-400">{(item.price * item.quantity).toLocaleString()} ج.م</span>
+                        </div>
+                      ))}
+                   </div>
+
+                   <div className="pt-10 border-t border-zinc-200 space-y-4">
+                      <div className="flex justify-between items-center">
+                         <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">المجموع الفرعي</span>
+                         <span className="text-sm font-bold text-zinc-900">{totalPrice.toLocaleString()} ج.م</span>
+                      </div>
+                      {discount > 0 && (
+                         <div className="flex justify-between items-center text-emerald-600">
+                            <span className="text-[10px] font-black uppercase tracking-widest">خصم ({discount}%)</span>
+                            <span className="text-sm font-bold">-{(totalPrice * discount / 100).toLocaleString()} ج.م</span>
+                         </div>
+                      )}
+                      <div className="flex justify-between items-end pt-4">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-zinc-900">الإجمالي الكلي</span>
+                          <span className="text-3xl font-light text-zinc-900 tracking-tighter">{finalPrice.toLocaleString()} ج.م</span>
+                       </div>
+                    </div>
+
+                    {/* Coupon Section */}
+                    <div className="space-y-4 pt-4">
+                       <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">كوبون الخصم</label>
+                       <div className="flex flex-col sm:flex-row gap-3">
+                          <input 
+                            value={couponInput} 
+                            onChange={e => setCouponInput(e.target.value)} 
+                            className="flex-1 bg-zinc-50 border border-zinc-100 sm:border-none p-4 sm:p-5 text-sm focus:ring-1 focus:ring-zinc-900 transition-all uppercase tracking-widest outline-none" 
+                            placeholder="أدخل الكود..." 
+                          />
+                          <button 
+                            onClick={handleApplyCoupon} 
+                            disabled={isValidatingCoupon || !!appliedCoupon || !couponInput.trim()}
+                            className="w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-0 bg-zinc-900 text-white text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-all disabled:opacity-50 whitespace-nowrap"
+                          >
+                            {isValidatingCoupon ? '...' : appliedCoupon ? 'مطبق' : 'تطبيق'}
+                          </button>
+                       </div>
+                    </div>
+
+                    <button onClick={handleCheckout} disabled={submitting} className="w-full h-20 bg-zinc-900 text-white flex items-center justify-center text-xs font-black uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors shadow-lg disabled:opacity-50">
+                       {submitting ? 'جاري التنفيذ...' : 'تأكيد الطلب الآن'}
+                    </button>
+                </div>
+             </div>
+          </div>
+        </main>
+        <ElegantFooter store={store} branding={branding} />
+      </div>
+    )
+  }
+
+  // ─── THEME: DEFAULT ────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-zinc-50 font-inter" dir="rtl" style={{ '--primary': primaryColor } as any}>
+    <div className="min-h-screen bg-zinc-50 font-inter" dir="rtl" style={commonStyles}>
       <StoreHeader store={store} branding={branding} slug={slug} />
 
       <main className="mx-auto max-w-5xl px-6 py-12">
@@ -184,7 +316,7 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
                     />
                   </div>
                   <button 
-                    onClick={handleApplyCoupon}
+                    onClick={handleApplyCoupon} 
                     disabled={isValidatingCoupon || !!appliedCoupon || !couponInput.trim()}
                     className="px-6 bg-zinc-900 text-white rounded-xl font-bold text-sm hover:bg-zinc-800 transition-all disabled:opacity-50"
                   >
@@ -295,6 +427,7 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
           </div>
         </div>
       </main>
+      <StoreFooter store={store} branding={branding} slug={slug} />
     </div>
   )
 }

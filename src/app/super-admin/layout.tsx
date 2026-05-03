@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { 
   LayoutDashboard, Users, CreditCard, Settings, 
-  LogOut, ShieldCheck, Store, Activity, Globe
+  LogOut, ShieldCheck, Store, Activity, Globe, Palette
 } from 'lucide-react'
 import LogoutButton from '@/components/LogoutButton'
 
@@ -26,6 +26,7 @@ export default async function SuperAdminLayout({
     { href: '/super-admin/upgrade-requests', label: 'طلبات الترقية', icon: CreditCard },
     { href: '/super-admin/merchants', label: 'إدارة المتاجر', icon: Store },
     { href: '/super-admin/plans', label: 'الاشتراكات والأسعار', icon: Settings },
+    { href: '/super-admin/themes', label: 'إدارة الثيمات', icon: Palette },
     { href: '/super-admin/analytics', label: 'الإحصائيات', icon: Activity },
   ]
 

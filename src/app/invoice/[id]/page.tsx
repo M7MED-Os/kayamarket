@@ -80,6 +80,7 @@ export default async function InvoicePage({
                logo_url: branding?.logo_url,
                tagline: branding?.tagline,
                primary_color: branding?.primary_color,
+               selected_theme: branding?.selected_theme,
                instapay: branding?.invoice_instapay,
                wallet: branding?.invoice_wallet,
                cod_deposit_required: settings?.cod_deposit_required,
@@ -190,261 +191,320 @@ export default async function InvoicePage({
       ? `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage)}`
       : null
 
-   return (
-      <div className="min-h-screen bg-zinc-50 font-inter" dir="rtl" style={{ '--store-primary': primaryColor } as any}>
+   const selectedTheme = row.selected_theme || 'default'
 
-         {/* ── Navbar ─────────────────────────────────────────────────────────── */}
-         <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-zinc-200 no-print">
-            <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
-               <Link href={storeBackHref} className="flex items-center gap-3">
-                  {storeBranding?.logo_url && (
-                     <div className="h-9 w-9 rounded-xl flex items-center justify-center font-black shadow-lg overflow-hidden" style={{ background: 'var(--store-primary)', boxShadow: '0 10px 15px -3px color-mix(in srgb, var(--store-primary), transparent 80%)' }}>
-                        <img src={storeBranding.logo_url} className="w-full h-full object-cover" />
+   if (selectedTheme === 'elegant') {
+      return (
+         <div className="min-h-screen bg-white font-inter" dir="rtl">
+            <header className="border-b border-zinc-100 py-8 no-print">
+               <div className="mx-auto max-w-4xl px-6 flex justify-between items-center">
+                  <h1 className="text-xl font-light italic tracking-tighter text-zinc-900 uppercase">{storeName}</h1>
+                  <Link href={storeBackHref} className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-900 flex items-center gap-2">
+                     العودة للمتجر <ArrowRight className="h-3 w-3 rotate-180" />
+                  </Link>
+               </div>
+            </header>
+
+            <main className="mx-auto max-w-4xl px-6 py-16 print:p-0">
+               {/* Success Message */}
+               <div className="mb-16 text-center space-y-4 no-print">
+                  <div className="inline-flex items-center justify-center h-16 w-16 rounded-full border border-zinc-900 mb-4">
+                     <CheckCircle2 className="h-8 w-8 text-zinc-900" />
+                  </div>
+                  <h2 className="text-3xl font-light tracking-tighter text-zinc-900">تم استلام طلبك بنجاح</h2>
+                  <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">شكراً لتسوقكم من {storeName}</p>
+                  
+                  <div className="pt-8 flex justify-center">
+                     <InvoiceActions 
+                        order={order} 
+                        items={items}
+                        storeInfo={storeInfo}
+                        branding={storeBranding}
+                        settings={storeSettings}
+                        hasPdfInvoice={config.hasPdfInvoice} 
+                        storeName={storeName} 
+                        whatsappUrl={whatsappUrl} 
+                        primaryColor="#000" 
+                     />
+                  </div>
+               </div>
+
+               {/* Elegant Invoice Card */}
+               <div className="border border-zinc-100 p-8 md:p-16 space-y-16 print:border-none print:p-0">
+                  <div className="flex flex-col md:flex-row justify-between items-start gap-12">
+                     <div className="space-y-4">
+                        {storeBranding?.logo_url ? (
+                           <img src={storeBranding.logo_url} alt={storeName} className="h-16 object-contain grayscale" />
+                        ) : (
+                           <h1 className="text-3xl font-light italic tracking-tighter text-zinc-900 uppercase">{storeName}</h1>
+                        )}
+                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{storeBranding?.tagline}</p>
+                     </div>
+                     <div className="text-right md:text-left space-y-2">
+                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-300">رقم الفاتورة</span>
+                        <h3 className="text-2xl font-light tracking-tighter text-zinc-900">#{shortId}</h3>
+                        <p className="text-[10px] font-bold text-zinc-400">{new Date(order.created_at).toLocaleDateString('ar-EG')}</p>
+                     </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-16 border-y border-zinc-50 py-12">
+                     <div className="space-y-6">
+                        <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-900">بيانات العميل</h4>
+                        <div className="space-y-4">
+                           <div className="flex items-center gap-3">
+                              <User className="h-4 w-4 text-zinc-300" />
+                              <span className="text-sm font-bold text-zinc-900">{order.customer_name}</span>
+                           </div>
+                           <div className="flex items-center gap-3">
+                              <Phone className="h-4 w-4 text-zinc-300" />
+                              <span className="text-sm font-bold text-zinc-900" dir="ltr">{order.customer_phone}</span>
+                           </div>
+                           <div className="flex items-start gap-3">
+                              <MapPin className="h-4 w-4 text-zinc-300 mt-0.5" />
+                              <span className="text-sm font-bold text-zinc-900 leading-relaxed">{order.customer_address}</span>
+                           </div>
+                        </div>
+                     </div>
+                     <div className="space-y-6">
+                        <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-900">تفاصيل الدفع</h4>
+                        <div className="space-y-4">
+                           <div className="flex items-center gap-3">
+                              <Wallet className="h-4 w-4 text-zinc-300" />
+                              <span className="text-sm font-bold text-zinc-900">{order.payment_method}</span>
+                           </div>
+                           {depositAmount > 0 && order.payment_method === 'الدفع عند الاستلام' && (
+                              <div className="bg-zinc-50 p-6 space-y-3">
+                                 <div className="flex justify-between items-center">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">العربون المطلوب</span>
+                                    <span className="text-sm font-black text-zinc-900">{depositAmount.toLocaleString()} ج.م</span>
+                                 </div>
+                                 <div className="flex justify-between items-center">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">المتبقي</span>
+                                    <span className="text-sm font-black text-zinc-900">{(finalPrice - depositAmount).toLocaleString()} ج.م</span>
+                                 </div>
+                              </div>
+                           )}
+                        </div>
+                     </div>
+                  </div>
+
+                  <div className="space-y-8">
+                     <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-900">المنتجات</h4>
+                     <div className="space-y-6">
+                        {items.map((item: any) => (
+                           <div key={item.id} className="flex justify-between items-center group">
+                              <div className="flex items-center gap-6">
+                                 <span className="text-[10px] font-bold text-zinc-300 italic">{item.quantity}x</span>
+                                 <span className="text-sm font-bold text-zinc-900 uppercase tracking-wide">{item.product_name}</span>
+                              </div>
+                              <span className="text-sm font-light text-zinc-400">{(item.product_price * item.quantity).toLocaleString()} ج.م</span>
+                           </div>
+                        ))}
+                     </div>
+
+                     <div className="pt-12 border-t border-zinc-100 space-y-4">
+                        <div className="flex justify-between items-center">
+                           <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">المجموع الفرعي</span>
+                           <span className="text-sm font-bold text-zinc-900">{productPrice.toLocaleString()} ج.م</span>
+                        </div>
+                        {discountPct > 0 && (
+                           <div className="flex justify-between items-center text-zinc-900">
+                              <span className="text-[10px] font-black uppercase tracking-widest italic">خصم ({order.coupon_code || discountPct + '%'})</span>
+                              <span className="text-sm font-bold">-{(productPrice * discountPct / 100).toLocaleString()} ج.م</span>
+                           </div>
+                        )}
+                        <div className="flex justify-between items-end pt-8">
+                           <span className="text-[10px] font-black uppercase tracking-widest text-zinc-900">الإجمالي الكلي</span>
+                           <span className="text-4xl font-light text-zinc-900 tracking-tighter">{finalPrice.toLocaleString()} ج.م</span>
+                        </div>
+                     </div>
+                  </div>
+
+                  {/* Payment Details */}
+                  {(storeBranding?.invoice_instapay || storeBranding?.invoice_wallet) && (
+                     <div className="pt-16 border-t border-zinc-100 grid grid-cols-1 md:grid-cols-2 gap-12">
+                        {storeBranding?.invoice_instapay && (
+                           <div className="space-y-4">
+                              <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-400">إنستا باي (InstaPay)</h4>
+                              <CopyableText text={storeBranding.invoice_instapay} label="اضغط للنسخ" />
+                           </div>
+                        )}
+                        {storeBranding?.invoice_wallet && (
+                           <div className="space-y-4">
+                              <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-400">محفظة إلكترونية</h4>
+                              <CopyableText text={storeBranding.invoice_wallet} label="اضغط للنسخ" />
+                           </div>
+                        )}
                      </div>
                   )}
-                  <span className="text-lg font-black" style={{ color: primaryColor }}>{storeName}</span>
-               </Link>
-               <Link href={storeBackHref} className="text-xs font-black text-zinc-500 hover:text-zinc-900 flex items-center gap-1">
-                  العودة للمتجر <ArrowRight className="h-4 w-4 rotate-180" />
+               </div>
+
+               {storeSettings?.policies && (
+                  <div className="mt-16 text-center max-w-2xl mx-auto opacity-40">
+                     <p className="text-[10px] font-black uppercase tracking-widest mb-4">سياسات المتجر</p>
+                     <p className="text-[10px] font-bold leading-relaxed whitespace-pre-line">{storeSettings.policies}</p>
+                  </div>
+               )}
+            </main>
+
+            <footer className="py-12 text-center no-print">
+               <p className="text-[9px] font-black text-zinc-300 uppercase tracking-[0.3em]">Kaya Market Platform</p>
+            </footer>
+         </div>
+      )
+   }
+
+   return (
+      <div className="min-h-screen bg-zinc-50 font-inter" dir="rtl" style={{ '--primary': primaryColor } as any}>
+         <header className="bg-white border-b border-zinc-100 py-6 no-print">
+            <div className="mx-auto max-w-4xl px-6 flex justify-between items-center">
+               <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-[var(--primary)] flex items-center justify-center text-white shadow-lg shadow-[var(--primary)]/20">
+                     <CheckCircle2 className="h-6 w-6" />
+                  </div>
+                  <div>
+                     <h1 className="text-xl font-black text-zinc-900">فاتورة الطلب</h1>
+                     <p className="text-xs font-bold text-zinc-400">#{shortId}</p>
+                  </div>
+               </div>
+               <Link href={storeBackHref} className="text-sm font-bold text-zinc-500 hover:text-zinc-900 transition-colors flex items-center gap-2">
+                  <ArrowRight className="h-4 w-4" />
+                  العودة للمتجر
                </Link>
             </div>
          </header>
 
-         <main className="mx-auto max-w-4xl px-6 py-10 print:p-0">
-
-            {/* ── Success Alert ────────────────────────────────────────────── */}
-            <div className="mb-8 p-6 md:p-8 bg-emerald-50 rounded-[2rem] md:rounded-[2.5rem] border-2 border-emerald-100 flex flex-col items-center justify-center text-center gap-6 no-print">
-               <div className="flex flex-col items-center gap-3">
-                  <div className="h-14 w-14 rounded-2xl bg-white flex items-center justify-center text-emerald-600 shadow-sm border border-emerald-100">
-                     <CheckCircle2 className="h-7 w-7" />
-                  </div>
-                  <div>
-                     <h2 className="text-xl md:text-2xl font-black text-emerald-900">تم استلام طلبك بنجاح!</h2>
-                     <p className="mt-2 text-sm font-bold text-emerald-700/70">يرجى تنزيل الفاتورة والضغط على "تأكيد عبر واتساب" لإتمام الطلب</p>
-                  </div>
-               </div>
-               <div className="flex flex-col items-center justify-center gap-4 w-full">
-                  <InvoiceActions 
-                     order={order} 
-                     items={items}
-                     storeInfo={storeInfo}
-                     branding={storeBranding}
-                     settings={storeSettings}
-                     hasPdfInvoice={config.hasPdfInvoice} 
-                     storeName={storeName} 
-                     whatsappUrl={whatsappUrl} 
-                     primaryColor={primaryColor} 
-                  />
-               </div>
-            </div>
-
-            {/* ── Invoice Card ─────────────────────────────────────────────────── */}
-            <div className="bg-white rounded-[3rem] shadow-2xl shadow-zinc-200/50 border border-zinc-100 overflow-hidden print:shadow-none print:border-none print:rounded-none">
-
-               <div className="p-8 md:p-12 border-b-2 border-dashed border-zinc-100 flex flex-col items-center gap-10 text-center">
-                  <div className="flex flex-col items-center gap-4">
-                     {storeBranding?.logo_url && (
-                        <div className="h-28 w-28 relative rounded-[2.5rem] overflow-hidden border-2 border-zinc-50 shadow-xl shadow-zinc-200/50 shrink-0">
-                           <img src={storeBranding.logo_url} alt={storeName} className="object-cover w-full h-full" />
-                        </div>
-                     )}
-                     <div>
-                        <h1 className="text-4xl font-black text-zinc-900 mb-2 tracking-tight">{storeName}</h1>
-                        <p className="text-base font-bold text-zinc-400 max-w-sm">{storeBranding?.tagline || 'شكراً لتعاملكم معنا'}</p>
-                     </div>
-                  </div>
-
-                  <div className="w-full grid grid-cols-2 gap-4 border-t border-zinc-50 pt-10">
-                     <div className="flex flex-col items-start text-right">
-                        <span className="text-[10px] font-black text-zinc-300 uppercase tracking-[0.2em] mb-1.5">رقم الفاتورة</span>
-                        <span className="text-xl md:text-2xl font-black text-zinc-900" dir="ltr">#{shortId}</span>
-                     </div>
-                     <div className="flex flex-col items-end text-left">
-                        <span className="text-[10px] font-black text-zinc-300 uppercase tracking-[0.2em] mb-1.5">تاريخ الإصدار</span>
-                        <span className="text-sm md:text-base font-black text-zinc-900">{new Date(order.created_at).toLocaleDateString('ar-EG')}</span>
-                     </div>
-                  </div>
-               </div>
-
-               <div className="p-8 md:p-12">
-                  {/* ── Customer & Payment Grid ─────────────────────────────────── */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
-                     {/* Customer Info */}
-                     <div className="space-y-6">
-                        <div className="flex items-center gap-3 mb-2">
-                           <div className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--store-primary)' }} />
-                           <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">بيانات العميل</h3>
-                        </div>
-                        <div className="grid gap-5">
-                           <div className="flex items-center gap-4">
-                              <div className="h-10 w-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400 shrink-0">
-                                 <User className="h-5 w-5" />
-                              </div>
-                              <div>
-                                 <p className="text-[10px] font-bold text-zinc-400 mb-0.5">الاسم الكامل</p>
-                                 <p className="text-sm font-black text-zinc-900 leading-none">{order.customer_name}</p>
-                              </div>
-                           </div>
-                           <div className="flex items-center gap-4">
-                              <div className="h-10 w-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400 shrink-0">
-                                 <Phone className="h-5 w-5" />
-                              </div>
-                              <div>
-                                 <p className="text-[10px] font-bold text-zinc-400 mb-0.5">رقم الهاتف</p>
-                                 <p className="text-sm font-black text-zinc-900 leading-none" dir="ltr">{order.customer_phone}</p>
-                              </div>
-                           </div>
-                           <div className="flex items-center gap-4">
-                              <div className="h-10 w-10 rounded-xl bg-zinc-50 flex items-center justify-center text-zinc-400 shrink-0">
-                                 <MapPin className="h-5 w-5" />
-                              </div>
-                              <div>
-                                 <p className="text-[10px] font-bold text-zinc-400 mb-0.5">عنوان التوصيل</p>
-                                 <p className="text-sm font-black text-zinc-900 leading-tight">{order.customer_address}</p>
-                              </div>
-                           </div>
-                        </div>
-                     </div>
-
-                     {/* Payment Info */}
-                     <div className="space-y-6">
-                        <div className="flex items-center gap-3 mb-2">
-                           <div className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--store-primary)' }} />
-                           <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">طريقة الدفع</h3>
-                        </div>
-                        <div className="bg-transparent px-0 py-1 space-y-5">
-                           <div className="flex items-center gap-4">
-                              <div className="h-12 w-12 rounded-2xl bg-zinc-50 flex items-center justify-center text-zinc-900 shadow-sm border border-zinc-100 shrink-0">
-                                 <Wallet className="h-6 w-6" />
-                              </div>
-                              <div>
-                                 <p className="text-[10px] font-bold text-zinc-400 mb-0.5">الوسيلة المختارة</p>
-                                 <p className="text-base font-black text-zinc-900">
-                                    {order.payment_method}
-                                    {depositAmount > 0 && order.payment_method === 'الدفع عند الاستلام' && ' (بمقدم)'}
-                                 </p>
-                              </div>
-                           </div>
-
-                           {depositAmount > 0 && order.payment_method === 'الدفع عند الاستلام' && (
-                              <div className="pt-4 border-t border-zinc-100 flex flex-wrap gap-x-8 gap-y-4">
-                                 <div>
-                                    <p className="text-[10px] font-bold text-amber-600 mb-0.5 uppercase tracking-wider">المبلغ المقدم</p>
-                                    <p className="text-xl font-black text-amber-600 leading-none">{depositAmount.toLocaleString()} ج.م</p>
-                                 </div>
-                                 <div>
-                                    <p className="text-[10px] font-bold text-zinc-400 mb-0.5 uppercase tracking-wider">المتبقي عند الاستلام</p>
-                                    <p className="text-xl font-black text-zinc-900 leading-none">{(finalPrice - depositAmount).toLocaleString()} ج.م</p>
-                                 </div>
-                              </div>
+         <main className="mx-auto max-w-4xl px-6 py-12 print:p-0">
+            <div className="bg-white rounded-[2.5rem] border border-zinc-200 shadow-sm overflow-hidden print:border-none print:shadow-none">
+               <div className="p-8 md:p-12 space-y-12">
+                  {/* Header Info */}
+                  <div className="flex flex-col md:flex-row justify-between gap-8">
+                     <div className="space-y-4">
+                        {storeBranding?.logo_url ? (
+                           <img src={storeBranding.logo_url} alt={storeName} className="h-12 object-contain" />
+                        ) : (
+                           <h2 className="text-2xl font-black text-zinc-900">{storeName}</h2>
+                        )}
+                        <div className="space-y-1">
+                           <p className="text-sm font-bold text-zinc-500 flex items-center gap-2">
+                              <Building2 className="h-4 w-4 opacity-40" />
+                              {storeName}
+                           </p>
+                           {storeInfo.whatsapp_phone && (
+                              <p className="text-sm font-bold text-zinc-500 flex items-center gap-2" dir="ltr">
+                                 <Phone className="h-4 w-4 opacity-40" />
+                                 {storeInfo.whatsapp_phone}
+                              </p>
                            )}
                         </div>
                      </div>
+                     <div className="text-right md:text-left space-y-4">
+                        <InvoiceActions 
+                           order={order} 
+                           items={items}
+                           storeInfo={storeInfo}
+                           branding={storeBranding}
+                           settings={storeSettings}
+                           hasPdfInvoice={config.hasPdfInvoice} 
+                           storeName={storeName} 
+                           whatsappUrl={whatsappUrl} 
+                           primaryColor={primaryColor} 
+                        />
+                     </div>
                   </div>
 
-                  {/* ── Order Summary Section ───────────────────────────────────── */}
-                  <div className="space-y-6 pt-10 border-t border-zinc-50">
-                     <div className="flex items-center gap-3 mb-2">
-                        <div className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--store-primary)' }} />
-                        <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">تفاصيل الطلب والأسعار</h3>
-                     </div>
-
-                     <div className="bg-transparent px-0 py-2">
-                        <div className="space-y-5 mb-8">
-                           {items && items.length > 0 ? (
-                              items.map((item: any) => (
-                                 <div key={item.id} className="flex justify-between items-start text-sm md:text-base font-black group">
-                                    <div className="flex gap-4 items-start">
-                                       <span className="text-zinc-400 bg-zinc-50 px-2 py-0.5 rounded-lg border border-zinc-100 text-[11px] min-w-[32px] text-center">{item.quantity}x</span>
-                                       <span className="text-zinc-900 flex-1 leading-tight">{item.product_name}</span>
-                                    </div>
-                                    <span className="text-zinc-900 shrink-0">{(Number(item.product_price) * item.quantity).toLocaleString()} ج.م</span>
-                                 </div>
-                              ))
-                           ) : (
-                              <div className="flex justify-between items-center text-base font-black">
-                                 <span className="text-zinc-900">{order.product_name}</span>
-                                 <span className="text-zinc-900">{Number(order.product_price).toLocaleString()} ج.م</span>
+                  {/* Customer Info */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-12 border-t border-zinc-100">
+                     <div className="space-y-4">
+                        <h4 className="text-xs font-black text-zinc-400 uppercase tracking-widest px-1">بيانات العميل</h4>
+                        <div className="space-y-3">
+                           <div className="flex items-center gap-3">
+                              <div className="h-8 w-8 rounded-lg bg-zinc-50 flex items-center justify-center text-zinc-400">
+                                 <User className="h-4 w-4" />
                               </div>
-                           )}
-                        </div>
-
-                        <div className="space-y-4 pt-6 border-t border-zinc-100/80">
-                           <div className="flex justify-between text-xs font-bold text-zinc-400 uppercase tracking-widest">
-                              <span>المجموع الفرعي</span>
-                              <span>{productPrice.toLocaleString()} ج.م</span>
+                              <span className="text-sm font-bold text-zinc-900">{order.customer_name}</span>
                            </div>
-
-                           {discountPct > 0 && (
-                              <div className="flex justify-between text-sm font-black text-emerald-600 bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100/50">
-                                 <div className="flex items-center gap-2">
-                                    <div className="h-6 w-6 rounded-lg bg-emerald-100 flex items-center justify-center text-[10px]">%</div>
-                                    <span>خصم الكوبون ({order.coupon_code || discountPct + '%'})</span>
-                                 </div>
-                                 <span dir="ltr">-{((productPrice * discountPct) / 100).toLocaleString()} ج.م</span>
+                           <div className="flex items-center gap-3">
+                              <div className="h-8 w-8 rounded-lg bg-zinc-50 flex items-center justify-center text-zinc-400">
+                                 <Phone className="h-4 w-4" />
                               </div>
-                           )}
-
-                           <div className="flex justify-between items-center pt-6 border-t border-zinc-200">
-                              <span className="text-xl font-black text-zinc-900">الإجمالي النهائي</span>
-                              <span className="text-3xl md:text-4xl font-black tracking-tight" style={{ color: 'var(--store-primary)' }}>
-                                 {finalPrice.toLocaleString()} <span className="text-xs mr-1 font-bold opacity-60 uppercase">ج.م</span>
+                              <span className="text-sm font-bold text-zinc-900" dir="ltr">{order.customer_phone}</span>
+                           </div>
+                           <div className="flex items-start gap-3">
+                              <div className="h-8 w-8 rounded-lg bg-zinc-50 flex items-center justify-center text-zinc-400 shrink-0">
+                                 <MapPin className="h-4 w-4" />
+                              </div>
+                              <span className="text-sm font-bold text-zinc-900 leading-relaxed">{order.customer_address}</span>
+                           </div>
+                        </div>
+                     </div>
+                     <div className="space-y-4">
+                        <h4 className="text-xs font-black text-zinc-400 uppercase tracking-widest px-1">تفاصيل الدفع</h4>
+                        <div className="bg-zinc-50 rounded-2xl p-5 space-y-3">
+                           <div className="flex justify-between items-center text-sm font-bold">
+                              <span className="text-zinc-500">طريقة الدفع</span>
+                              <span className="text-zinc-900">{order.payment_method === 'cod' ? 'دفع عند الاستلام' : order.payment_method}</span>
+                           </div>
+                           <div className="flex justify-between items-center text-sm font-bold">
+                              <span className="text-zinc-500">الحالة</span>
+                              <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-600 text-[10px] font-black uppercase">
+                                 {order.status === 'pending' ? 'قيد المراجعة' : order.status === 'confirmed' ? 'تم التأكيد' : order.status === 'processing' ? 'جاري التجهيز' : order.status === 'shipped' ? 'تم الشحن' : order.status === 'delivered' ? 'تم التوصيل' : order.status}
                               </span>
                            </div>
                         </div>
                      </div>
                   </div>
-               </div>
 
-               <div className="px-8 md:px-12 pb-12">
-                  <div className="flex items-center gap-3 mb-8">
-                     <div className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--store-primary)' }} />
-                     <h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">بيانات التحويل البنكي</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                     <div className="p-6 rounded-[2rem] border-2 border-zinc-50 bg-zinc-50/30 flex flex-col items-center text-center group hover:border-[var(--store-primary)]/30 transition-all">
-                        <div className="h-14 w-14 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform" style={{ color: 'var(--store-primary)' }}>
-                           <Building2 className="h-7 w-7" />
-                        </div>
-                        <p className="text-sm font-black text-zinc-900 mb-2">إنستا باي (InstaPay)</p>
-                        <CopyableText text={storeBranding?.invoice_instapay || 'غير متوفر'} label="اضغط للنسخ" />
-                     </div>
-                     <div className="p-6 rounded-[2rem] border-2 border-zinc-50 bg-zinc-50/30 flex flex-col items-center text-center group hover:border-[var(--store-primary)]/30 transition-all">
-                        <div className="h-14 w-14 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform" style={{ color: 'var(--store-primary)' }}>
-                           <Wallet className="h-7 w-7" />
-                        </div>
-                        <p className="text-sm font-black text-zinc-900 mb-2">محفظة إلكترونية</p>
-                        <CopyableText text={storeBranding?.invoice_wallet || 'غير متوفر'} label="اضغط للنسخ" />
+                  {/* Order Items */}
+                  <div className="space-y-6 pt-12 border-t border-zinc-100">
+                     <h4 className="text-xs font-black text-zinc-400 uppercase tracking-widest px-1">المنتجات</h4>
+                     <div className="space-y-4">
+                        {(items.length > 0 ? items : [{ product_name: order.product_name, quantity: 1, product_price: order.product_price }]).map((item: any, idx: number) => (
+                           <div key={idx} className="flex justify-between items-center p-4 rounded-2xl bg-zinc-50/50 border border-zinc-100 hover:border-zinc-200 transition-colors">
+                              <div className="flex items-center gap-4">
+                                 <div className="h-10 w-10 rounded-xl bg-white border border-zinc-100 flex items-center justify-center font-black text-zinc-900 text-xs">
+                                    {item.quantity}x
+                                 </div>
+                                 <span className="text-sm font-black text-zinc-900">{item.product_name}</span>
+                              </div>
+                              <span className="text-sm font-bold text-zinc-900">{(item.product_price * item.quantity).toLocaleString()} ج.م</span>
+                           </div>
+                        ))}
                      </div>
                   </div>
-               </div>
 
-               <div className="bg-zinc-900 p-12 text-center text-white relative overflow-hidden">
-                  <div className="absolute top-0 left-0 w-full h-full opacity-10" style={{ background: 'var(--store-primary)' }} />
-                  <div className="relative z-10">
-                     <p className="text-sm font-black mb-4">شكراً لتسوقكم من {storeName}</p>
-                     <div className="flex items-center justify-center gap-6">
-                        {whatsappUrl && (
-                           <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-xs font-bold text-zinc-400 hover:text-white transition-colors">
-                              <MessageSquare className="h-4 w-4" />
-                              تواصل عبر واتساب
-                           </a>
+                  {/* Total Summary */}
+                  <div className="pt-12 border-t border-zinc-100 flex flex-col md:flex-row justify-between gap-8">
+                     {storeSettings?.policies && (
+                        <div className="flex-1 max-w-md">
+                           <h4 className="text-xs font-black text-zinc-400 uppercase tracking-widest mb-4 px-1">سياسات المتجر</h4>
+                           <p className="text-[10px] font-bold text-zinc-400 leading-relaxed whitespace-pre-line px-1">{storeSettings.policies}</p>
+                        </div>
+                     )}
+                     <div className="w-full md:w-80 space-y-4">
+                        <div className="flex justify-between items-center text-sm font-bold text-zinc-500 px-1">
+                           <span>المجموع الفرعي</span>
+                           <span>{productPrice.toLocaleString()} ج.م</span>
+                        </div>
+                        {discountPct > 0 && (
+                           <div className="flex justify-between items-center text-sm font-bold text-emerald-600 px-1">
+                              <span>الخصم ({order.coupon_code || discountPct + '%'})</span>
+                              <span>-{(productPrice * discountPct / 100).toLocaleString()} ج.م</span>
+                           </div>
                         )}
+                        <div className="h-px bg-zinc-100 my-4" />
+                        <div className="flex justify-between items-center px-1">
+                           <span className="text-lg font-black text-zinc-900">الإجمالي</span>
+                           <span className="text-2xl font-black text-zinc-900">{finalPrice.toLocaleString()} ج.م</span>
+                        </div>
                      </div>
                   </div>
                </div>
             </div>
-
-            {storeSettings?.policies && (
-               <div className="mt-12 text-center max-w-2xl mx-auto px-6">
-                  <p className="text-[10px] font-black text-zinc-300 uppercase tracking-[0.2em] mb-4">سياسات المتجر</p>
-                  <p className="text-xs font-bold text-zinc-400 leading-relaxed whitespace-pre-line">{storeSettings.policies}</p>
-               </div>
-            )}
          </main>
 
-         <footer className="mt-auto py-10 text-center no-print">
-            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">Powered by KayaMarket</p>
+         <footer className="py-12 text-center no-print opacity-40">
+            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em]">Kaya Market Platform</p>
          </footer>
       </div>
    )

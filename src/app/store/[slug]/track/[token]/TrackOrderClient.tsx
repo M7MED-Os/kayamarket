@@ -14,6 +14,11 @@ const STATUS_STEPS = [
   { id: 'delivered', label: 'تم التوصيل', icon: PackageCheck },
 ]
 
+import { 
+  ElegantHeader, 
+  ElegantFooter 
+} from '@/components/store/themes/ElegantTheme'
+
 export default function TrackOrderClient({ order, store, branding, slug }: any) {
   const [storeRating, setStoreRating] = useState(5)
   const [storeComment, setStoreComment] = useState('')
@@ -31,6 +36,9 @@ export default function TrackOrderClient({ order, store, branding, slug }: any) 
   const currentStepIndex = STATUS_STEPS.findIndex(s => s.id === (order.status === 'paid' ? 'delivered' : order.status))
   
   const primaryColor = branding?.primary_color || '#0ea5e9'
+  const selectedTheme = (branding as any)?.selected_theme || 'default'
+
+  const commonStyles = { '--primary': primaryColor } as any
 
   const handleStoreReview = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -78,8 +86,96 @@ export default function TrackOrderClient({ order, store, branding, slug }: any) 
     )
   }
 
+  // ─── THEME: ELEGANT ────────────────────────────────────────────────────────
+  if (selectedTheme === 'elegant') {
+    return (
+      <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
+        <ElegantHeader store={store} branding={branding} slug={slug} />
+        <main className="mx-auto max-w-4xl px-6 py-20">
+          <div className="text-center mb-16 space-y-4">
+             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">تتبع الطلب</span>
+             <h1 className="text-4xl font-light text-zinc-900 tracking-tighter">تفاصيل <span className="font-bold underline decoration-zinc-200 underline-offset-8">الفاتورة</span></h1>
+             <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest pt-2">#{order.id.split('-')[0]}</p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-12">
+             {/* Status */}
+             <div className="border border-zinc-100 p-10 space-y-8">
+                <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">حالة الطلب</h3>
+                {isCancelled ? (
+                  <div className="text-rose-500 font-bold uppercase tracking-widest">تم إلغاء الطلب</div>
+                ) : (
+                  <div className="flex flex-wrap gap-12">
+                    {STATUS_STEPS.map((step, idx) => {
+                      const isCompleted = currentStepIndex >= idx
+                      return (
+                        <div key={step.id} className="flex items-center gap-3">
+                           <div className={`h-2 w-2 rounded-full ${isCompleted ? 'bg-zinc-900' : 'bg-zinc-100'}`} />
+                           <span className={`text-[10px] font-black uppercase tracking-widest ${isCompleted ? 'text-zinc-900' : 'text-zinc-200'}`}>
+                              {step.label}
+                           </span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+             </div>
+
+             {/* Order Details */}
+             <div className="grid grid-cols-1 md:grid-cols-3 border border-zinc-100 divide-y md:divide-y-0 md:divide-x divide-x-reverse divide-zinc-100">
+                <div className="p-10 space-y-2">
+                   <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">المنتج</span>
+                   <p className="text-lg font-bold text-zinc-900 uppercase tracking-wide">{order.product_name}</p>
+                </div>
+                <div className="p-10 space-y-2">
+                   <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">الإجمالي</span>
+                   <p className="text-lg font-bold text-zinc-900">{order.final_price} ج.م</p>
+                </div>
+                <div className="p-10 space-y-2">
+                   <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">التاريخ</span>
+                   <p className="text-lg font-bold text-zinc-900">{new Date(order.created_at).toLocaleDateString('ar-EG')}</p>
+                </div>
+             </div>
+
+             {/* Reviews */}
+             {isDelivered && (
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                  <div className="border border-zinc-100 p-10 space-y-8">
+                     <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">تقييم المتجر</h3>
+                     {storeSubmitted ? (
+                        <div className="text-sm font-bold text-zinc-400 italic">شكراً لتقييمك</div>
+                     ) : (
+                        <form onSubmit={handleStoreReview} className="space-y-6">
+                           {renderStars(storeRating, setStoreRating)}
+                           <textarea value={storeComment} onChange={(e) => setStoreComment(e.target.value)} className="w-full bg-zinc-50 border-none text-sm p-4 h-24 focus:ring-1 focus:ring-zinc-900 transition-all" placeholder="تعليقك..." />
+                           <button type="submit" className="w-full bg-zinc-900 text-white py-4 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-colors">إرسال</button>
+                        </form>
+                     )}
+                  </div>
+                  <div className="border border-zinc-100 p-10 space-y-8">
+                     <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">تقييم المنتج</h3>
+                     {productSubmitted ? (
+                        <div className="text-sm font-bold text-zinc-400 italic">شكراً لتقييمك</div>
+                     ) : (
+                        <form onSubmit={handleProductReview} className="space-y-6">
+                           {renderStars(productRating, setProductRating)}
+                           <textarea value={productComment} onChange={(e) => setProductComment(e.target.value)} className="w-full bg-zinc-50 border-none text-sm p-4 h-24 focus:ring-1 focus:ring-zinc-900 transition-all" placeholder="تعليقك..." />
+                           <button type="submit" className="w-full bg-zinc-900 text-white py-4 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-colors">إرسال</button>
+                        </form>
+                     )}
+                  </div>
+               </div>
+             )}
+          </div>
+        </main>
+        <ElegantFooter store={store} branding={branding} />
+      </div>
+    )
+  }
+
+  // ─── THEME: DEFAULT ────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-slate-50 font-inter" dir="rtl" style={{ '--primary': primaryColor } as any}>
+    <div className="min-h-screen bg-slate-50 font-inter" dir="rtl" style={commonStyles}>
       <StoreHeader store={store} branding={branding} slug={slug} />
 
       <main className="max-w-4xl mx-auto px-6 py-12">
@@ -239,6 +335,7 @@ export default function TrackOrderClient({ order, store, branding, slug }: any) 
           </Link>
         </div>
       </main>
+      <StoreFooter store={store} branding={branding} slug={slug} />
     </div>
   )
 }

@@ -31,6 +31,11 @@ export async function generateMetadata({ params }: PageProps) {
   }
 }
 
+import { 
+  ElegantHeader, 
+  ElegantFooter 
+} from '@/components/store/themes/ElegantTheme'
+
 export default async function StoreProductPage({ params }: PageProps) {
   const { slug, id } = await params
   const supabase = await createClient()
@@ -54,8 +59,6 @@ export default async function StoreProductPage({ params }: PageProps) {
     getProductRatingSummary(id)
   ])
 
-  if (!product) notFound()
-
   // Increment views
   supabase.rpc('increment_product_views', { product_id: id }).then(() => { })
 
@@ -70,10 +73,77 @@ export default async function StoreProductPage({ params }: PageProps) {
   }
 
   const primaryColor = branding?.primary_color || '#e11d48'
-  const logoSrc = branding?.logo_url || null
+  const selectedTheme = (branding as any)?.selected_theme || 'default'
 
+  const commonStyles = { '--store-primary': primaryColor, '--primary': primaryColor } as any
+
+  // ─── THEME: ELEGANT ────────────────────────────────────────────────────────
+  if (selectedTheme === 'elegant') {
+    return (
+      <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
+        <ElegantHeader store={store} branding={branding} slug={slug} />
+        <main className="mx-auto max-w-7xl px-6 py-20">
+          <div className="grid grid-cols-1 gap-20 lg:grid-cols-2 items-start">
+             {/* Gallery */}
+             <div className="lg:sticky lg:top-28">
+                <div className="relative">
+                   <ImageGallery images={galleryImages} productName={product.name} />
+                </div>
+             </div>
+
+             {/* Details */}
+             <div className="space-y-12">
+                <div className="space-y-6">
+                   <div className="flex items-center gap-4">
+                      <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">المنتج</span>
+                      <div className="h-px flex-1 bg-zinc-100" />
+                   </div>
+                   <h1 className="text-5xl font-light text-zinc-900 leading-tight tracking-tighter">
+                      {product.name}
+                   </h1>
+                   <div className="flex items-baseline gap-4">
+                      <div className="text-3xl font-light text-zinc-900 tracking-tighter">
+                         {Number(product.price).toLocaleString()} ج.م
+                      </div>
+                      {product.original_price && Number(product.original_price) > Number(product.price) && (
+                        <div className="text-lg font-bold text-zinc-300 line-through decoration-zinc-100">
+                           {Number(product.original_price).toLocaleString()} ج.م
+                        </div>
+                      )}
+                   </div>
+                </div>
+
+                {product.description && (
+                  <p className="text-lg text-zinc-500 font-light leading-relaxed italic border-r-2 border-zinc-100 pr-6 py-2">
+                    {product.description}
+                  </p>
+                )}
+
+                <div className="pt-8">
+                   <CheckoutBox product={product} storeId={store.id} storeSlug={slug} selectedTheme={selectedTheme} />
+                </div>
+
+                <div className="pt-12 border-t border-zinc-100">
+                    <ProductReviews 
+                      productId={product.id} 
+                      storeId={store.id}
+                      initialReviews={reviews as any}
+                      averageRating={ratingSummary.average_rating}
+                      totalReviews={ratingSummary.total_reviews}
+                      selectedTheme={selectedTheme}
+                    />
+                </div>
+             </div>
+          </div>
+        </main>
+        <ElegantFooter store={store} branding={branding} />
+      </div>
+    )
+  }
+
+  // ─── THEME: DEFAULT ────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-white font-inter" dir="rtl" style={{ '--store-primary': primaryColor, '--primary': primaryColor } as any}>
+    <div className="min-h-screen bg-white font-inter" dir="rtl" style={commonStyles}>
 
       <StoreHeader store={store} branding={branding} slug={slug} />
 
@@ -93,7 +163,7 @@ export default async function StoreProductPage({ params }: PageProps) {
 
           {/* ── Gallery (Left on Desktop, Top on Mobile) ── */}
           <div className="lg:sticky lg:top-28 relative">
-            <div className="rounded-[3rem] overflow-hidden border border-zinc-100 shadow-2xl shadow-zinc-200/50">
+            <div className="rounded-[3rem] border border-zinc-100 shadow-2xl shadow-zinc-200/50">
               <ImageGallery images={galleryImages} productName={product.name} />
             </div>
 
@@ -174,6 +244,7 @@ export default async function StoreProductPage({ params }: PageProps) {
               initialReviews={reviews as any}
               averageRating={ratingSummary.average_rating}
               totalReviews={ratingSummary.total_reviews}
+              selectedTheme={selectedTheme}
             />
 
 

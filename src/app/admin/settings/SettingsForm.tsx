@@ -13,12 +13,12 @@ import {
    Layers, Brush, Building2, BellRing, Info, Share2,
    CheckCircle2, Clock, SmartphoneIcon, MonitorIcon, Truck, ShieldCheck, Headphones, Calendar,
    ChevronRight, ArrowLeft, MoreHorizontal, Check, Wallet, MousePointer2, MapPin,
-   Copy, Trash2, Maximize2, UploadCloud, ArrowRight, Hash, Percent, Zap, Package, X
+   Copy, Trash2, Maximize2, UploadCloud, ArrowRight, Hash, Percent, Zap, Package, X, Lock
 } from 'lucide-react'
 import ImageUpload from '@/components/ImageUpload'
 import { useSearchParams, useRouter } from 'next/navigation'
 
-type ViewType = 'hub' | 'builder' | 'branding' | 'media' | 'identity' | 'checkout' | 'plan' | 'upgrade-checkout'
+type ViewType = 'hub' | 'builder' | 'branding' | 'media' | 'identity' | 'checkout' | 'plan' | 'upgrade-checkout' | 'themes'
 
 interface Section {
    id: string
@@ -54,6 +54,7 @@ export default function SettingsForm({ initialStore, initialBranding, initialSet
    const [faviconUrl, setFaviconUrl] = useState(initialBranding?.favicon_url || '')
    const [invoiceInstapay, setInvoiceInstapay] = useState(initialBranding?.invoice_instapay || '')
    const [invoiceWallet, setInvoiceWallet] = useState(initialBranding?.invoice_wallet || '')
+   const [selectedTheme, setSelectedTheme] = useState(initialBranding?.selected_theme || 'default')
 
    // Helper to generate shades for secondary color
    const getSecondaryPresets = (primary: string) => {
@@ -160,7 +161,7 @@ export default function SettingsForm({ initialStore, initialBranding, initialSet
       sections, headerSettings, showHeroMobile, heroTitle, heroDescription, announcementText, announcementEnabled,
       facebookUrl, instagramUrl, tiktokUrl, storeAddress, codEnabled, codDepositRequired, depositPercentage, policies,
       heroAlignment, heroImageUrl, heroCtaText, bannerOverlayOpacity, featuresData, footerDescription,
-      invoiceInstapay, invoiceWallet, faqData
+      invoiceInstapay, invoiceWallet, faqData, selectedTheme
    ])
 
    const toggleSection = (id: string) => {
@@ -201,6 +202,7 @@ export default function SettingsForm({ initialStore, initialBranding, initialSet
          formData.append('footer_description', footerDescription)
          formData.append('faq_data', JSON.stringify(faqData))
          formData.append('announcement_enabled', announcementEnabled.toString())
+         formData.append('selected_theme', selectedTheme)
          formData.append('show_hero_mobile', showHeroMobile.toString())
          formData.append('cod_enabled', codEnabled.toString())
          formData.append('cod_deposit_required', codDepositRequired.toString())
@@ -228,12 +230,37 @@ export default function SettingsForm({ initialStore, initialBranding, initialSet
    }
 
    const hubItems = [
+      { id: 'themes', label: 'قوالب المتجر', icon: Palette, color: 'text-indigo-600', bg: 'bg-indigo-50' },
       { id: 'builder', label: 'تنسيق المتجر', icon: Layout, color: 'text-blue-600', bg: 'bg-blue-50' },
-      { id: 'branding', label: 'الألوان والخطوط', icon: Palette, color: 'text-purple-600', bg: 'bg-purple-50' },
+      { id: 'branding', label: 'الألوان والخطوط', icon: Brush, color: 'text-purple-600', bg: 'bg-purple-50' },
       { id: 'media', label: 'الشعار والبانر', icon: BannerIcon, color: 'text-amber-600', bg: 'bg-amber-50' },
       { id: 'identity', label: 'المعلومات', icon: Globe, color: 'text-emerald-600', bg: 'bg-emerald-50' },
       { id: 'checkout', label: 'الدفع والسياسات', icon: CreditCard, color: 'text-rose-600', bg: 'bg-rose-50' },
       { id: 'plan', label: 'خطة الاشتراك', icon: Zap, color: 'text-orange-600', bg: 'bg-orange-50' },
+   ]
+
+   const AVAILABLE_THEMES = [
+      {
+         id: 'default',
+         name: 'الافتراضي (Premium Mesh)',
+         desc: 'تصميم عصري بخلفيات متدرجة وتأثيرات زجاجية، مثالي للمتاجر التي تبحث عن مظهر فخم.',
+         requiredPlan: 'starter',
+         preview: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop'
+      },
+      {
+         id: 'elegant',
+         name: 'الأنيق (Minimal Elegant)',
+         desc: 'تصميم بسيط ونظيف يركز على المنتجات والصور الاحترافية، مناسب لمتاجر الأزياء والمجوهرات.',
+         requiredPlan: 'growth',
+         preview: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2670&auto=format&fit=crop'
+      },
+      {
+         id: 'dark-vogue',
+         name: 'دارك فوغ (Dark Vogue)',
+         desc: 'ثيم غامق بلمسات ذهبية للمنتجات الفاخرة.',
+         requiredPlan: 'pro',
+         preview: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2670&auto=format&fit=crop'
+      }
    ]
 
    const setView = (v: ViewType) => router.push(`/admin/settings?tab=${v}`)
@@ -313,6 +340,74 @@ export default function SettingsForm({ initialStore, initialBranding, initialSet
                </div>
 
                <div className="max-w-full space-y-10 animate-in slide-in-from-left-4 duration-500 pb-20">
+
+                  {/* Themes Selection View */}
+                  {currentView === 'themes' && (
+                     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                           {AVAILABLE_THEMES.map((theme) => {
+                              const isLocked = plan === 'starter' && theme.requiredPlan !== 'starter'
+                              const isActive = selectedTheme === theme.id
+
+                              return (
+                                 <div
+                                    key={theme.id}
+                                    className={`group relative flex flex-col bg-white rounded-[2.5rem] border transition-all duration-500 overflow-hidden shadow-sm
+                                ${isActive ? 'border-indigo-600 ring-2 ring-indigo-600/10 shadow-indigo-100' : 'border-slate-100 hover:border-slate-300'}
+                                ${isLocked ? 'grayscale-[0.5] opacity-80' : ''}`}
+                                 >
+                                    <div className="relative h-52 overflow-hidden">
+                                       <img src={theme.preview} alt={theme.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                       {isActive && (
+                                          <div className="absolute inset-0 bg-indigo-600/10 flex items-center justify-center">
+                                             <div className="bg-indigo-600 text-white px-4 py-2 rounded-full text-xs font-black shadow-lg flex items-center gap-2">
+                                                <CheckCircle2 className="h-4 w-4" />
+                                                مفعل حالياً
+                                             </div>
+                                          </div>
+                                       )}
+                                       {isLocked && (
+                                          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-[2px] flex items-center justify-center">
+                                             <div className="bg-white/90 text-slate-900 px-4 py-2 rounded-full text-[10px] font-black shadow-lg flex items-center gap-2 uppercase tracking-widest">
+                                                <Lock className="h-4 w-4" />
+                                                يتطلب ترقية
+                                             </div>
+                                          </div>
+                                       )}
+                                    </div>
+                                    <div className="p-8 flex flex-col flex-1 gap-4">
+                                       <div className="space-y-1">
+                                          <h4 className="text-xl font-black text-slate-900">{theme.name}</h4>
+                                          <p className="text-xs font-bold text-slate-400 leading-relaxed">{theme.desc}</p>
+                                       </div>
+                                       <div className="mt-auto pt-4 flex items-center justify-between">
+                                          <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                                             {theme.requiredPlan === 'starter' ? 'مجاني للجميع' : `باقة ${getPlanName(theme.requiredPlan as any)}`}
+                                          </span>
+                                          {!isActive && !isLocked && (
+                                             <button
+                                                onClick={() => setSelectedTheme(theme.id)}
+                                                className="bg-slate-900 text-white px-6 py-2.5 rounded-xl text-xs font-black hover:bg-indigo-600 transition-all active:scale-95 shadow-lg shadow-slate-100"
+                                             >
+                                                تفعيل الثيم
+                                             </button>
+                                          )}
+                                          {isLocked && (
+                                             <button
+                                                onClick={() => setView('plan')}
+                                                className="bg-indigo-50 text-indigo-600 px-6 py-2.5 rounded-xl text-xs font-black hover:bg-indigo-100 transition-all"
+                                             >
+                                                ترقية الآن
+                                             </button>
+                                          )}
+                                       </div>
+                                    </div>
+                                 </div>
+                              )
+                           })}
+                        </div>
+                     </div>
+                  )}
 
                   {/* Structured Builder View */}
                   {currentView === 'builder' && (
