@@ -5,7 +5,7 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import { 
   LayoutDashboard, ShoppingCart, Package, Settings, ExternalLink, 
   Ticket, Layout, Palette, Globe, CreditCard, Shield, MessageSquare, Star,
-  Menu, X
+  Menu, X, LayoutGrid
 } from 'lucide-react'
 
 interface AdminNavProps {
@@ -28,6 +28,7 @@ export default function AdminNav({ storeSlug }: AdminNavProps) {
 
   const settingsSubItems = [
     { label: 'تنسيق المتجر', tab: 'builder', icon: Layout },
+    { label: 'القوالب', tab: 'themes', icon: Palette },
     { label: 'الألوان والخطوط', tab: 'branding', icon: Palette },
     { label: 'الشعار والبانر', tab: 'media', icon: Globe },
     { label: 'المعلومات', tab: 'identity', icon: MessageSquare },
