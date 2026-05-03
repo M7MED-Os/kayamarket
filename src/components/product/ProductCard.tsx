@@ -97,13 +97,22 @@ export default function ProductCard({ product, slug }: ProductCardProps) {
   return (
     <div className="group relative flex flex-col bg-white rounded-[2.5rem] border border-zinc-100 shadow-sm hover:shadow-2xl hover:shadow-zinc-200/50 transition-all duration-500 hover:-translate-y-2 overflow-hidden">
       
-      {/* Wishlist Button */}
-      <button 
-        onClick={handleToggleWishlist}
-        className={`absolute top-4 left-4 z-20 h-10 w-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-md transition-all shadow-sm ${isFavorite ? 'text-rose-500 bg-white' : 'text-zinc-400 hover:text-rose-500 hover:bg-white'}`}
-      >
-        <Heart className={`h-5 w-5 ${isFavorite ? 'fill-rose-500' : ''}`} />
-      </button>
+      <div className="absolute top-3 left-3 z-20 flex flex-col gap-2">
+        <button 
+          onClick={handleToggleWishlist}
+          className={`h-8 w-8 md:h-10 md:w-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-md transition-all shadow-sm ${isFavorite ? 'text-rose-500 bg-white' : 'text-zinc-400 hover:text-rose-500 hover:bg-white'}`}
+        >
+          <Heart className={`h-4 w-4 md:h-5 md:w-5 ${isFavorite ? 'fill-rose-500' : ''}`} />
+        </button>
+
+        <button 
+          onClick={handleAddToCart}
+          disabled={product.stock === 0}
+          className="h-8 w-8 md:h-10 md:w-10 flex items-center justify-center rounded-full bg-zinc-900/90 text-white backdrop-blur-md transition-all shadow-sm hover:scale-110 active:scale-95 disabled:opacity-50"
+        >
+          <ShoppingCart className="h-4 w-4 md:h-5 md:w-5" />
+        </button>
+      </div>
 
       {/* Product Image */}
       <Link

@@ -67,17 +67,23 @@ export default function CartView({ params, storeData }: { params: { slug: string
                           </div>
                           
                           <div className="flex items-center justify-between pt-4">
-                             <div className="flex items-center bg-zinc-50 px-4 py-2 gap-6">
-                                <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="text-zinc-400 hover:text-zinc-900 transition-colors">
+                             <div className="flex items-center border border-zinc-100 p-1">
+                                <button 
+                                   onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))} 
+                                   className="h-10 w-10 flex items-center justify-center text-zinc-400 hover:text-zinc-900 hover:bg-zinc-50 transition-all active:scale-90"
+                                >
                                    <Minus className="h-3 w-3" />
                                 </button>
-                                <span className="text-sm font-black w-4 text-center">{item.quantity}</span>
-                                <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="text-zinc-400 hover:text-zinc-900 transition-colors">
+                                <span className="text-sm font-black w-8 text-center tabular-nums">{item.quantity}</span>
+                                <button 
+                                   onClick={() => updateQuantity(item.id, item.quantity + 1)} 
+                                   className="h-10 w-10 flex items-center justify-center text-zinc-400 hover:text-zinc-900 hover:bg-zinc-50 transition-all active:scale-90"
+                                >
                                    <Plus className="h-3 w-3" />
                                 </button>
                              </div>
-                             <span className="text-sm font-bold text-zinc-900 uppercase tracking-widest">
-                                الإجمالي: {(item.price * item.quantity).toLocaleString()} ج.م
+                             <span className="text-sm font-bold text-zinc-900 uppercase tracking-widest tabular-nums">
+                                {(item.price * item.quantity).toLocaleString()} ج.م
                              </span>
                           </div>
                        </div>
@@ -161,17 +167,17 @@ export default function CartView({ params, storeData }: { params: { slug: string
                     </div>
                     
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center bg-zinc-50 border border-zinc-100 rounded-xl p-0.5">
+                      <div className="flex items-center bg-zinc-50 border border-zinc-100 rounded-2xl p-1">
                         <button 
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          className="h-8 w-8 flex items-center justify-center rounded-lg bg-white text-zinc-600 hover:text-primary-600 shadow-sm transition-all active:scale-90"
+                          onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                          className="h-9 w-9 flex items-center justify-center rounded-xl bg-white text-zinc-600 hover:text-zinc-900 shadow-sm transition-all active:scale-90"
                         >
                           <Minus className="h-3.5 w-3.5" />
                         </button>
-                        <span className="w-10 text-center text-sm font-black text-zinc-900">{item.quantity}</span>
+                        <span className="w-10 text-center text-sm font-black text-zinc-900 tabular-nums">{item.quantity}</span>
                         <button 
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                          className="h-8 w-8 flex items-center justify-center rounded-lg bg-white text-zinc-600 hover:text-primary-600 shadow-sm transition-all active:scale-90"
+                          className="h-9 w-9 flex items-center justify-center rounded-xl bg-white text-zinc-600 hover:text-zinc-900 shadow-sm transition-all active:scale-90"
                         >
                           <Plus className="h-3.5 w-3.5" />
                         </button>
@@ -179,7 +185,7 @@ export default function CartView({ params, storeData }: { params: { slug: string
                       
                       <button 
                         onClick={() => removeItem(item.id)}
-                        className="text-zinc-400 hover:text-red-500 transition-colors p-2"
+                        className="text-zinc-400 hover:text-rose-500 transition-all p-2 hover:scale-110 active:scale-95"
                       >
                         <Trash2 className="h-5 w-5" />
                       </button>

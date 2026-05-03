@@ -42,7 +42,7 @@ export default function StoreHeader({ store, branding, slug }: StoreHeaderProps)
           <nav className="hidden md:flex items-center gap-8 text-[13px] font-black text-zinc-500 ml-4">
             <Link href={`/store/${slug}/products`} className="hover:text-zinc-900 transition-colors">المنتجات</Link>
             <Link href={`/store/${slug}/track`} className="hover:text-zinc-900 transition-colors flex items-center gap-1"><Truck className="h-4 w-4" /> تتبع طلبك</Link>
-            <a href={`/store/${slug}#contact`} className="hover:text-zinc-900 transition-colors">تواصل معنا</a>
+            <a href={`https://wa.me/${store.whatsapp_phone?.replace(/\D/g, '')}?text=${encodeURIComponent('مرحباً، أود الاستفسار عن بعض المنتجات.')}`} className="hover:text-zinc-900 transition-colors">تواصل معنا</a>
           </nav>
 
           <div className="flex items-center gap-2">

@@ -15,6 +15,8 @@ export const ElegantProductCard = ({ product, slug }: any) => {
   const isWishlisted = isInWishlist(product.id)
   const productImage = product.image_url || (product.images && product.images.length > 0 ? product.images[0] : 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2670&auto=format&fit=crop')
 
+  const { addItem } = useCart()
+
   const handleWishlist = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -24,6 +26,20 @@ export const ElegantProductCard = ({ product, slug }: any) => {
     }
   }
 
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    addItem({ 
+      id: product.id, 
+      name: product.name, 
+      price: product.price || 0, 
+      original_price: product.original_price, 
+      image_url: productImage,
+      quantity: 1 
+    })
+    toast.success('تمت الإضافة للسلة')
+  }
+
   return (
     <Link href={`/store/${slug}/products/${product.id}`} className="group space-y-6">
       <div className="relative aspect-[3/4] overflow-hidden bg-zinc-50 border border-zinc-100 transition-all duration-700 group-hover:border-zinc-900">
@@ -31,14 +47,21 @@ export const ElegantProductCard = ({ product, slug }: any) => {
           src={productImage}
           alt={product.name}
           fill
-          className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-110 group-hover:scale-100"
+          className="object-cover lg:grayscale lg:group-hover:grayscale-0 transition-all duration-700 scale-110 group-hover:scale-100"
         />
-        <div className="absolute top-4 left-4">
+        <div className="absolute top-3 left-3 flex flex-col gap-2">
           <button
             onClick={handleWishlist}
-            className={`h-10 w-10 flex items-center justify-center rounded-full backdrop-blur-md border border-zinc-100 transition-colors ${isWishlisted ? 'bg-rose-500 text-white border-rose-500' : 'bg-white/90 text-zinc-400 hover:text-rose-500'}`}
+            className={`h-8 w-8 md:h-10 md:w-10 flex items-center justify-center rounded-full backdrop-blur-md border transition-all hover:scale-110 active:scale-95 ${isWishlisted ? 'bg-rose-500 text-white border-rose-500' : 'bg-white/90 text-zinc-400 border-zinc-100 hover:text-rose-500'}`}
           >
-            <Heart className={`h-5 w-5 ${isWishlisted ? 'fill-current' : ''}`} strokeWidth={1.5} />
+            <Heart className={`h-4 w-4 md:h-5 md:w-5 ${isWishlisted ? 'fill-current' : ''}`} strokeWidth={1.5} />
+          </button>
+          
+          <button
+            onClick={handleAddToCart}
+            className="h-8 w-8 md:h-10 md:w-10 flex items-center justify-center rounded-full bg-zinc-900/90 text-white backdrop-blur-md border border-zinc-900 transition-all hover:scale-110 active:scale-95 shadow-lg"
+          >
+            <ShoppingBag className="h-4 w-4 md:h-5 md:w-5" strokeWidth={1.5} />
           </button>
         </div>
       </div>
@@ -130,7 +153,7 @@ export const ElegantHero = ({ branding, store, slug }: any) => {
                 <ArrowLeft className="h-4 w-4" />
               </Link>
               <Link
-                href={`https://wa.me/${store.whatsapp_phone?.replace(/\D/g, '')}`}
+                href={`https://wa.me/${store.whatsapp_phone?.replace(/\D/g, '')}?text=${encodeURIComponent('مرحباً، أود الاستفسار عن بعض المنتجات.')}`}
                 className="w-full sm:w-auto border border-zinc-200 text-zinc-900 px-10 py-5 text-sm font-black uppercase tracking-widest hover:bg-zinc-50 transition-all duration-500 flex items-center justify-center gap-3"
               >
                 <MessageSquare className="h-4 w-4" />
@@ -208,42 +231,9 @@ export const ElegantBestsellers = ({ products, slug }: any) => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-16">
-          {products.slice(0, 8).map((product: any) => {
-            const productImage = product.image_url || (product.images && product.images.length > 0 ? product.images[0] : 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2670&auto=format&fit=crop')
-
-            return (
-              <Link key={product.id} href={`/store/${slug}/products/${product.id}`} className="group space-y-6">
-                <div className="relative aspect-[3/4] overflow-hidden bg-zinc-50 border border-zinc-100 transition-all duration-700 group-hover:border-zinc-900">
-                  <Image
-                    src={productImage}
-                    alt={product.name}
-                    fill
-                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 scale-110 group-hover:scale-100"
-                  />
-                  {product.sales_count > 10 && (
-                    <div className="absolute top-4 right-4">
-                      <div className="bg-white/90 backdrop-blur-sm text-zinc-900 px-3 py-1 text-[10px] font-black uppercase tracking-widest border border-zinc-100 shadow-sm">
-                        رائج
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className="space-y-2 text-center">
-                  <h3 className="text-sm font-bold text-zinc-900 group-hover:text-[var(--primary)] transition-colors uppercase tracking-wider line-clamp-1">{product.name}</h3>
-                  <div className="flex flex-col items-center gap-0.5">
-                    <div className="text-lg font-light text-zinc-900 tracking-tighter">
-                      {Number(product.price).toLocaleString()} ج.م
-                    </div>
-                    {product.original_price && Number(product.original_price) > Number(product.price) && (
-                      <div className="text-[10px] font-bold text-zinc-300 line-through decoration-zinc-200">
-                        {Number(product.original_price).toLocaleString()} ج.م
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </Link>
-            )
-          })}
+          {products.slice(0, 8).map((product: any) => (
+            <ElegantProductCard key={product.id} product={product} slug={slug} />
+          ))}
         </div>
       </div>
     </section>
@@ -343,7 +333,7 @@ export const ElegantHeader = ({ store, branding, slug }: any) => {
               </span>
             )}
           </Link>
-          <Link href={`https://wa.me/${store.whatsapp_phone?.replace(/\D/g, '')}`} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-900 border border-zinc-900 px-5 py-2 hover:bg-zinc-900 hover:text-white transition-all duration-500">
+          <Link href={`https://wa.me/${store.whatsapp_phone?.replace(/\D/g, '')}?text=${encodeURIComponent('مرحباً، أود الاستفسار عن بعض المنتجات.')}`} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-900 border border-zinc-900 px-5 py-2 hover:bg-zinc-900 hover:text-white transition-all duration-500">
             <MessageSquare className="h-3 w-3" />
             مساعدة
           </Link>
@@ -469,7 +459,7 @@ export const ElegantFooter = ({ store, branding }: any) => {
               <ul className="space-y-3">
                 {store.whatsapp_phone && (
                   <li>
-                    <Link href={`https://wa.me/${store.whatsapp_phone?.replace(/\D/g, '')}`} className="group flex items-center gap-2 text-[10px] font-bold text-zinc-400 hover:text-zinc-900 transition-colors">
+                    <Link href={`https://wa.me/${store.whatsapp_phone?.replace(/\D/g, '')}?text=${encodeURIComponent('مرحباً، أود الاستفسار عن بعض المنتجات.')}`} className="group flex items-center gap-2 text-[10px] font-bold text-zinc-400 hover:text-zinc-900 transition-colors">
                       <MessageSquare className="h-3 w-3 opacity-40 group-hover:opacity-100" />
                       واتساب
                     </Link>
