@@ -96,7 +96,7 @@ export default function AdminNav({ storeSlug }: AdminNavProps) {
       </nav>
 
       {/* ── Mobile Bottom Navigation (Icons Only) ─────────────────────────── */}
-      <nav className="xl:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-2xl border-t border-slate-200 z-50 flex justify-between items-center px-4 pb-safe-bottom h-20 shadow-[0_-8px_40px_rgba(0,0,0,0.08)]">
+      <nav className="xl:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-2xl border-t border-slate-200 z-50 flex justify-between items-center px-2 pb-safe-bottom h-16 shadow-[0_-8px_40px_rgba(0,0,0,0.08)]">
         {navItems.map((item) => {
           const Icon = item.icon
           const isActive = item.href === '/admin' ? pathname === '/admin' : pathname.startsWith(item.href)
@@ -109,17 +109,17 @@ export default function AdminNav({ storeSlug }: AdminNavProps) {
                 isActive ? 'text-sky-500' : 'text-slate-400 hover:text-slate-600'
               }`}
             >
-              <div className={`p-3 rounded-2xl transition-all duration-500 ${
+              <div className={`p-2.5 rounded-2xl transition-all duration-500 ${
                 isActive 
-                  ? 'bg-sky-500 text-white shadow-lg shadow-sky-200 scale-110 -translate-y-1' 
+                  ? 'bg-sky-500 text-white shadow-lg shadow-sky-200 scale-105 -translate-y-1' 
                   : 'bg-transparent'
               }`}>
-                <Icon className="h-6 w-6" strokeWidth={isActive ? 2.5 : 2} />
+                <Icon className="h-5 w-5" strokeWidth={isActive ? 2.5 : 2} />
               </div>
               
               {/* Active Indicator Dot */}
               {isActive && (
-                <div className="absolute bottom-2 h-1 w-1 bg-sky-500 rounded-full animate-pulse" />
+                <div className="absolute bottom-1.5 h-1 w-1 bg-sky-500 rounded-full animate-pulse" />
               )}
             </Link>
           )

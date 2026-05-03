@@ -46,20 +46,20 @@ export default async function AdminProductsPage() {
       {/* ── Header Section ───────────────────────────────────────────── */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
         <div className="space-y-3">
-          <div className="flex items-center gap-4">
-            <div className="h-12 md:h-16 w-2 bg-sky-500 rounded-full shadow-[0_0_15px_rgba(14,165,233,0.3)]" />
-            <div className="flex flex-col">
-              <div className="flex items-center gap-3">
-                <h2 className="text-3xl md:text-6xl font-black text-slate-900 font-poppins tracking-tighter leading-none">المنتجات</h2>
-                {products && (
-                  <div className="bg-sky-50 text-sky-600 px-5 py-2 rounded-2xl text-sm font-black font-inter border border-sky-100 shadow-sm">
-                    {products.length} منتج
-                  </div>
-                )}
-              </div>
-              <p className="text-slate-400 font-inter text-base md:text-xl font-medium mt-3 max-w-xl">إدارة وتنسيق معروضات متجرك بكل احترافية وسهولة.</p>
-            </div>
+          <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-3 mb-1">
+            <div className="h-8 md:h-10 w-1.5 bg-sky-500 rounded-full shrink-0" />
+            <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter">المنتجات</h2>
+            {products && (
+              <span className="bg-sky-50 text-sky-600 px-3 py-1 rounded-full text-sm font-bold font-inter border border-sky-100 shadow-sm">
+                {products.length} منتج
+              </span>
+            )}
           </div>
+          <p className="text-slate-500 font-medium text-sm md:text-lg max-w-2xl leading-relaxed">
+            إدارة وتنسيق معروضات متجرك بكل احترافية وسهولة.
+          </p>
+        </div>
         </div>
         <ProductHeaderActions />
       </div>

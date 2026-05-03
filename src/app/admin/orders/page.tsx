@@ -54,16 +54,19 @@ export default async function AdminOrdersPage({
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 font-poppins">الطلبات</h2>
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-center gap-3 mb-1">
+            <div className="h-8 md:h-10 w-1.5 bg-sky-500 rounded-full shrink-0" />
+            <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter">الطلبات</h2>
             {count !== null && (
-              <span className="bg-sky-50 text-sky-600 px-3 py-1 rounded-full text-xs font-bold font-inter border border-sky-100 shadow-sm">
+              <span className="bg-sky-50 text-sky-600 px-3 py-1 rounded-full text-sm font-bold font-inter border border-sky-100 shadow-sm">
                 {count} طلب
               </span>
             )}
           </div>
-          <p className="text-slate-500 font-inter text-sm md:text-base mt-2">إدارة ومتابعة طلبات متجرك وتحديث حالاتها بكل سهولة.</p>
+          <p className="text-slate-500 font-medium text-sm md:text-lg max-w-2xl leading-relaxed">
+            إدارة ومتابعة طلبات متجرك وتحديث حالاتها بكل سهولة.
+          </p>
         </div>
       </div>
 

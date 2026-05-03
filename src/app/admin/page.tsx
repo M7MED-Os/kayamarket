@@ -61,11 +61,11 @@ export default async function AdminDashboardPage() {
       {/* ── Header Section ───────────────────────────────────────────── */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-2 text-right">
         <div className="space-y-2">
-          <div className="flex items-center gap-4 mb-1 justify-start">
-            <div className="h-8 md:h-12 w-1.5 bg-sky-500 rounded-full" />
-            <h2 className="text-3xl md:text-5xl font-black text-slate-900 font-poppins tracking-tighter">نظرة عامة</h2>
+          <div className="flex flex-wrap items-center gap-3 mb-1">
+            <div className="h-8 md:h-10 w-1.5 bg-sky-500 rounded-full shrink-0" />
+            <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter">نظرة عامة</h2>
           </div>
-          <p className="text-slate-400 font-inter text-sm md:text-lg max-w-2xl font-bold leading-relaxed">
+          <p className="text-slate-500 font-medium text-sm md:text-lg max-w-2xl leading-relaxed">
             تابع أداء متجرك، نمو مبيعاتك، وإدارة مخزونك بكل سهولة.
           </p>
         </div>

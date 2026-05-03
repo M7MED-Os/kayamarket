@@ -56,13 +56,14 @@ export default async function AdminCoupons() {
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700" dir="rtl">
       
-      {/* ── Minimal Header ───────────────────────────────────────────── */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-3 mb-1">
-          <div className="h-10 w-1.5 bg-sky-500 rounded-full shadow-[0_0_15px_rgba(14,165,233,0.3)]" />
-          <h1 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter leading-none">كوبونات الخصم</h1>
+      <div className="space-y-2 mb-8">
+        <div className="flex flex-wrap items-center gap-3 mb-1">
+          <div className="h-8 md:h-10 w-1.5 bg-sky-500 rounded-full shrink-0" />
+          <h2 className="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter">كوبونات الخصم</h2>
         </div>
-        <p className="text-slate-500 font-medium text-base md:text-lg max-w-xl">أنشئ أكواد خصم جذابة لعملائك لزيادة مبيعات متجرك وتحفيزهم على الشراء.</p>
+        <p className="text-slate-500 font-medium text-sm md:text-lg max-w-2xl leading-relaxed">
+          أنشئ أكواد خصم جذابة لعملائك لزيادة مبيعات متجرك وتحفيزهم على الشراء.
+        </p>
       </div>
 
       <CouponTable 

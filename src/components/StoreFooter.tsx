@@ -2,10 +2,12 @@
 
 import Link from 'next/link'
 import { MapPin, Phone } from 'lucide-react'
+import { getPlanConfig } from '@/lib/subscription'
 
 export default function StoreFooter({ store, branding, slug }: { store: any; branding: any; slug: string }) {
   const logoSrc = branding?.logo_url || null
   const address = branding?.address || store?.address || null
+  const planConfig = getPlanConfig(store?.plan)
 
   return (
     <footer id="contact" className="bg-zinc-950 text-white pt-10 pb-6">
@@ -84,8 +86,24 @@ export default function StoreFooter({ store, branding, slug }: { store: any; bra
             </div>
           </div>
         </div>
-        <div className="pt-6 border-t border-white/5 text-center">
-          <p className="text-zinc-600 text-xs font-bold">© {new Date().getFullYear()} {store?.name}. جميع الحقوق محفوظة.</p>
+        <div className="pt-8 mt-4 border-t border-white/5 text-center flex flex-col items-center gap-5">
+          {!planConfig.canRemoveWatermark && (
+            <a href="https://kayamarket.com" target="_blank" rel="noopener noreferrer" className="group inline-flex items-center gap-3 bg-zinc-900/40 hover:bg-zinc-800 transition-all duration-300 px-5 py-2.5 rounded-2xl border border-zinc-800/50 hover:border-sky-500/30 shadow-sm">
+              <span className="text-zinc-400 text-xs font-bold group-hover:text-zinc-300 transition-colors">بكل فخر، صُنع بواسطة</span>
+              <div className="flex items-center gap-1.5 text-white">
+                <svg viewBox="0 0 100 100" fill="none" className="h-5 w-5 text-sky-500 group-hover:scale-110 transition-transform duration-300">
+                  <path d="M15 50 C15 30.67 30.67 15 50 15 C69.33 15 85 30.67 85 50" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+                  <path d="M85 50 C85 69.33 69.33 85 50 85 C30.67 85 15 69.33 15 50" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+                  <path d="M30 35 L30 65" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+                  <path d="M50 50 L50 70" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+                  <path d="M35 30 L50 50 L65 30" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M70 35 L70 65" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+                </svg>
+                <span className="font-black font-poppins tracking-tighter text-sm group-hover:text-sky-50 transition-colors duration-300">KayaMarket</span>
+              </div>
+            </a>
+          )}
+          <p className="text-zinc-600 text-[11px] font-black tracking-wide">© {new Date().getFullYear()} {store?.name}. جميع الحقوق محفوظة.</p>
         </div>
       </div>
     </footer>

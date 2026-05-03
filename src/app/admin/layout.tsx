@@ -98,9 +98,31 @@ export default async function AdminLayout({ children }: { children: ReactNode })
           <KayaLogo className="h-8 w-8" />
           <span className="text-xl font-black font-poppins text-slate-900 tracking-tighter">KayaMarket</span>
         </div>
-        <div className="h-10 w-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600">
-           <Store className="h-5 w-5" />
-        </div>
+        {storeSlug ? (
+          <>
+            <style>{`
+              @keyframes storePulse {
+                0% { background-color: #f8fafc; color: #0ea5e9; box-shadow: 0 0 0 0 rgba(14, 165, 233, 0.4); }
+                50% { background-color: #0ea5e9; color: #ffffff; box-shadow: 0 0 0 8px rgba(14, 165, 233, 0); transform: scale(1.05); }
+                100% { background-color: #f8fafc; color: #0ea5e9; box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
+              }
+            `}</style>
+            <a 
+              href={`/store/${storeSlug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="زيارة المتجر"
+              className="group relative h-10 w-10 rounded-full border border-sky-200 flex items-center justify-center overflow-hidden active:scale-90 shadow-sm"
+              style={{ animation: 'storePulse 3s infinite' }}
+            >
+               <Store className="h-5 w-5 relative z-10" />
+            </a>
+          </>
+        ) : (
+          <div className="h-10 w-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600">
+             <Store className="h-5 w-5" />
+          </div>
+        )}
       </header>
 
       {/* ── Main Content ─────────────────────────────────────────────────── */}
