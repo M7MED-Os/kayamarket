@@ -9,6 +9,8 @@ import {
   ElegantHeader, 
   ElegantFooter 
 } from '@/components/store/themes/ElegantTheme'
+import StoreHeader from '@/components/StoreHeader'
+import StoreFooter from '@/components/StoreFooter'
 
 const STATUS_STEPS = [
   { id: 'pending', label: 'قيد المراجعة', icon: Clock },

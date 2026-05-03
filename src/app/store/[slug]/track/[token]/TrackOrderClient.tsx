@@ -5,6 +5,7 @@ import { CheckCircle, Clock, Package, PackageCheck, CreditCard, XCircle, Star, S
 import { submitStoreReview, submitProductReview } from '@/app/actions/reviews'
 import toast from 'react-hot-toast'
 import StoreHeader from '@/components/StoreHeader'
+import StoreFooter from '@/components/StoreFooter'
 import Link from 'next/link'
 
 const STATUS_STEPS = [
