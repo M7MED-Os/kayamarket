@@ -47,7 +47,7 @@ export default function CartView({ params, storeData }: { params: { slug: string
                <div className="lg:col-span-2 space-y-12">
                    {items.map((item) => (
                     <div key={item.id} className="flex gap-10 items-start pb-10 border-b border-zinc-100 group">
-                       <div className="relative h-40 w-32 bg-zinc-50 border border-zinc-50 overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-700">
+                       <div className="relative h-40 w-32 bg-zinc-50 border border-zinc-50 overflow-hidden lg:grayscale lg:group-hover:grayscale-0 transition-all duration-700">
                           {item.image_url && <img src={item.image_url} alt={item.name} className="h-full w-full object-cover scale-110 group-hover:scale-100 transition-transform duration-700" />}
                        </div>
                        <div className="flex-1 space-y-6">
