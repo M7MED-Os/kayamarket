@@ -32,8 +32,6 @@ export default async function InvoicePage({
    // 1. Check if there's a logged-in user (Merchant)
    const { data: { user } } = await supabase.auth.getUser()
 
-   console.log(`[Invoice] Access Attempt - ID: ${id}, Token: ${token}, User: ${user?.id || 'GUEST'}`)
-
    // 2. Fetch Order + Items + Store Config in one go using RPC v2
    // We pass the token if available. If not, the RPC will check auth.uid()
    let { data: rows, error: rpcError } = await supabase.rpc('get_order_invoice_v2', {
@@ -43,7 +41,6 @@ export default async function InvoicePage({
 
    // 3. Fallback: If no data but user is logged in, try with Admin Client directly without RPC
    if ((!rows || rows.length === 0) && user) {
-      console.log('[Invoice] RPC returned empty for merchant, falling back to manual Admin fetch...')
       const { createAdminClient } = await import('@/lib/supabase/server')
       const adminSupabase = createAdminClient()
 
@@ -227,7 +224,17 @@ export default async function InvoicePage({
                   </div>
                </div>
                <div className="flex flex-col items-center justify-center gap-4 w-full">
-                  <InvoiceActions order={order} hasPdfInvoice={config.hasPdfInvoice} storeName={storeName} whatsappUrl={whatsappUrl} primaryColor={primaryColor} />
+                  <InvoiceActions 
+                     order={order} 
+                     items={items}
+                     storeInfo={storeInfo}
+                     branding={storeBranding}
+                     settings={storeSettings}
+                     hasPdfInvoice={config.hasPdfInvoice} 
+                     storeName={storeName} 
+                     whatsappUrl={whatsappUrl} 
+                     primaryColor={primaryColor} 
+                  />
                </div>
             </div>
 

@@ -1,6 +1,3 @@
-import fs from 'fs'
-import path from 'path'
-
 export function generateInvoiceHTML(order: any, store: any, branding: any, settings: any = { cod_enabled: true, cod_deposit_required: false }, items: any[] = []) {
     const shortId = (order.order_id || order.id || '000000').split('-')[0].toUpperCase()
     const primaryColor = branding?.primary_color || '#e11d48'

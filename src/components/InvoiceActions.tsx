@@ -5,26 +5,103 @@ import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import UpgradeModal from './UpgradeModal'
 
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
+import { generateInvoiceHTML } from '@/templates/InvoiceHTML'
+
 interface InvoiceActionsProps {
   order: any
+  items?: any[]
+  storeInfo?: any
+  branding?: any
+  settings?: any
   hasPdfInvoice?: boolean
   storeName?: string
   whatsappUrl?: string | null
+  primaryColor?: string
 }
 
-export default function InvoiceActions({ order, hasPdfInvoice = false, storeName = 'المتجر', whatsappUrl = null, primaryColor = '#0ea5e9' }: InvoiceActionsProps & { primaryColor?: string }) {
+export default function InvoiceActions({ 
+  order, 
+  items = [],
+  storeInfo = {},
+  branding = {},
+  settings = {},
+  hasPdfInvoice = false, 
+  storeName = 'المتجر', 
+  whatsappUrl = null, 
+  primaryColor = '#0ea5e9' 
+}: InvoiceActionsProps) {
   const [currentUrl, setCurrentUrl] = useState('')
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
 
-  // Debug log
-  useEffect(() => {
-    console.log('Invoice Permissions:', { storeName, hasPdfInvoice })
-  }, [hasPdfInvoice, storeName])
-
   useEffect(() => {
     setCurrentUrl(window.location.href)
   }, [])
+
+  const generatePdfBlob = async (): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      try {
+        const htmlString = generateInvoiceHTML(order, storeInfo, branding, settings, items);
+        
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'fixed';
+        iframe.style.top = '-10000px';
+        iframe.style.width = '210mm';
+        iframe.style.height = '297mm';
+        document.body.appendChild(iframe);
+
+        iframe.contentDocument?.open();
+        iframe.contentDocument?.write(htmlString);
+        iframe.contentDocument?.close();
+
+        setTimeout(async () => {
+          try {
+            const element = iframe.contentDocument?.querySelector('.container') as HTMLElement;
+            if (!element) throw new Error('Container not found');
+
+            const canvas = await html2canvas(element, { scale: 2, useCORS: true });
+            const imgData = canvas.toDataURL('image/png');
+            
+            const pdf = new jsPDF({
+              orientation: 'portrait',
+              unit: 'mm',
+              format: 'a4'
+            });
+            
+            const imgProps = pdf.getImageProperties(imgData);
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            
+            let heightLeft = imgHeight;
+            let position = 0;
+            
+            // Add first page
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+            heightLeft -= pageHeight;
+            
+            // Add subsequent pages if the invoice is too long
+            while (heightLeft > 0) {
+              position = position - pageHeight;
+              pdf.addPage();
+              pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+              heightLeft -= pageHeight;
+            }
+            
+            resolve(pdf.output('blob'));
+          } catch (err) {
+            reject(err);
+          } finally {
+            document.body.removeChild(iframe);
+          }
+        }, 1500);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
 
   const handleDownload = async () => {
     if (!hasPdfInvoice) {
@@ -36,34 +113,16 @@ export default function InvoiceActions({ order, hasPdfInvoice = false, storeName
     setIsGeneratingPdf(true)
 
     try {
-      // Handle the fact that RPC returns order_id instead of id
-      const actualOrderId = order.order_id || order.id
-      
-      if (!actualOrderId) {
-        throw new Error('Order ID is missing')
-      }
-
-      // Extract the token from the current URL if it exists
-      const urlObj = new URL(window.location.href)
-      const token = urlObj.searchParams.get('token')
-      
-      const apiUrl = token 
-        ? `/api/invoice/${actualOrderId}/pdf?token=${token}`
-        : `/api/invoice/${actualOrderId}/pdf`
-
-      const response = await fetch(apiUrl)
-      if (!response.ok) throw new Error('Failed to generate PDF')
-
-      const blob = await response.blob()
-      const downloadUrl = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = downloadUrl
-      const shortId = actualOrderId.split('-')[0].toUpperCase()
-      a.download = `Invoice-${shortId}.pdf`
-      document.body.appendChild(a)
-      a.click()
-      document.body.removeChild(a)
-      window.URL.revokeObjectURL(downloadUrl)
+      const blob = await generatePdfBlob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = downloadUrl;
+      const shortId = (order.order_id || order.id || '0000').split('-')[0].toUpperCase();
+      a.download = `Invoice-${shortId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(downloadUrl);
     } catch (error) {
       console.error('PDF Download Error:', error)
       toast.error('حدث خطأ أثناء تحميل الفاتورة. يرجى المحاولة مرة أخرى.')
@@ -82,21 +141,9 @@ export default function InvoiceActions({ order, hasPdfInvoice = false, storeName
     setIsGeneratingPdf(true)
 
     try {
-      const actualOrderId = order.order_id || order.id
-      if (!actualOrderId) throw new Error('Order ID is missing')
-
-      const urlObj = new URL(window.location.href)
-      const token = urlObj.searchParams.get('token')
-      const apiUrl = token 
-        ? `/api/invoice/${actualOrderId}/pdf?token=${token}`
-        : `/api/invoice/${actualOrderId}/pdf`
-
-      const response = await fetch(apiUrl)
-      if (!response.ok) throw new Error('Failed to generate PDF')
-
-      const blob = await response.blob()
-      const shortId = actualOrderId.split('-')[0].toUpperCase()
-      const file = new File([blob], `Invoice-${shortId}.pdf`, { type: 'application/pdf' })
+      const blob = await generatePdfBlob();
+      const shortId = (order.order_id || order.id || '0000').split('-')[0].toUpperCase();
+      const file = new File([blob], `Invoice-${shortId}.pdf`, { type: 'application/pdf' });
 
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({
@@ -105,15 +152,14 @@ export default function InvoiceActions({ order, hasPdfInvoice = false, storeName
           text: `فاتورة الطلب رقم #${shortId}`
         })
       } else {
-        // Fallback to direct download if sharing files is not supported
-        const downloadUrl = window.URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = downloadUrl
-        a.download = file.name
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
-        window.URL.revokeObjectURL(downloadUrl)
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = file.name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(downloadUrl);
       }
     } catch (error) {
       console.error('Error sharing PDF:', error)
