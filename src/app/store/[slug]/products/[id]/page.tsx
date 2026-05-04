@@ -159,6 +159,21 @@ export default async function StoreProductPage({ params }: PageProps) {
       <div className="min-h-screen bg-[#FAF3F0]/20" dir="rtl" style={commonStyles}>
         <FloralHeader store={store} branding={branding} slug={slug} />
         <main className="mx-auto max-w-7xl px-6 py-24">
+          {/* Bloom Breadcrumb */}
+          <nav className="mb-10 flex items-center gap-2 flex-wrap" aria-label="breadcrumb">
+            <Link href={`/store/${slug}`} className="text-sm font-bold text-zinc-400 hover:text-[var(--primary)] transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-rose-50 hover:border-rose-100">
+              الرئيسية
+            </Link>
+            <ChevronRight className="h-3.5 w-3.5 text-zinc-300 rotate-180" />
+            <Link href={`/store/${slug}/products`} className="text-sm font-bold text-zinc-400 hover:text-[var(--primary)] transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-rose-50 hover:border-rose-100">
+              المنتجات
+            </Link>
+            <ChevronRight className="h-3.5 w-3.5 text-zinc-300 rotate-180" />
+            <span className="text-sm font-bold text-[var(--primary)] px-3 py-1.5 rounded-full bg-rose-50 border border-rose-100 max-w-[200px] truncate">
+              {product.name}
+            </span>
+          </nav>
+
           <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 items-start">
             {/* Gallery */}
             <div className="lg:sticky lg:top-32 rounded-[2.5rem] overflow-hidden border border-rose-50 shadow-sm">
@@ -169,12 +184,12 @@ export default async function StoreProductPage({ params }: PageProps) {
             <div className="space-y-10">
               <div className="space-y-4">
                 <span className="inline-block px-4 py-1.5 rounded-full bg-rose-50 text-[var(--primary)] text-sm font-bold border border-rose-100">
-                  {product.category || 'باقات زهور'}
+                  {product.category || 'منتج'}
                 </span>
-                <h1 className="text-4xl md:text-5xl font-serif italic text-[#2B2B2B] leading-tight">
+                <h1 className="text-4xl md:text-5xl font-sans font-black text-[#2B2B2B] leading-tight">
                   {product.name}
                 </h1>
-                
+
                 <div className="flex items-center gap-2">
                   <div className="flex gap-1">
                     {[...Array(5)].map((_, idx) => (

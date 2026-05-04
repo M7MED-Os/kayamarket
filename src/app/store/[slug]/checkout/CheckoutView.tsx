@@ -1,8 +1,9 @@
 'use client'
 
 import { useCart } from '@/context/CartContext'
-import { CreditCard, Banknote, CheckCircle2, Loader2, Ticket, Phone, User, MapPin } from 'lucide-react'
+import { CreditCard, Banknote, CheckCircle2, Loader2, Ticket, Phone, User, MapPin, ShoppingBag } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
@@ -274,9 +275,29 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
       <div className="min-h-screen bg-[#FAF3F0]/20" dir="rtl" style={commonStyles}>
         <FloralHeader store={store} branding={branding} slug={slug} />
         <main className="mx-auto max-w-5xl px-6 py-24">
+          {/* Cart → Checkout progress */}
+          <div className="flex items-center justify-center gap-3 mb-10">
+            <Link
+              href={`/store/${slug}/cart`}
+              className="flex items-center gap-2 text-sm font-bold text-zinc-400 hover:text-[var(--primary)] transition-colors px-4 py-2 rounded-full bg-white border border-rose-50 hover:border-rose-100"
+            >
+              <ShoppingBag className="h-4 w-4" />
+              السلة
+            </Link>
+            <div className="flex items-center gap-1">
+              <div className="h-px w-6 bg-[var(--primary)]/30" />
+              <div className="h-1.5 w-1.5 rounded-full bg-[var(--primary)]" />
+              <div className="h-px w-6 bg-[var(--primary)]/30" />
+            </div>
+            <span className="flex items-center gap-2 text-sm font-bold text-[var(--primary)] bg-rose-50 px-4 py-2 rounded-full border border-rose-100">
+              <CreditCard className="h-4 w-4" />
+              تأكيد الطلب
+            </span>
+          </div>
+
           <div className="text-center mb-16 space-y-4">
-            <h1 className="text-4xl md:text-5xl font-serif italic text-[#2B2B2B]">تأكيد الطلب</h1>
-            <p className="text-zinc-500 font-medium">خطوة أخيرة لتأكيد باقتك المميزة</p>
+            <h1 className="text-4xl md:text-5xl font-sans font-black text-[#2B2B2B]">تأكيد الطلب</h1>
+            <p className="text-zinc-500 font-medium">خطوة أخيرة لتأكيد طلبك المميز</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
@@ -287,7 +308,7 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
                       <div className="h-10 w-10 bg-rose-50 rounded-full flex items-center justify-center">
                          <User className="h-5 w-5 text-[var(--primary)]" />
                       </div>
-                      <h3 className="text-lg font-serif text-[#2B2B2B]">بيانات المستلم</h3>
+                       <h3 className="text-lg font-sans font-bold text-[#2B2B2B]">بيانات المستلم</h3>
                    </div>
                    <div className="space-y-6">
                       <div className="space-y-2">
@@ -313,7 +334,7 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
                       <div className="h-10 w-10 bg-emerald-50 rounded-full flex items-center justify-center">
                          <CreditCard className="h-5 w-5 text-emerald-600" />
                       </div>
-                      <h3 className="text-lg font-serif text-[#2B2B2B]">طريقة الدفع</h3>
+                       <h3 className="text-lg font-sans font-bold text-[#2B2B2B]">طريقة الدفع</h3>
                    </div>
                    <div className="grid grid-cols-1 gap-4">
                       {['الدفع عند الاستلام', 'تحويل بنكي / محافظ إلكترونية'].map(method => {
@@ -339,7 +360,7 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
              {/* Summary */}
              <div className="space-y-8 lg:sticky lg:top-32">
                 <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-rose-50 shadow-sm space-y-8">
-                   <h3 className="text-lg font-serif text-[#2B2B2B] border-b border-rose-50 pb-4">ملخص الطلب</h3>
+                   <h3 className="text-lg font-sans font-bold text-[#2B2B2B] border-b border-rose-50 pb-4">ملخص الطلب</h3>
                    <div className="space-y-4">
                       {items.map(item => (
                         <div key={item.id} className="flex justify-between items-center group bg-[#FAF3F0]/20 p-4 rounded-2xl border border-rose-50/50">
@@ -382,7 +403,7 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
                           <button 
                             onClick={handleApplyCoupon} 
                             disabled={isValidatingCoupon || !!appliedCoupon || !couponInput.trim()}
-                            className="px-6 py-4 bg-zinc-900 text-white rounded-xl text-sm font-bold hover:bg-zinc-800 transition-all disabled:opacity-50 whitespace-nowrap"
+                            className="px-6 py-4 bg-[var(--primary)] text-white rounded-xl text-sm font-bold hover:brightness-110 transition-all disabled:opacity-50 whitespace-nowrap shadow-lg shadow-[var(--primary)]/10"
                           >
                             {isValidatingCoupon ? '...' : appliedCoupon ? 'مطبق' : 'تطبيق'}
                           </button>
@@ -465,7 +486,7 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
                   <button 
                     onClick={handleApplyCoupon} 
                     disabled={isValidatingCoupon || !!appliedCoupon || !couponInput.trim()}
-                    className="px-6 bg-zinc-900 text-white rounded-xl font-bold text-sm hover:bg-zinc-800 transition-all disabled:opacity-50"
+                    className="px-6 bg-[var(--primary)] text-white rounded-xl font-bold text-sm hover:brightness-110 transition-all disabled:opacity-50 shadow-lg shadow-[var(--primary)]/10"
                   >
                     {isValidatingCoupon ? <Loader2 className="h-4 w-4 animate-spin" /> : appliedCoupon ? 'مطبق' : 'تطبيق'}
                   </button>
@@ -565,7 +586,7 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
               <button
                 onClick={handleCheckout}
                 disabled={submitting}
-                className="w-full h-14 md:h-16 bg-zinc-900 text-white rounded-xl md:rounded-2xl font-black text-base md:text-lg flex items-center justify-center gap-3 hover:bg-zinc-800 shadow-xl shadow-zinc-200 transition-all active:scale-95 disabled:opacity-50"
+                className="w-full h-14 md:h-16 bg-[var(--primary)] text-white rounded-xl md:rounded-2xl font-black text-base md:text-lg flex items-center justify-center gap-3 hover:brightness-110 shadow-xl shadow-[var(--primary)]/20 transition-all active:scale-95 disabled:opacity-50 disabled:bg-zinc-400 disabled:shadow-none"
               >
                 {submitting ? <Loader2 className="h-5 w-5 md:h-6 md:w-6 animate-spin" /> : <CheckCircle2 className="h-5 w-5 md:h-6 md:w-6" />}
                 تأكيد الطلب

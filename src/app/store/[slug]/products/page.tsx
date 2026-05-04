@@ -15,7 +15,8 @@ import {
 import {
   FloralHeader,
   FloralFooter,
-  FloralProductCard
+  FloralProductCard,
+  FloralSectionTitle
 } from '@/components/store/themes/FloralTheme'
 
 interface PageProps {
@@ -94,7 +95,7 @@ export default async function AllProductsPage({ params, searchParams }: PageProp
           {products.length === 0 ? (
             <div className="text-center py-32 border border-zinc-100 bg-zinc-50/50 rounded-[3rem] mt-12">
               <div className="h-20 w-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
-                 <ShoppingBag className="h-8 w-8 text-zinc-200" />
+                <ShoppingBag className="h-8 w-8 text-zinc-200" />
               </div>
               <p className="text-lg font-light italic text-zinc-400">عذراً، لم نجد أي قطع تطابق بحثك حالياً</p>
             </div>
@@ -116,12 +117,9 @@ export default async function AllProductsPage({ params, searchParams }: PageProp
     return (
       <div className="min-h-screen bg-[#FAF3F0]/20" dir="rtl" style={commonStyles}>
         <FloralHeader store={store} branding={branding} slug={slug} />
-        
+
         <main className="mx-auto max-w-7xl px-6 py-24">
-          <div className="text-center mb-16 space-y-4">
-            <h1 className="text-4xl md:text-5xl font-serif italic text-[#2B2B2B]">الباقات والزهور</h1>
-            <p className="text-zinc-500 font-medium">اختر ما يعبر عن مشاعرك من بين {productsWithRatings.length} منتجاً متاحاً</p>
-          </div>
+          <FloralSectionTitle title="الباقات والزهور" subtitle={`متوفر لدينا ${productsWithRatings.length} منتجاً`} />
 
           <ProductFilters categories={categories} currentCategory={currentCategory as string} slug={`${slug}/products`} searchQuery={searchQuery as string} />
 

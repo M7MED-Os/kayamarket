@@ -38,13 +38,13 @@ export const ElegantProductCard = ({ product, slug }: any) => {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    addItem({ 
-      id: product.id, 
-      name: product.name, 
-      price: product.price || 0, 
-      original_price: product.original_price, 
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price || 0,
+      original_price: product.original_price,
       image_url: productImage,
-      quantity: 1 
+      quantity: 1
     })
     setShowHint(true)
     toast.success('تمت الإضافة للسلة')
@@ -66,7 +66,7 @@ export const ElegantProductCard = ({ product, slug }: any) => {
           >
             <Heart className={`h-4 w-4 md:h-5 md:w-5 ${isWishlisted ? 'fill-current' : ''}`} strokeWidth={1.5} />
           </button>
-          
+
           <div className="relative flex items-center gap-2">
             <button
               onClick={handleAddToCart}
@@ -147,7 +147,7 @@ export const ElegantHero = ({ branding, store, slug }: any) => {
   return (
     <section className="relative bg-white border-b border-zinc-100 overflow-hidden flex flex-col justify-center min-h-[calc(100vh-120px)]" dir="rtl">
       {hasImage && <div className="absolute top-0 right-0 w-px h-full bg-zinc-50 hidden lg:block" style={{ right: '50%' }} />}
-      
+
       <div className="mx-auto max-w-7xl px-6 relative w-full">
         <div className={`flex flex-col lg:flex-row items-center gap-16 ${!hasImage ? 'text-center justify-center' : 'justify-center lg:justify-between'}`}>
           {/* Content */}
@@ -182,7 +182,7 @@ export const ElegantHero = ({ branding, store, slug }: any) => {
           {/* Side Image - ONLY ON LG+ */}
           {hasImage && (
             <div className="flex-1 w-full hidden lg:block">
-               <div className="relative aspect-[4/5] w-full max-w-[450px] mx-auto lg:mr-auto lg:ml-0 group">
+              <div className="relative aspect-[4/5] w-full max-w-[450px] mx-auto lg:mr-auto lg:ml-0 group">
                 <div className="absolute inset-0 border border-zinc-900 translate-x-6 translate-y-6 group-hover:translate-x-4 group-hover:translate-y-4 transition-transform duration-700" />
                 <div className="relative h-full w-full overflow-hidden bg-zinc-50">
                   <Image
@@ -297,7 +297,7 @@ export const ElegantHeader = ({ store, branding, slug }: any) => {
   return (
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-zinc-100" dir="rtl">
       <div className="mx-auto max-w-7xl px-4 md:px-6 h-20 flex items-center justify-between relative">
-        
+
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8">
           <Link href={`/store/${slug}`} className={`text-xs font-black uppercase tracking-widest transition-colors ${isActive(`/store/${slug}`) ? 'text-[var(--primary)]' : 'text-zinc-400 hover:text-[var(--primary)]'}`}>الرئيسية</Link>
@@ -307,17 +307,17 @@ export const ElegantHeader = ({ store, branding, slug }: any) => {
 
         {/* Mobile Left Actions (Cart/Wishlist) */}
         <div className="flex md:hidden items-center gap-4">
-           <Link href={`/store/${slug}/cart`} className="relative text-zinc-400 hover:text-[var(--primary)] transition-colors">
-             <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
-             {totalItems > 0 && <span className="absolute -top-2 -right-2 bg-[var(--primary)] text-white text-[7px] h-3.5 w-3.5 rounded-none flex items-center justify-center font-black shadow-lg">{totalItems}</span>}
-           </Link>
-           <Link href={`/store/${slug}/wishlist`} className="relative text-zinc-400 hover:text-rose-500 transition-colors">
-             <Heart className="h-5 w-5" strokeWidth={1.5} />
-             {wishlistItems.length > 0 && <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-[7px] h-3.5 w-3.5 rounded-none flex items-center justify-center font-black shadow-lg shadow-rose-500/20">{wishlistItems.length}</span>}
-           </Link>
-           <Link href={`/store/${slug}/track`} className={`relative transition-colors ${isActive(`/store/${slug}/track`) ? 'text-[var(--primary)]' : 'text-zinc-400 hover:text-[var(--primary)]'}`}>
-             <Truck className="h-5 w-5" strokeWidth={1.5} />
-           </Link>
+          <Link href={`/store/${slug}/cart`} className="relative text-zinc-400 hover:text-[var(--primary)] transition-colors">
+            <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
+            {totalItems > 0 && <span className="absolute -top-2 -right-2 bg-[var(--primary)] text-white text-[7px] h-3.5 w-3.5 rounded-none flex items-center justify-center font-black shadow-lg">{totalItems}</span>}
+          </Link>
+          <Link href={`/store/${slug}/wishlist`} className="relative text-zinc-400 hover:text-rose-500 transition-colors">
+            <Heart className="h-5 w-5" strokeWidth={1.5} />
+            {wishlistItems.length > 0 && <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-[7px] h-3.5 w-3.5 rounded-none flex items-center justify-center font-black shadow-lg shadow-rose-500/20">{wishlistItems.length}</span>}
+          </Link>
+          <Link href={`/store/${slug}/track`} className={`relative transition-colors ${isActive(`/store/${slug}/track`) ? 'text-[var(--primary)]' : 'text-zinc-400 hover:text-[var(--primary)]'}`}>
+            <Truck className="h-5 w-5" strokeWidth={1.5} />
+          </Link>
         </div>
 
         {/* Logo (Centered Always) */}
@@ -335,33 +335,33 @@ export const ElegantHeader = ({ store, branding, slug }: any) => {
 
         {/* Mobile Right Actions (Home/Products) */}
         <div className="flex md:hidden items-center gap-4">
-           <Link href={`/store/${slug}`} className={`text-[9px] font-black uppercase tracking-widest transition-colors ${isActive(`/store/${slug}`) ? 'text-[var(--primary)]' : 'text-zinc-400'}`}>الرئيسية</Link>
-           <Link href={`/store/${slug}/products`} className={`text-[9px] font-black uppercase tracking-widest transition-colors ${isActive(`/store/${slug}/products`) ? 'text-[var(--primary)]' : 'text-zinc-400'}`}>المنتجات</Link>
+          <Link href={`/store/${slug}`} className={`text-[9px] font-black uppercase tracking-widest transition-colors ${isActive(`/store/${slug}`) ? 'text-[var(--primary)]' : 'text-zinc-400'}`}>الرئيسية</Link>
+          <Link href={`/store/${slug}/products`} className={`text-[9px] font-black uppercase tracking-widest transition-colors ${isActive(`/store/${slug}/products`) ? 'text-[var(--primary)]' : 'text-zinc-400'}`}>المنتجات</Link>
         </div>
 
         {/* Desktop Right Actions */}
-          <div className="hidden md:flex items-center gap-6">
-            <Link href={`/store/${slug}/wishlist`} className="group relative text-zinc-400 hover:text-rose-500 transition-colors">
-              <Heart className="h-5 w-5" strokeWidth={1.5} />
-              {wishlistItems.length > 0 && (
-                <span className="absolute -top-2 -left-2 bg-rose-500 text-white text-[8px] font-black h-4 w-4 rounded-none flex items-center justify-center shadow-lg shadow-rose-500/20">
-                  {wishlistItems.length}
-                </span>
-              )}
-            </Link>
-            <Link href={`/store/${slug}/cart`} className="group relative text-zinc-400 hover:text-[var(--primary)] transition-colors">
-              <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
-              {totalItems > 0 && (
-                <span className="absolute -top-2 -left-2 bg-[var(--primary)] text-white text-[8px] font-black h-4 w-4 rounded-none flex items-center justify-center shadow-lg">
-                  {totalItems}
-                </span>
-              )}
-            </Link>
-            <Link href={`https://wa.me/${store.whatsapp_phone?.replace(/\D/g, '')}?text=${encodeURIComponent('مرحباً، أود الاستفسار عن بعض المنتجات.')}`} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white bg-[var(--primary)] px-5 py-2 hover:brightness-125 transition-all duration-500 rounded-none disabled:brightness-75">
-              <MessageSquare className="h-3 w-3" />
-              مساعدة
-            </Link>
-          </div>
+        <div className="hidden md:flex items-center gap-6">
+          <Link href={`/store/${slug}/wishlist`} className="group relative text-zinc-400 hover:text-rose-500 transition-colors">
+            <Heart className="h-5 w-5" strokeWidth={1.5} />
+            {wishlistItems.length > 0 && (
+              <span className="absolute -top-2 -left-2 bg-rose-500 text-white text-[8px] font-black h-4 w-4 rounded-none flex items-center justify-center shadow-lg shadow-rose-500/20">
+                {wishlistItems.length}
+              </span>
+            )}
+          </Link>
+          <Link href={`/store/${slug}/cart`} className="group relative text-zinc-400 hover:text-[var(--primary)] transition-colors">
+            <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
+            {totalItems > 0 && (
+              <span className="absolute -top-2 -left-2 bg-[var(--primary)] text-white text-[8px] font-black h-4 w-4 rounded-none flex items-center justify-center shadow-lg">
+                {totalItems}
+              </span>
+            )}
+          </Link>
+          <Link href={`https://wa.me/${store.whatsapp_phone?.replace(/\D/g, '')}?text=${encodeURIComponent('مرحباً، أود الاستفسار عن بعض المنتجات.')}`} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white bg-[var(--primary)] px-5 py-2 hover:brightness-125 transition-all duration-500 rounded-none disabled:brightness-75">
+            <MessageSquare className="h-3 w-3" />
+            مساعدة
+          </Link>
+        </div>
       </div>
       <div className="h-1 w-full bg-gradient-to-r from-transparent via-[var(--primary)]/20 to-transparent" />
     </header>

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useState, useEffect, useMemo } from 'react'
 import { ShoppingBag, Heart, Menu, X, Flower2, Truck, Gift, Star, ChevronDown, Quote, MessageCircle, ChevronRight } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
@@ -37,28 +38,23 @@ export function StarDeco({ className }: { className?: string }) {
   )
 }
 
-// ─── Mobile Menu ─────────────────────────────────────────────────────────────
-function MobileMenu({ open, onClose, slug }: { open: boolean; onClose: () => void; slug: string }) {
-  if (!open) return null
+// ─── Section Title ───────────────────────────────────────────────────────────
+export function FloralSectionTitle({ title, subtitle, centered = true }: { title: string; subtitle?: string; centered?: boolean }) {
   return (
-    <div className="fixed inset-0 z-[100] flex">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="absolute inset-y-0 right-0 w-72 bg-white shadow-2xl flex flex-col p-8 gap-6 animate-in slide-in-from-right duration-300">
-        <button onClick={onClose} className="self-end p-2 text-zinc-400 hover:text-zinc-700">
-          <X className="h-6 w-6" />
-        </button>
-        <nav className="flex flex-col gap-6 text-lg font-serif italic text-[#2B2B2B]">
-          <Link href={`/store/${slug}/products`} onClick={onClose} className="hover:text-[var(--primary)] transition-colors">كل الباقات</Link>
-          <Link href={`/store/${slug}/track`} onClick={onClose} className="hover:text-[var(--primary)] transition-colors">تتبع طلبك</Link>
-          <Link href={`#features`} onClick={onClose} className="hover:text-[var(--primary)] transition-colors">لماذا نحن</Link>
-        </nav>
-        <div className="mt-auto">
-          <Link href={`/store/${slug}/products`} onClick={onClose} className="w-full flex items-center justify-center gap-2 px-6 py-4 bg-[var(--primary)] text-white rounded-full font-bold shadow-lg shadow-[var(--primary)]/20 hover:-translate-y-0.5 transition-all">
-            <ShoppingBag className="h-5 w-5" />
-            تسوق الآن
-          </Link>
+    <div className={`flex flex-col ${centered ? 'items-center text-center' : 'items-start text-right'} space-y-3 mb-16 group`}>
+      {subtitle && (
+        <div className="flex items-center gap-2 mb-1">
+          <div className="h-px w-6 bg-[var(--primary)]/30 group-hover:w-12 transition-all duration-700" />
+          <span className="text-[10px] font-black text-[var(--primary)] uppercase tracking-[0.3em]">{subtitle}</span>
+          <div className="h-px w-6 bg-[var(--primary)]/30 group-hover:w-12 transition-all duration-700" />
         </div>
-      </div>
+      )}
+      <h2 className="text-4xl md:text-5xl font-sans font-black text-[#2B2B2B] leading-tight relative">
+        {title}
+        <div className={`absolute -bottom-4 ${centered ? 'left-1/2 -translate-x-1/2' : 'right-0'} w-12 h-1 bg-[var(--primary)]/10 rounded-full overflow-hidden`}>
+          <div className="h-full w-full bg-[var(--primary)] -translate-x-full group-hover:translate-x-0 transition-transform duration-700" />
+        </div>
+      </h2>
     </div>
   )
 }
@@ -67,7 +63,6 @@ function MobileMenu({ open, onClose, slug }: { open: boolean; onClose: () => voi
 export function FloralHeader({ store, branding, slug }: { store: any; branding: any; slug: string }) {
   const { totalItems } = useCart()
   const { totalItems: wishCount } = useWishlist()
-  const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -77,56 +72,43 @@ export function FloralHeader({ store, branding, slug }: { store: any; branding: 
   }, [])
 
   return (
-    <>
-      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} slug={slug} />
-      <header className={`sticky top-0 z-50 transition-all duration-500 ${scrolled ? 'bg-white/95 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.04)] border-b border-rose-50' : 'bg-white/70 backdrop-blur-md'}`}>
-        {/* Top accent line */}
-        <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-[var(--primary)] to-transparent opacity-40" />
-        <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
-          {/* Logo */}
-          <Link href={`/store/${slug}`} className="group flex items-center gap-2">
-            {branding?.logo_url ? (
-              <img src={branding.logo_url} alt={store.name} className="h-11 w-auto object-contain group-hover:scale-105 transition-transform duration-300" />
-            ) : (
-              <span className="text-2xl md:text-3xl font-serif italic font-bold text-[var(--primary)] tracking-tight group-hover:opacity-80 transition-opacity">{store.name}</span>
+    <header className={`sticky top-0 z-50 transition-all duration-500 ${scrolled ? 'bg-white/95 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.04)] border-b border-rose-50 py-3' : 'bg-white/80 backdrop-blur-md py-5'}`}>
+      <div className="mx-auto max-w-7xl px-6 flex items-center justify-between relative">
+
+        {/* Right: Nav Links (in RTL) */}
+        <nav className="flex items-center gap-3 md:gap-10">
+          <Link href={`/store/${slug}`} className="text-[11px] md:text-sm font-bold text-zinc-600 hover:text-[var(--primary)] transition-colors">الرئيسية</Link>
+          <Link href={`/store/${slug}/products`} className="text-[11px] md:text-sm font-bold text-zinc-600 hover:text-[var(--primary)] transition-colors">منتجاتنا</Link>
+        </nav>
+
+        {/* Center: Logo */}
+        <Link href={`/store/${slug}`} className="absolute left-1/2 -translate-x-1/2 group">
+          {branding?.logo_url ? (
+            <img src={branding.logo_url} alt={store.name} className="h-10 md:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105" />
+          ) : (
+            <span className="text-2xl md:text-3xl font-sans font-bold text-[var(--primary)] tracking-tight group-hover:opacity-80 transition-opacity whitespace-nowrap">{store.name}</span>
+          )}
+        </Link>
+
+        {/* Left: Icons (Cart, Wishlist, Track) */}
+        <div className="flex items-center gap-0.5 md:gap-1">
+          <Link href={`/store/${slug}/cart`} className="relative p-1.5 md:p-2.5 text-zinc-500 hover:text-[var(--primary)] hover:bg-rose-50 rounded-full transition-all" title="السلة">
+            <ShoppingBag className="h-4.5 w-4.5 md:h-5 md:w-5" />
+            {totalItems > 0 && (
+              <span className="absolute top-0.5 right-0.5 h-3.5 w-3.5 md:h-4 md:w-4 rounded-full bg-[var(--primary)] text-[8px] md:text-[9px] font-black text-white flex items-center justify-center shadow-md">{totalItems}</span>
             )}
           </Link>
-
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-10 text-sm font-bold text-zinc-600">
-            <Link href={`/store/${slug}/products`} className="group flex flex-col items-center gap-0.5">
-              <span className="group-hover:text-[var(--primary)] transition-colors">مجموعتنا</span>
-              <span className="h-0.5 w-0 bg-[var(--primary)] transition-all duration-300 group-hover:w-full rounded-full" />
-            </Link>
-            <Link href={`/store/${slug}/track`} className="group flex flex-col items-center gap-0.5">
-              <span className="group-hover:text-[var(--primary)] transition-colors">تتبع هديتك</span>
-              <span className="h-0.5 w-0 bg-[var(--primary)] transition-all duration-300 group-hover:w-full rounded-full" />
-            </Link>
-            <Link href="#features" className="group flex flex-col items-center gap-0.5">
-              <span className="group-hover:text-[var(--primary)] transition-colors">لماذا نحن</span>
-              <span className="h-0.5 w-0 bg-[var(--primary)] transition-all duration-300 group-hover:w-full rounded-full" />
-            </Link>
-          </nav>
-
-          {/* Actions */}
-          <div className="flex items-center gap-1">
-            <Link href={`/store/${slug}/wishlist`} className="relative p-3 text-zinc-500 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all">
-              <Heart className="h-5 w-5" />
-              {wishCount > 0 && <span className="absolute top-2 right-2 h-3 w-3 rounded-full bg-rose-500 ring-2 ring-white" />}
-            </Link>
-            <Link href={`/store/${slug}/cart`} className="relative p-3 text-zinc-500 hover:text-[var(--primary)] hover:bg-rose-50 rounded-full transition-all">
-              <ShoppingBag className="h-5 w-5" />
-              {totalItems > 0 && (
-                <span className="absolute top-1.5 right-1.5 h-4 w-4 rounded-full bg-[var(--primary)] text-[9px] font-black text-white flex items-center justify-center shadow-md">{totalItems}</span>
-              )}
-            </Link>
-            <button onClick={() => setMenuOpen(true)} className="md:hidden p-3 text-zinc-500 hover:bg-rose-50 rounded-full transition-all">
-              <Menu className="h-6 w-6" />
-            </button>
-          </div>
+          <Link href={`/store/${slug}/wishlist`} className="relative p-1.5 md:p-2.5 text-zinc-500 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-all" title="المفضلة">
+            <Heart className="h-4.5 w-4.5 md:h-5 md:w-5" />
+            {wishCount > 0 && <span className="absolute top-1 right-1 h-2.5 w-2.5 md:h-3.5 md:w-3.5 rounded-full bg-rose-500 ring-2 ring-white" />}
+          </Link>
+          <Link href={`/store/${slug}/track`} className="p-1.5 md:p-2.5 text-zinc-500 hover:text-[var(--primary)] hover:bg-rose-50 rounded-full transition-all" title="تتبع الطلب">
+            <Truck className="h-4.5 w-4.5 md:h-5 md:w-5" />
+          </Link>
         </div>
-      </header>
-    </>
+
+      </div>
+    </header>
   )
 }
 
@@ -155,7 +137,7 @@ export function FloralHero({ branding, store, slug }: { branding: any; store: an
               <span className="text-xs font-black text-[var(--primary)] uppercase tracking-[0.2em]">تشكيلة الموسم</span>
             </div>
 
-            <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-black text-[#2B2B2B] leading-[1.2] tracking-normal drop-shadow-sm max-w-[12em] mx-auto lg:mx-0">
+            <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-black leading-[1.2] tracking-normal drop-shadow-sm max-w-[12em] mx-auto lg:mx-0" style={{ color: 'var(--primary)', filter: 'brightness(0.7)' }}>
               {heroTitle}
             </h1>
 
@@ -205,7 +187,7 @@ export function FloralHero({ branding, store, slug }: { branding: any; store: an
           <div className="relative justify-center order-1 lg:order-2 hidden lg:flex">
             {/* Main arch image */}
             <div className="relative w-[85%] max-w-sm lg:max-w-none aspect-[3/4] rounded-t-full rounded-b-[4rem] overflow-hidden shadow-2xl shadow-rose-900/15 ring-8 ring-white group">
-              <img src={heroImage} alt="Floral Arrangement" className="absolute inset-0 h-full w-full object-cover scale-105 group-hover:scale-110 transition-transform duration-[1.5s]" />
+              <Image src={heroImage} alt={store.name} fill priority sizes="(max-width: 1024px) 0px, 45vw" className="object-cover scale-105 group-hover:scale-110 transition-transform duration-[1.5s]" />
               <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
             </div>
 
@@ -252,9 +234,14 @@ export function FloralProductCard({ product, slug }: { product: any; slug: strin
       {/* Image */}
       <div className="relative aspect-[4/5] overflow-hidden bg-zinc-50 border-b border-rose-50/50">
         <Link href={`/store/${slug}/products/${product.id}`} className="block h-full w-full">
-          <img src={product.image_url} alt={product.name}
-            className="h-full w-full object-cover transition-transform duration-[1.5s] group-hover:scale-110" />
-        </Link>
+            <Image
+              src={product.image_url || '/placeholder.jpg'}
+              alt={product.name}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              className="object-cover transition-transform duration-[1.5s] group-hover:scale-110"
+            />
+          </Link>
         <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
         {/* Badges */}
@@ -264,17 +251,18 @@ export function FloralProductCard({ product, slug }: { product: any; slug: strin
           </span>
         )}
 
-        {/* Wishlist */}
-        <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleItem(product) }}
-          className={`absolute top-3 left-3 h-10 w-10 rounded-full flex items-center justify-center backdrop-blur-xl border border-white/30 shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 ${favorited ? 'bg-rose-500 text-white' : 'bg-white/75 text-zinc-500 hover:text-rose-500'}`}>
-          <Heart className={`h-4.5 w-4.5 ${favorited ? 'fill-current' : ''}`} strokeWidth={2} />
-        </button>
+        {/* Action Group */}
+        <div className="absolute top-3 left-3 flex flex-col gap-2.5 z-10">
+          {/* Wishlist */}
+          <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggleItem(product) }}
+            className={`h-10 w-10 rounded-full flex items-center justify-center backdrop-blur-xl border border-white/30 shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 ${favorited ? 'bg-rose-500 text-white' : 'bg-white/75 text-zinc-500 hover:text-rose-500'}`}>
+            <Heart className={`h-4.5 w-4.5 ${favorited ? 'fill-current' : ''}`} strokeWidth={2} />
+          </button>
 
-        {/* Add to cart - slides up */}
-        <div className="absolute bottom-4 inset-x-4 translate-y-10 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500 z-10">
+          {/* Add to cart */}
           <button onClick={handleAdd}
-            className={`w-full h-12 flex items-center justify-center gap-2 rounded-full font-bold text-sm backdrop-blur-xl shadow-2xl border border-white/20 transition-all hover:scale-[1.02] active:scale-95 ${adding ? 'bg-emerald-500 text-white' : 'bg-white/90 text-[#2B2B2B] hover:bg-[var(--primary)] hover:text-white'}`}>
-            {adding ? <><CheckCircle2 className="h-5 w-5" /> تمت الإضافة</> : <><ShoppingBag className="h-5 w-5" /> أضف للسلة</>}
+            className={`h-10 w-10 rounded-full flex items-center justify-center backdrop-blur-xl border border-white/30 shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 ${adding ? 'bg-emerald-500 text-white' : 'bg-white/75 text-zinc-500 hover:text-[var(--primary)]'}`}>
+            {adding ? <CheckCircle2 className="h-5 w-5" /> : <ShoppingBag className="h-4.5 w-4.5" />}
           </button>
         </div>
       </div>
@@ -282,7 +270,7 @@ export function FloralProductCard({ product, slug }: { product: any; slug: strin
       {/* Info */}
       <div className="px-4 pt-3 pb-6 text-center space-y-1.5">
         <Link href={`/store/${slug}/products/${product.id}`}>
-          <h3 className="font-serif italic text-[#2B2B2B] text-base font-bold line-clamp-1 hover:text-[var(--primary)] transition-colors">{product.name}</h3>
+          <h3 className="font-sans text-[#2B2B2B] text-base font-bold line-clamp-1 hover:text-[var(--primary)] transition-colors">{product.name}</h3>
         </Link>
         <div className="flex items-center justify-center gap-2">
           {product.original_price && product.original_price > product.price && (
@@ -292,6 +280,28 @@ export function FloralProductCard({ product, slug }: { product: any; slug: strin
         </div>
       </div>
     </div>
+  )
+}
+
+// ─── Bestsellers ──────────────────────────────────────────────────────────────
+export function FloralBestsellers({ products, slug }: { products: any[]; slug: string }) {
+  if (!products || products.length === 0) return null
+  const featured = products.slice(0, 4)
+
+  return (
+    <section id="bestsellers" className="py-28 bg-[#FAF3F0]/30 relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-rose-100 to-transparent" />
+      <div className="mx-auto max-w-7xl px-6">
+        {/* Header */}
+        <FloralSectionTitle title="باقاتنا المميزة" subtitle="الأكثر طلباً" />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {featured.map((product) => (
+            <FloralProductCard key={product.id} product={product} slug={slug} />
+          ))}
+        </div>
+      </div>
+    </section>
   )
 }
 
@@ -308,20 +318,7 @@ export function FloralCategories({ categories, slug }: { categories: any[]; slug
     <section className="py-28 bg-white">
       <div className="mx-auto max-w-7xl px-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-6 mb-16">
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <StarDeco className="h-4 w-4 text-[var(--primary)]" />
-              <span className="text-xs font-black text-[var(--primary)] uppercase tracking-[0.25em]">تصفح حسب المناسبة</span>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-serif italic text-[#2B2B2B] leading-tight">أقسام المتجر</h2>
-          </div>
-          <Link href={`/store/${slug}/products`}
-            className="flex items-center gap-2 text-sm font-bold text-zinc-500 hover:text-[var(--primary)] transition-colors group px-6 py-3 rounded-full border border-zinc-200 hover:border-[var(--primary)] shrink-0">
-            عرض الكل
-            <ChevronRight className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-          </Link>
-        </div>
+        <FloralSectionTitle title="أقسام المتجر" subtitle="تصفح حسب المناسبة" />
 
         {/* Grid — elegant arch cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-8">
@@ -329,12 +326,17 @@ export function FloralCategories({ categories, slug }: { categories: any[]; slug
             <Link key={cat.id || i} href={`/store/${slug}/products?category=${cat.name}`}
               className="group flex flex-col items-center gap-5">
               <div className="relative w-full aspect-[3/4] rounded-t-full rounded-b-3xl overflow-hidden border-4 border-white shadow-md ring-1 ring-zinc-100 group-hover:ring-[var(--primary)]/30 group-hover:shadow-2xl group-hover:-translate-y-3 transition-all duration-700">
-                <img src={cat.image_url || placeholders[i % 4]} alt={cat.name}
-                  className="absolute inset-0 h-full w-full object-cover group-hover:scale-110 transition-transform duration-1000" />
+                <Image
+                  src={cat.image_url || placeholders[i % 4]}
+                  alt={cat.name}
+                  fill
+                  sizes="(max-width: 640px) 50vw, 25vw"
+                  className="object-cover group-hover:scale-110 transition-transform duration-1000"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity duration-500" />
               </div>
               <div className="text-center">
-                <h3 className="text-xl font-serif italic text-[#2B2B2B] group-hover:text-[var(--primary)] transition-colors duration-300">{cat.name}</h3>
+                <h3 className="text-xl font-sans font-bold text-[#2B2B2B] group-hover:text-[var(--primary)] transition-colors duration-300">{cat.name}</h3>
               </div>
             </Link>
           ))}
@@ -376,10 +378,7 @@ export function FloralFeatures({ branding }: { branding?: any }) {
   return (
     <section id="features" className="py-28" style={{ background: 'linear-gradient(180deg, #fff 0%, #FAF3F0 100%)' }}>
       <div className="mx-auto max-w-7xl px-6">
-        <div className="text-center mb-16 space-y-4">
-          <h2 className="text-4xl md:text-5xl font-serif italic text-[#2B2B2B]">لماذا تختارنا؟</h2>
-          <p className="text-zinc-500 font-medium max-w-md mx-auto">كل تفصيلة صُممت بعناية لتجعل هديتك لا تُنسى</p>
-        </div>
+        <FloralSectionTitle title="لماذا تختارنا؟" subtitle="بماذا نتميز" />
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feat: any, i: number) => (
             <div key={i} className="group flex flex-col items-center text-center space-y-5 p-8 rounded-[2rem] bg-white border border-zinc-50 hover:border-[var(--primary)]/20 hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
@@ -387,7 +386,7 @@ export function FloralFeatures({ branding }: { branding?: any }) {
                 {getIcon(i)}
               </div>
               <div className="space-y-2">
-                <h4 className="text-xl font-serif text-[#2B2B2B]">{feat.title}</h4>
+                <h4 className="text-xl font-sans font-bold text-[#2B2B2B]">{feat.title}</h4>
                 <p className="text-sm text-zinc-500 font-medium leading-relaxed">{feat.desc}</p>
               </div>
             </div>
@@ -428,13 +427,7 @@ export function FloralTestimonials({ reviews }: { reviews: any[] }) {
       `}</style>
 
       <div className="mx-auto max-w-7xl px-6">
-        <div className="text-center mb-16 space-y-4">
-          <div className="flex items-center justify-center gap-2">
-            <StarDeco className="h-4 w-4 text-[var(--primary)]" />
-            <span className="text-xs font-black text-[var(--primary)] uppercase tracking-[0.25em]">آراء عملائنا</span>
-          </div>
-          <h2 className="text-4xl md:text-5xl font-serif italic text-[#2B2B2B]">مشاعر من القلب</h2>
-        </div>
+        <FloralSectionTitle title="مشاعر من القلب" subtitle="آراء عملائنا" />
       </div>
 
       <div className="relative w-full" dir="ltr">
@@ -481,33 +474,44 @@ export function FloralTestimonials({ reviews }: { reviews: any[] }) {
 
 // ─── FAQ ────────────────────────────────────────────────────────────────────
 export function FloralFAQ({ branding }: { branding: any }) {
+  const [openIdx, setOpenIdx] = useState<number | null>(0)
   const faqs = branding?.faq_data || [
     { q: 'هل يمكن إضافة كارت إهداء مع الباقة؟', a: 'نعم، نوفر كروت إهداء بتصاميم فاخرة مجاناً مع كل طلب.' },
     { q: 'متى يتم التوصيل؟', a: 'نفس اليوم للطلبات قبل الساعة 4 عصراً.' },
-    { q: 'هل الزهور طبيعية وطازجة؟', a: 'نعم، نختار أجود الزهور يومياً من مزارع معتمدة.' },
-    { q: 'هل يمكن إرسال الباقة كهدية مجهولة؟', a: 'بالتأكيد! يمكنك اختيار إرسال الهدية بدون ذكر اسم المُرسل.' },
+    { q: 'هل المنتجات طبيعية وطازجة؟', a: 'نعم، نختار أجود المنتجات يومياً من مصادر معتمدة.' },
+    { q: 'هل يمكن إرسال الطلب كهدية مجهولة؟', a: 'بالتأكيد! يمكنك اختيار إرسال الهدية بدون ذكر اسم المُرسل.' },
   ]
   return (
-    <section className="py-28" style={{ background: '#FAF3F0' }}>
+    <section id="faq" className="py-28" style={{ background: '#FAF3F0' }}>
       <div className="mx-auto max-w-4xl px-6">
-        <div className="text-center mb-16 space-y-4">
-          <h2 className="text-4xl md:text-5xl font-serif italic text-[#2B2B2B]">أسئلة شائعة</h2>
-          <p className="text-zinc-500 font-medium">كل ما تحتاج لمعرفته</p>
-        </div>
+        <FloralSectionTitle title="أسئلة شائعة" subtitle="كل ما تود معرفته" />
         <div className="space-y-4">
-          {faqs.map((faq: any, i: number) => (
-            <details key={i} className="group bg-white rounded-[2rem] overflow-hidden border border-transparent hover:border-rose-100 transition-all duration-300 hover:shadow-md">
-              <summary className="flex items-center justify-between cursor-pointer p-7 font-serif italic text-lg text-[#2B2B2B] list-none gap-4">
-                <span>{faq.q}</span>
-                <div className="h-9 w-9 rounded-full bg-[#FAF3F0] flex items-center justify-center group-open:bg-[var(--primary)] group-open:text-white transition-colors shrink-0">
-                  <ChevronDown className="h-5 w-5 transition-transform duration-500 group-open:rotate-180" />
+          {faqs.map((faq: any, i: number) => {
+            const isOpen = openIdx === i
+            return (
+              <div key={i} className="bg-white rounded-[2rem] border border-transparent hover:border-rose-100 transition-all duration-300 shadow-sm overflow-hidden">
+                <button
+                  onClick={() => setOpenIdx(isOpen ? null : i)}
+                  className="w-full flex items-center justify-between p-6 md:p-8 text-right focus:outline-none"
+                >
+                  <div className="flex items-center gap-4">
+                    <span className={`h-8 w-8 rounded-full ${isOpen ? 'bg-[var(--primary)] text-white' : 'bg-rose-50 text-[var(--primary)]'} flex items-center justify-center text-xs font-black shrink-0 transition-colors`}>{i + 1}</span>
+                    <h3 className={`text-lg md:text-xl font-sans font-bold transition-colors ${isOpen ? 'text-[var(--primary)]' : 'text-[#2B2B2B]'}`}>
+                      {faq.q}
+                    </h3>
+                  </div>
+                  <ChevronDown className={`h-5 w-5 text-zinc-400 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                </button>
+                <div className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                  <div className="overflow-hidden">
+                    <p className="px-6 md:px-8 pb-8 pt-0 text-base font-medium text-zinc-500 leading-relaxed pr-20 md:pr-20">
+                      {faq.a}
+                    </p>
+                  </div>
                 </div>
-              </summary>
-              <div className="px-7 pb-7 text-base font-medium text-zinc-600 leading-relaxed border-t border-zinc-50 pt-5">
-                {faq.a}
               </div>
-            </details>
-          ))}
+            )
+          })}
         </div>
       </div>
     </section>
@@ -529,71 +533,64 @@ export function FloralFooter({ store, branding }: { store: any; branding: any })
   const activeSocials = socials.filter(s => branding?.[s.key])
 
   return (
-    <footer className="bg-[#2B2B2B] text-white pt-20 pb-10 relative overflow-hidden" id="contact">
-      {/* Top decorative line */}
-      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[var(--primary)] to-transparent opacity-40" />
-      {/* Decorative petals */}
+    <footer className="bg-[#2B2B2B] text-white pt-20 pb-8 relative overflow-hidden" id="contact">
+      <div className="absolute top-0 inset-x-0 h-[3px] bg-[var(--primary)] opacity-80" />
       <PetalDeco className="absolute -top-20 left-10 h-48 w-48 text-white opacity-[0.02]" />
-      <PetalDeco className="absolute bottom-0 right-10 h-64 w-64 text-[var(--primary)] opacity-[0.04] rotate-45" />
 
       <div className="mx-auto max-w-7xl px-6 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 pb-16 border-b border-white/10">
-
-          {/* Brand */}
-          <div className="lg:col-span-2 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 pb-16">
+          
+          {/* Brand - Right */}
+          <div className="space-y-4 flex flex-col items-center md:items-start text-center md:text-right">
             {branding?.logo_url ? (
-              <img src={branding.logo_url} alt={store.name} className="h-12 w-auto object-contain brightness-0 invert opacity-90" />
+              <img src={branding.logo_url} alt={store.name} className="h-10 w-auto object-contain brightness-0 invert opacity-90" />
             ) : (
-              <span className="text-3xl font-serif italic text-white">{store.name}</span>
+              <span className="text-3xl font-sans font-bold text-white">{store.name}</span>
             )}
             <p className="text-zinc-400 text-sm leading-relaxed max-w-xs font-medium">
-              {branding?.footer_description || branding?.tagline || 'نؤمن أن الزهور هي لغة القلوب، نسعى دائماً لنكون جزءاً من ذكرياتكم.'}
+              {branding?.footer_description || branding?.tagline || 'نسعى دائماً لنكون جزءاً من لحظاتكم الجميلة.'}
             </p>
           </div>
 
-          {/* Links */}
-          <div className="space-y-5">
-            <h4 className="text-sm font-serif italic text-white/80">روابط سريعة</h4>
-            <ul className="space-y-3 text-sm font-medium text-zinc-400">
-              <li><Link href={`/store/${store.slug}/products`} className="hover:text-white transition-colors">تصفح الباقات</Link></li>
-              <li><Link href={`/store/${store.slug}/track`} className="hover:text-white transition-colors">تتبع طلبك</Link></li>
-              <li><Link href="#" className="hover:text-white transition-colors">سياسة الاسترجاع</Link></li>
-              <li><Link href="#faq" className="hover:text-white transition-colors">الأسئلة الشائعة</Link></li>
-            </ul>
+          {/* Quick Links - Center */}
+          <div className="flex flex-col items-center">
+            <div className="space-y-5 w-fit">
+              <h4 className="text-sm font-sans font-bold text-white/80 text-center md:text-right">روابط سريعة</h4>
+              <ul className="space-y-4 text-xs font-medium text-zinc-400 text-center md:text-right">
+                <li><Link href={`/store/${store.slug}/products`} className="hover:text-white transition-colors">تصفح المنتجات</Link></li>
+                <li><Link href={`/store/${store.slug}/track`} className="hover:text-white transition-colors">تتبع طلبك</Link></li>
+                <li><Link href="#" className="hover:text-white transition-colors">سياسة الاسترجاع</Link></li>
+                <li><Link href="#faq" className="hover:text-white transition-colors">الأسئلة الشائعة</Link></li>
+              </ul>
+            </div>
           </div>
 
-          <div className="space-y-5">
-            <h4 className="text-sm font-serif italic text-white/80">التواصل</h4>
-            <div className="space-y-4">
-              {store.address && (
-                <div className="flex items-start gap-2 text-sm font-medium text-zinc-400 pt-2">
-                  <div className="h-6 w-6 rounded-full bg-white/5 flex items-center justify-center shrink-0 mt-0.5">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" /><circle cx="12" cy="10" r="3" /></svg>
-                  </div>
-                  <span className="leading-relaxed">{store.address}</span>
-                </div>
-              )}
-              <div className="flex flex-wrap items-center gap-3 pt-3">
+          {/* Contact & Socials - Left */}
+          <div className="flex flex-col items-center md:items-end">
+            <div className="space-y-5 w-fit">
+              <h4 className="text-sm font-sans font-bold text-white/80 text-center md:text-right">التواصل</h4>
+              <div className="flex flex-wrap justify-center md:justify-end gap-3 pt-2">
                 {store.whatsapp_phone && (
                   <a href={`https://wa.me/${store.whatsapp_phone.replace(/\D/g, '')}?text=${encodeURIComponent('مرحباً! أود التواصل معكم.')}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"
-                    className="h-10 w-10 rounded-full bg-white/8 hover:bg-[var(--primary)] border border-white/10 hover:border-[var(--primary)] flex items-center justify-center text-zinc-400 hover:text-white transition-all duration-300 hover:scale-110">
-                    <MessageCircle className="h-5 w-5" />
+                    className="h-9 w-9 rounded-full bg-white/5 hover:bg-[var(--primary)] border border-white/10 hover:border-transparent flex items-center justify-center text-zinc-400 hover:text-white transition-all duration-300">
+                    <MessageCircle className="h-4 w-4" />
                   </a>
                 )}
                 {activeSocials.map(({ key, Icon, label }) => (
                   <a key={key} href={branding[key]} target="_blank" rel="noopener noreferrer" aria-label={label}
-                    className="h-10 w-10 rounded-full bg-white/8 hover:bg-[var(--primary)] border border-white/10 hover:border-[var(--primary)] flex items-center justify-center text-zinc-400 hover:text-white transition-all duration-300 hover:scale-110">
-                    <Icon className="h-5 w-5" />
+                    className="h-9 w-9 rounded-full bg-white/5 hover:bg-[var(--primary)] border border-white/10 hover:border-transparent flex items-center justify-center text-zinc-400 hover:text-white transition-all duration-300">
+                    <Icon className="h-4 w-4" />
                   </a>
                 ))}
               </div>
             </div>
           </div>
+
         </div>
 
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-bold text-zinc-600">
+        <div className="pt-6 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-medium text-zinc-500">
           <p>© {new Date().getFullYear()} {store.name}. جميع الحقوق محفوظة.</p>
-          <p>صُنع بواسطة <span className="text-white font-serif italic">KayaMarket</span></p>
+          <p className="flex items-center gap-1">صُنع بواسطة <span className="text-white font-sans font-bold">KayaMarket</span></p>
         </div>
       </div>
     </footer>

@@ -40,54 +40,37 @@ export default function CountdownTimer({ endDate, selectedTheme = 'default' }: C
 
   if (isExpired || !timeLeft) return null
 
-  if (isElegant) {
-    return (
+  const isFloral = selectedTheme === 'floral'
+
+  return (
+    <div className={`py-4 border-y border-zinc-50 flex items-center gap-6 ${isFloral ? 'bg-[#FAF3F0]/30 px-6 rounded-2xl border-none shadow-sm' : ''}`} dir="rtl">
+      <span className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-300 rotate-180 [writing-mode:vertical-lr]">تنتهي قريباً</span>
       <div className="flex flex-col items-start justify-center gap-2 w-full" dir="rtl">
         <div className="flex items-center justify-center gap-1.5 text-zinc-900">
           <Timer className="h-3.5 w-3.5" />
           <span className="text-[10px] font-black uppercase tracking-widest">ينتهي خلال:</span>
         </div>
-        
         <div className="flex items-center gap-4" dir="ltr">
-          <TimeUnit value={timeLeft.days} label="يوم" isElegant={true} />
+          <TimeUnit value={timeLeft.days} label="يوم" isFloral={isFloral} />
           <span className="text-zinc-200 font-light">:</span>
-          <TimeUnit value={timeLeft.hours} label="ساعة" isElegant={true} />
+          <TimeUnit value={timeLeft.hours} label="ساعة" isFloral={isFloral} />
           <span className="text-zinc-200 font-light">:</span>
-          <TimeUnit value={timeLeft.minutes} label="دقيقة" isElegant={true} />
+          <TimeUnit value={timeLeft.minutes} label="دقيقة" isFloral={isFloral} />
           <span className="text-zinc-200 font-light">:</span>
-          <TimeUnit value={timeLeft.seconds} label="ثانية" isElegant={true} />
+          <TimeUnit value={timeLeft.seconds} label="ثانية" isFloral={isFloral} />
         </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="flex flex-col items-center justify-center gap-1 w-full bg-zinc-900/80 backdrop-blur-md rounded-[1.25rem] py-2 px-3 shadow-2xl border border-white/10">
-      <div className="flex items-center justify-center gap-1.5 text-white mb-0.5">
-        <Timer className="h-3.5 w-3.5 text-rose-500 animate-pulse" />
-        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-100">ينتهي العرض خلال:</span>
-      </div>
-      
-      <div className="flex items-center justify-center gap-2 w-full" dir="ltr">
-        <TimeUnit value={timeLeft.days} label="يوم" />
-        <span className="text-white/30 font-black mb-3">:</span>
-        <TimeUnit value={timeLeft.hours} label="ساعة" />
-        <span className="text-white/30 font-black mb-3">:</span>
-        <TimeUnit value={timeLeft.minutes} label="دقيقة" />
-        <span className="text-white/30 font-black mb-3">:</span>
-        <TimeUnit value={timeLeft.seconds} label="ثانية" />
       </div>
     </div>
   )
 }
 
-function TimeUnit({ value, label, isElegant }: { value: number; label: string; isElegant?: boolean }) {
+function TimeUnit({ value, label, isFloral }: { value: number; label: string; isFloral?: boolean }) {
   return (
-    <div className="flex flex-col items-center min-w-[32px]">
-      <span className={`text-xl font-light leading-none tracking-tight ${isElegant ? 'text-zinc-900' : 'text-white font-black'}`}>
+    <div className={`flex flex-col items-center min-w-[32px] ${isFloral ? 'bg-white/50 p-2 rounded-xl shadow-inner' : ''}`}>
+      <span className={`text-xl font-light leading-none tracking-tight text-zinc-900 ${isFloral ? 'font-serif italic' : ''}`}>
         {value.toString().padStart(2, '0')}
       </span>
-      <span className={`text-[9px] font-bold mt-1 ${isElegant ? 'text-zinc-400' : 'text-zinc-400'}`}>{label}</span>
+      <span className="text-[9px] font-bold mt-1 text-zinc-400">{label}</span>
     </div>
   )
 }

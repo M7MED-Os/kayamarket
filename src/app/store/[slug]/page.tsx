@@ -314,6 +314,7 @@ import {
   FloralCategories,
   FloralProductCard,
   FloralFeatures,
+  FloralBestsellers,
   FloralTestimonials,
   FloralFAQ,
   FloralFooter
@@ -406,21 +407,7 @@ export default async function StorePage({ params, searchParams }: PageProps) {
           <FloralHero branding={branding} store={store} slug={slug} />
           {shown('categories') && <FloralCategories categories={dbCategories || []} slug={slug} />}
 
-          {shown('bestsellers') && (
-            <section className="py-28 bg-white">
-              <div className="mx-auto max-w-7xl px-6">
-                <div className="text-center mb-16 space-y-3">
-                  <span className="text-xs font-black text-[var(--primary)] uppercase tracking-[0.25em]">مختاراتنا لك</span>
-                  <h2 className="text-4xl md:text-5xl font-serif italic text-[#2B2B2B]">الأكثر مبيعاً</h2>
-                </div>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-8">
-                  {productsWithRatings.slice(0, 8).map(product => (
-                    <FloralProductCard key={product.id} product={product} slug={slug} />
-                  ))}
-                </div>
-              </div>
-            </section>
-          )}
+          {shown('bestsellers') && <FloralBestsellers products={productsWithRatings} slug={slug} />}
 
           {shown('features') && <FloralFeatures branding={branding} />}
           {shown('testimonials') && <FloralTestimonials reviews={storeReviews || []} />}

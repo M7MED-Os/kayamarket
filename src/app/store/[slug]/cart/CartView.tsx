@@ -125,9 +125,18 @@ export default function CartView({ params, storeData }: { params: { slug: string
       <div className="min-h-screen bg-[#FAF3F0]/20" dir="rtl" style={commonStyles}>
         <FloralHeader store={store} branding={branding} slug={slug} />
         <main className="mx-auto max-w-5xl px-6 py-24">
+          {/* Store branding mini header */}
+          <div className="flex justify-center mb-6">
+            {branding?.logo_url ? (
+              <img src={branding.logo_url} alt={store.name} className="h-10 w-auto object-contain opacity-80" />
+            ) : (
+              <span className="text-xs font-black text-[var(--primary)] uppercase tracking-[0.3em] opacity-70">{store.name}</span>
+            )}
+          </div>
+
           <div className="text-center mb-16 space-y-4">
-            <h1 className="text-4xl md:text-5xl font-serif italic text-[#2B2B2B]">سلة المشتريات</h1>
-            <p className="text-zinc-500 font-medium">نجهز لك باقاتك بكل حب وعناية</p>
+            <h1 className="text-4xl md:text-5xl font-sans font-black text-[#2B2B2B]">سلة المشتريات</h1>
+            <p className="text-zinc-500 font-medium">نجهز طلبك بكل حب وعناية</p>
           </div>
 
           {items.length === 0 ? (
@@ -135,9 +144,9 @@ export default function CartView({ params, storeData }: { params: { slug: string
               <div className="h-20 w-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-6">
                 <ShoppingBag className="h-8 w-8 text-[var(--primary)]" />
               </div>
-              <p className="text-xl font-serif italic text-[#2B2B2B] mb-8">سلتك فارغة حالياً</p>
+              <p className="text-xl font-sans font-bold text-[#2B2B2B] mb-8">سلتك فارغة حالياً</p>
               <Link href={`/store/${slug}`} className="inline-flex items-center gap-2 text-sm font-bold bg-[var(--primary)] text-white px-10 py-4 rounded-full hover:bg-[var(--primary)]/90 transition-all duration-300">
-                تصفح الباقات
+                تصفح المنتجات
               </Link>
             </div>
           ) : (
@@ -151,7 +160,7 @@ export default function CartView({ params, storeData }: { params: { slug: string
                     <div className="flex-1 space-y-4">
                       <div className="flex justify-between items-start">
                         <div className="space-y-1">
-                          <h3 className="text-lg font-serif text-[#2B2B2B]">{item.name}</h3>
+                          <h3 className="text-lg font-sans font-bold text-[#2B2B2B]">{item.name}</h3>
                           <div className="flex items-center gap-3">
                             <div className="text-lg font-bold text-[var(--primary)]">{item.price.toLocaleString()} ج.م</div>
                           </div>
@@ -188,7 +197,7 @@ export default function CartView({ params, storeData }: { params: { slug: string
 
               <div className="lg:col-span-1">
                 <div className="bg-white p-8 rounded-[2rem] border border-rose-50 shadow-sm sticky top-32 space-y-8">
-                  <h3 className="text-lg font-serif text-[#2B2B2B] pb-4 border-b border-rose-50">ملخص الطلب</h3>
+                  <h3 className="text-lg font-sans font-bold text-[#2B2B2B] pb-4 border-b border-rose-50">ملخص الطلب</h3>
                   <div className="flex justify-between items-end">
                     <span className="text-sm font-bold text-zinc-500">الإجمالي</span>
                     <span className="text-3xl font-black text-[var(--primary)]">{totalPrice.toLocaleString()} ج.م</span>
@@ -226,7 +235,7 @@ export default function CartView({ params, storeData }: { params: { slug: string
             <p className="text-zinc-500 font-bold mb-8">ابدأ بإضافة المنتجات التي تعجبك للسلة</p>
             <Link
               href={`/store/${slug}#products`}
-              className="inline-flex items-center gap-2 px-10 py-4 bg-zinc-900 text-white rounded-2xl font-black hover:bg-zinc-800 transition-all active:scale-95"
+              className="inline-flex items-center gap-2 px-10 py-4 bg-[var(--primary)] text-white rounded-2xl font-black hover:brightness-110 transition-all active:scale-95"
             >
               العودة للمتجر
               <ArrowRight className="h-5 w-5" />
@@ -309,7 +318,7 @@ export default function CartView({ params, storeData }: { params: { slug: string
 
                 <Link
                   href={`/store/${slug}/checkout`}
-                  className="w-full h-16 bg-zinc-900 text-white rounded-2xl font-black text-lg flex items-center justify-center gap-3 hover:bg-zinc-800 shadow-xl shadow-zinc-200 transition-all active:scale-95"
+                  className="w-full h-16 bg-[var(--primary)] text-white rounded-2xl font-black text-lg flex items-center justify-center gap-3 hover:brightness-110 shadow-xl shadow-[var(--primary)]/20 transition-all active:scale-95"
                 >
                   <CreditCard className="h-6 w-6" />
                   إتمام الطلب

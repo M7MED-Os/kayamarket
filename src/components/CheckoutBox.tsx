@@ -3,12 +3,11 @@
 import { useState, useEffect } from 'react'
 import { Product } from '@/types/product'
 import { createClient } from '@/lib/supabase/client'
-import { CheckCircle2, Banknote, CreditCard } from 'lucide-react'
+import { CheckCircle2, Banknote, CreditCard, Truck, HeartHandshake, ShieldCheck, ShoppingCart, Minus, Plus } from 'lucide-react'
 import { createOrder } from '@/app/actions/order'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { useCart } from '@/context/CartContext'
-import { Plus, Minus, ShoppingCart } from 'lucide-react'
 import CountdownTimer from './CountdownTimer'
 
 interface CheckoutBoxProps {
@@ -128,112 +127,137 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
     return (
       <div className="space-y-10">
         <div className="space-y-2">
-           <div className="flex items-baseline gap-3">
-              <span className="text-4xl font-light text-zinc-900 tracking-tighter">
-                {Number(finalPrice).toLocaleString()} ج.م
+          <div className="flex items-baseline gap-3">
+            <span className="text-4xl font-light text-zinc-900 tracking-tighter">
+              {Number(finalPrice).toLocaleString()} ج.م
+            </span>
+            {(product.price && ((product.original_price && product.original_price > product.price) || discount > 0)) && (
+              <span className="text-xl line-through text-zinc-300 font-light italic">
+                {Number(product.original_price || product.price).toLocaleString()}
               </span>
-              {(product.price && ((product.original_price && product.original_price > product.price) || discount > 0)) && (
-                <span className="text-xl line-through text-zinc-300 font-light italic">
-                  {Number(product.original_price || product.price).toLocaleString()}
-                </span>
-              )}
-           </div>
+            )}
+          </div>
 
-           {/* Countdown Timer (Themed) */}
-           {product.sale_end_date && new Date(product.sale_end_date) > new Date() && (
-             <div className="py-4 border-y border-zinc-50 flex items-center gap-6">
-               <span className="text-[9px] font-black uppercase tracking-[0.3em] text-zinc-300 rotate-180 [writing-mode:vertical-lr]">تنتهي قريباً</span>
-               <CountdownTimer endDate={product.sale_end_date} selectedTheme={selectedTheme} />
-             </div>
-           )}
+          {/* Countdown Timer (Themed) */}
+          {product.sale_end_date && new Date(product.sale_end_date) > new Date() && (
+            <CountdownTimer endDate={product.sale_end_date} selectedTheme={selectedTheme} />
+          )}
 
-           {product.stock !== null && (
-              <div className="flex items-center gap-2">
-                 <div className={`h-1 w-1 rounded-none ${product.stock > 0 ? 'bg-[var(--primary)]' : 'bg-zinc-200'}`} />
-                 <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
-                    {product.stock > 0 ? `متوفر: ${product.stock} قطعة` : 'نفذت الكمية'}
-                 </span>
-              </div>
-           )}
+          {product.stock !== null && (
+            <div className="flex items-center gap-2">
+              <div className={`h-1 w-1 rounded-none ${product.stock > 0 ? 'bg-[var(--primary)]' : 'bg-zinc-200'}`} />
+              <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                {product.stock > 0 ? `متوفر: ${product.stock} قطعة` : 'نفذت الكمية'}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="space-y-6">
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                 <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">الاسم</label>
-                 <input value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all rounded-none" placeholder="الاسم بالكامل..." />
-              </div>
-              <div className="space-y-1">
-                 <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">رقم الهاتف</label>
-                 <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all text-right rounded-none" dir="ltr" placeholder="01234567890" />
-              </div>
-           </div>
-           <div className="space-y-1">
-              <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">العنوان</label>
-              <input value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all rounded-none" placeholder="المدينة، الشارع، رقم المنزل..." />
-           </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">الاسم</label>
+              <input value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all rounded-none" placeholder="الاسم بالكامل..." />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">رقم الهاتف</label>
+              <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all text-right rounded-none" dir="ltr" placeholder="01234567890" />
+            </div>
+          </div>
+          <div className="space-y-1">
+            <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">العنوان</label>
+            <input value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all rounded-none" placeholder="المدينة، الشارع، رقم المنزل..." />
+          </div>
 
-            <div className="space-y-4">
-              <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">طريقة الدفع</label>
-              <div className="flex flex-col sm:flex-row gap-4">
-                 {['الدفع عند الاستلام', 'تحويل بنكي / محافظ إلكترونية'].map(m => (
-                    <button key={m} onClick={() => setPaymentMethod(m)} className={`flex-1 p-4 text-[10px] font-black uppercase tracking-widest border transition-all duration-500 rounded-none ${paymentMethod === m ? 'border-[var(--primary)] bg-[var(--primary)] text-white' : 'border-zinc-100 text-zinc-400 hover:border-[var(--primary)]/30'}`}>
-                       {m}
-                    </button>
-                 ))}
+          <div className="space-y-4">
+            <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">طريقة الدفع</label>
+            <div className="flex flex-col sm:flex-row gap-4">
+              {['الدفع عند الاستلام', 'تحويل بنكي / محافظ إلكترونية'].map(m => (
+                <button key={m} onClick={() => setPaymentMethod(m)} className={`flex-1 p-4 text-[10px] font-black uppercase tracking-widest border transition-all duration-500 rounded-none ${paymentMethod === m ? 'border-[var(--primary)] bg-[var(--primary)] text-white' : 'border-zinc-100 text-zinc-400 hover:border-[var(--primary)]/30'}`}>
+                  {m}
+                </button>
+              ))}
+            </div>
+            {paymentMethod === 'الدفع عند الاستلام' && settings.cod_deposit_required && (
+              <div className="p-4 bg-zinc-50 border border-zinc-100 text-[10px] font-black uppercase tracking-widest text-zinc-900 flex justify-between items-center rounded-none">
+                <span>مقدم مطلوب ({settings.deposit_percentage}%)</span>
+                <span>{finalPrice ? ((finalPrice * settings.deposit_percentage) / 100).toLocaleString() : '0'} ج.م</span>
               </div>
-              {paymentMethod === 'الدفع عند الاستلام' && settings.cod_deposit_required && (
-                <div className="p-4 bg-zinc-50 border border-zinc-100 text-[10px] font-black uppercase tracking-widest text-zinc-900 flex justify-between items-center rounded-none">
-                  <span>مقدم مطلوب ({settings.deposit_percentage}%)</span>
-                  <span>{finalPrice ? ((finalPrice * settings.deposit_percentage) / 100).toLocaleString() : '0'} ج.م</span>
+            )}
+          </div>
+
+          {/* Coupon Section */}
+          <div className="space-y-4 pt-4 border-t border-zinc-100">
+            <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">كوبون الخصم</label>
+            <div className="flex gap-4">
+              <input
+                value={couponCode}
+                onChange={e => setCouponCode(e.target.value)}
+                className="flex-1 bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all uppercase tracking-widest rounded-none"
+                placeholder="أدخل الكود..."
+              />
+              <button
+                onClick={applyCoupon}
+                disabled={loading || !couponCode}
+                className="px-8 bg-[var(--primary)] text-white text-[10px] font-black uppercase tracking-widest hover:brightness-125 transition-all disabled:brightness-75 rounded-none"
+              >
+                تطبيق
+              </button>
+            </div>
+            {discount > 0 && <p className="text-[10px] font-black text-emerald-600">تم تطبيق خصم {discount}%</p>}
+          </div>
+
+          <div className="pt-6 space-y-4">
+            <div className="flex gap-4">
+              <div className="flex items-center bg-zinc-50 px-2 py-2 gap-2 rounded-none">
+                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 flex items-center justify-center text-zinc-400 hover:text-[var(--primary)] transition-colors"><Minus className="h-4 w-4" /></button>
+                <span className="text-base font-black w-8 text-center">{quantity}</span>
+                <button onClick={() => setQuantity(quantity + 1)} className="w-12 h-12 flex items-center justify-center text-zinc-400 hover:text-[var(--primary)] transition-colors"><Plus className="h-4 w-4" /></button>
+              </div>
+              <div className="flex-1 relative">
+                <button onClick={handleAddToCartWithHint} className="w-full bg-white border border-[var(--primary)] text-[var(--primary)] h-14 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[var(--primary)] hover:text-white transition-all duration-500 rounded-none">
+                  <ShoppingCart className="h-4 w-4" />
+                  إضافة للسلة
+                </button>
+                {showCartHint && (
+                  <div className="absolute bottom-full mb-3 left-0 right-0 bg-[var(--primary)] text-white text-[9px] font-black px-4 py-2 rounded-none text-center animate-in fade-in slide-in-from-bottom-2 duration-300 uppercase tracking-widest shadow-xl z-20">
+                    هذا الزر يقوم بإضافة المنتج لسلة المشتريات
+                  </div>
+                )}
+              </div>
+            </div>
+            {/* Store Policies (Elegant) */}
+            <div className="py-6 border-y border-zinc-50 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {[
+                  { icon: Truck, label: 'توصيل سريع لكل المحافظات' },
+                  { icon: HeartHandshake, label: 'الدفع عند الاستلام متاح' },
+                  { icon: ShieldCheck, label: 'تسوق آمن وضمان 100%' }
+                ].map((policy, idx) => (
+                  <div key={idx} className="flex items-center gap-3">
+                    <div className="h-7 w-7 rounded-full bg-zinc-50 flex items-center justify-center text-zinc-400">
+                      <policy.icon className="h-3.5 w-3.5" />
+                    </div>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 leading-tight">
+                      {policy.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              
+              {settings.policies && (
+                <div className="p-4 bg-zinc-50/50 border border-zinc-100 rounded-none">
+                  <p className="text-[10px] text-zinc-500 leading-relaxed font-medium">
+                    {settings.policies}
+                  </p>
                 </div>
               )}
             </div>
 
-           {/* Coupon Section */}
-           <div className="space-y-4 pt-4 border-t border-zinc-100">
-              <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">كوبون الخصم</label>
-              <div className="flex gap-4">
-                 <input 
-                   value={couponCode} 
-                   onChange={e => setCouponCode(e.target.value)} 
-                   className="flex-1 bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all uppercase tracking-widest rounded-none" 
-                   placeholder="أدخل الكود..." 
-                 />
-                 <button 
-                   onClick={applyCoupon} 
-                   disabled={loading || !couponCode}
-                   className="px-8 bg-[var(--primary)] text-white text-[10px] font-black uppercase tracking-widest hover:brightness-125 transition-all disabled:brightness-75 rounded-none"
-                 >
-                   تطبيق
-                 </button>
-              </div>
-              {discount > 0 && <p className="text-[10px] font-black text-emerald-600">تم تطبيق خصم {discount}%</p>}
-           </div>
-
-           <div className="pt-6 space-y-4">
-              <div className="flex gap-4">
-                 <div className="flex items-center bg-zinc-50 px-2 py-2 gap-2 rounded-none">
-                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 flex items-center justify-center text-zinc-400 hover:text-[var(--primary)] transition-colors"><Minus className="h-4 w-4" /></button>
-                    <span className="text-base font-black w-8 text-center">{quantity}</span>
-                    <button onClick={() => setQuantity(quantity + 1)} className="w-12 h-12 flex items-center justify-center text-zinc-400 hover:text-[var(--primary)] transition-colors"><Plus className="h-4 w-4" /></button>
-                 </div>
-                 <div className="flex-1 relative">
-                    <button onClick={handleAddToCartWithHint} className="w-full bg-white border border-[var(--primary)] text-[var(--primary)] h-14 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[var(--primary)] hover:text-white transition-all duration-500 rounded-none">
-                       <ShoppingCart className="h-4 w-4" />
-                       إضافة للسلة
-                    </button>
-                    {showCartHint && (
-                      <div className="absolute bottom-full mb-3 left-0 right-0 bg-zinc-900 text-white text-[9px] font-black px-4 py-2 rounded-none text-center animate-in fade-in slide-in-from-bottom-2 duration-300 uppercase tracking-widest shadow-xl z-20">
-                        هذا الزر يقوم بإضافة المنتج لسلة المشتريات
-                      </div>
-                    )}
-                 </div>
-              </div>
-              <button onClick={handleOrder} disabled={loading} className="w-full bg-[var(--primary)] text-white h-16 flex items-center justify-center text-[10px] font-black uppercase tracking-[0.2em] hover:brightness-125 transition-all shadow-lg disabled:brightness-75 rounded-none">
-                 {loading ? 'جاري التنفيذ...' : 'تأكيد الطلب الآن'}
-              </button>
-           </div>
+            <button onClick={handleOrder} disabled={loading} className="w-full bg-[var(--primary)] text-white h-16 flex items-center justify-center text-[10px] font-black uppercase tracking-[0.2em] hover:brightness-125 transition-all shadow-lg disabled:brightness-75 rounded-none">
+              {loading ? 'جاري التنفيذ...' : 'تأكيد الطلب الآن'}
+            </button>
+          </div>
         </div>
       </div>
     )
@@ -369,7 +393,7 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
           <div>
             <label className="block text-sm font-bold text-zinc-700 mb-2">طريقة الدفع <span className="text-primary-500">*</span></label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <label className={`relative flex rounded-xl border p-4 transition-all ${!settings.cod_enabled ? 'cursor-not-allowed opacity-60 bg-zinc-50 border-zinc-200' : paymentMethod === 'الدفع عند الاستلام' ? 'cursor-pointer border-primary-600 bg-primary-50/50 shadow-sm' : 'cursor-pointer border-zinc-200 hover:border-primary-200 bg-white'}`}>
+              <label className={`relative flex rounded-xl border p-4 transition-all ${!settings.cod_enabled ? 'cursor-not-allowed opacity-60 bg-zinc-50 border-zinc-200' : paymentMethod === 'الدفع عند الاستلام' ? 'cursor-pointer border-[var(--primary)] bg-[var(--primary)]/5 shadow-sm' : 'cursor-pointer border-zinc-200 hover:border-[var(--primary)]/20 bg-white'}`}>
                 <input type="radio" name="paymentMethod" value="الدفع عند الاستلام" checked={paymentMethod === 'الدفع عند الاستلام'} onChange={(e) => setPaymentMethod(e.target.value)} disabled={!settings.cod_enabled} className="sr-only" />
                 <div className="flex w-full items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -390,7 +414,7 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
                 </div>
               </label>
 
-              <label className={`relative flex cursor-pointer rounded-xl border p-4 transition-all ${paymentMethod === 'تحويل بنكي / محافظ إلكترونية' ? 'border-primary-600 bg-primary-50/50 shadow-sm' : 'border-zinc-200 hover:border-primary-200 bg-white'}`}>
+              <label className={`relative flex cursor-pointer rounded-xl border p-4 transition-all ${paymentMethod === 'تحويل بنكي / محافظ إلكترونية' ? 'border-[var(--primary)] bg-[var(--primary)]/5 shadow-sm' : 'border-zinc-200 hover:border-[var(--primary)]/20 bg-white'}`}>
                 <input type="radio" name="paymentMethod" value="تحويل بنكي / محافظ إلكترونية" checked={paymentMethod === 'تحويل بنكي / محافظ إلكترونية'} onChange={(e) => setPaymentMethod(e.target.value)} className="sr-only" />
                 <div className="flex w-full items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -427,7 +451,7 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
             <button
               onClick={applyCoupon}
               disabled={loading || !couponCode}
-              className="rounded-xl bg-zinc-900 px-6 py-3 text-sm font-bold text-white hover:bg-zinc-800 disabled:opacity-50 transition-all active:scale-95 whitespace-nowrap"
+              className="rounded-xl bg-[var(--primary)] px-6 py-3 text-sm font-bold text-white hover:brightness-110 disabled:opacity-50 transition-all active:scale-95 whitespace-nowrap"
             >
               {loading ? '...' : 'تطبيق'}
             </button>
@@ -454,14 +478,14 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
           <button
             onClick={handleOrder}
             disabled={loading || product.stock === 0 || !!(product.price && (!customerName.trim() || !customerAddress.trim() || !customerPhone.trim()))}
-            className="w-full sm:flex-[2] inline-flex items-center justify-center gap-2 rounded-2xl bg-primary-600 h-14 text-lg font-bold text-white transition hover:bg-primary-700 shadow-lg shadow-primary-200 disabled:opacity-50 disabled:bg-zinc-400 disabled:shadow-none"
+            className="w-full sm:flex-[2] inline-flex items-center justify-center gap-2 rounded-2xl bg-[var(--primary)] h-14 text-lg font-bold text-white transition hover:brightness-110 shadow-lg shadow-[var(--primary)]/20 disabled:opacity-50 disabled:bg-zinc-400 disabled:shadow-none"
           >
             {loading ? 'جاري التحضير...' : product.stock === 0 ? 'نفذت الكمية' : 'تأكيد الطلب'}
           </button>
-          
+
           <button
             onClick={handleAddToCart}
-            className="w-full sm:flex-[1] flex items-center justify-center gap-2 h-14 bg-zinc-900 text-white rounded-2xl font-black text-sm hover:bg-zinc-800 transition-all shadow-lg shadow-zinc-200"
+            className="w-full sm:flex-[1] flex items-center justify-center gap-2 h-14 bg-white border border-[var(--primary)] text-[var(--primary)] rounded-2xl font-black text-sm hover:bg-[var(--primary)]/5 transition-all shadow-sm"
           >
             <ShoppingCart className="h-5 w-5" />
             إضافة للسلة
