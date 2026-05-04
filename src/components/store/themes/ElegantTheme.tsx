@@ -253,7 +253,7 @@ export const ElegantFeatures = ({ branding }: { branding?: any }) => {
     <section className="py-24 bg-zinc-50 border-y border-zinc-100" dir="rtl">
       <div className="mx-auto max-w-7xl px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
-          {features.map((f, i) => (
+          {features.map((f: { title: string, desc: string }, i: number) => (
             <div key={i} className="text-center space-y-4">
               <span className="text-[10px] font-black text-[var(--primary)] uppercase tracking-[0.4em]">0{i + 1}</span>
               <h3 className="text-xl font-bold text-zinc-900">{f.title}</h3>
@@ -388,7 +388,7 @@ export const ElegantTestimonials = ({ reviews }: { reviews: any[] }) => {
           }}
         >
           <div className="flex gap-12 px-6">
-            {repeatedSet.map((review, idx) => (
+            {repeatedSet.map((review: any, idx: number) => (
               <div key={idx} className="w-[350px] shrink-0 border border-zinc-100 p-10 bg-zinc-50/30 hover:bg-white hover:border-zinc-900 transition-all duration-700 group">
                 <div className="space-y-6">
                   {/* Elegant Stars */}
