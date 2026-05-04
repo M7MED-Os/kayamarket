@@ -31,10 +31,14 @@ export async function generateMetadata({ params }: PageProps) {
   }
 }
 
-import { 
-  ElegantHeader, 
-  ElegantFooter 
+import {
+  ElegantHeader,
+  ElegantFooter
 } from '@/components/store/themes/ElegantTheme'
+import {
+  FloralHeader,
+  FloralFooter
+} from '@/components/store/themes/FloralTheme'
 
 export default async function StoreProductPage({ params }: PageProps) {
   const { slug, id } = await params
@@ -84,59 +88,134 @@ export default async function StoreProductPage({ params }: PageProps) {
         <ElegantHeader store={store} branding={branding} slug={slug} />
         <main className="mx-auto max-w-7xl px-6 py-20">
           <div className="grid grid-cols-1 gap-20 lg:grid-cols-2 items-start">
-             {/* Gallery */}
-             <div className="lg:sticky lg:top-28">
-                <div className="relative">
-                   <ImageGallery images={galleryImages} productName={product.name} />
-                </div>
-             </div>
+            {/* Gallery */}
+            <div className="lg:sticky lg:top-28">
+              <div className="relative">
+                <ImageGallery images={galleryImages} productName={product.name} />
+              </div>
+            </div>
 
-             {/* Details */}
-             <div className="space-y-12">
-                <div className="space-y-6">
-                   <div className="flex items-center gap-4">
-                      <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">المنتج</span>
-                      <div className="h-px flex-1 bg-zinc-100" />
-                   </div>
-                   <h1 className="text-5xl font-light text-zinc-900 leading-tight tracking-tighter">
-                      {product.name}
-                   </h1>
-                   <div className="flex items-baseline gap-4">
-                      <div className="text-3xl font-light text-zinc-900 tracking-tighter">
-                         {Number(product.price).toLocaleString()} ج.م
-                      </div>
-                      {product.original_price && Number(product.original_price) > Number(product.price) && (
-                        <div className="text-lg font-bold text-zinc-300 line-through decoration-zinc-100">
-                           {Number(product.original_price).toLocaleString()} ج.م
-                        </div>
-                      )}
-                   </div>
+            {/* Details */}
+            <div className="space-y-12">
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">المنتج</span>
+                  <div className="h-px flex-1 bg-zinc-100" />
                 </div>
-
-                {product.description && (
-                  <p className="text-lg text-zinc-500 font-light leading-relaxed italic border-r-2 border-zinc-100 pr-6 py-2">
-                    {product.description}
-                  </p>
-                )}
-
-                <div className="pt-8">
-                   <CheckoutBox product={product} storeId={store.id} storeSlug={slug} selectedTheme={selectedTheme} />
+                <h1 className="text-5xl font-light text-zinc-900 leading-tight tracking-tighter">
+                  {product.name}
+                </h1>
+                <div className="flex items-baseline gap-4">
+                  <div className="text-3xl font-light text-zinc-900 tracking-tighter">
+                    {Number(product.price).toLocaleString()} ج.م
+                  </div>
+                  {product.original_price && Number(product.original_price) > Number(product.price) && (
+                    <div className="text-lg font-bold text-zinc-300 line-through decoration-zinc-100">
+                      {Number(product.original_price).toLocaleString()} ج.م
+                    </div>
+                  )}
                 </div>
+              </div>
 
-                <div className="pt-12 border-t border-zinc-100">
-                    <ProductReviews 
-                      productId={product.id} 
-                      storeId={store.id}
-                      initialReviews={reviews as any}
-                      averageRating={ratingSummary.average_rating}
-                      totalReviews={ratingSummary.total_reviews}
-                      selectedTheme={selectedTheme}
-                    />
-                </div>
-             </div>
+              {product.description && (
+                <p className="text-lg text-zinc-500 font-light leading-relaxed italic border-r-2 border-zinc-100 pr-6 py-2">
+                  {product.description}
+                </p>
+              )}
+
+              <div className="pt-8">
+                <CheckoutBox product={product} storeId={store.id} storeSlug={slug} selectedTheme={selectedTheme} />
+              </div>
+
+              <div className="pt-12 border-t border-zinc-100">
+                <ProductReviews
+                  productId={product.id}
+                  storeId={store.id}
+                  initialReviews={reviews as any}
+                  averageRating={ratingSummary.average_rating}
+                  totalReviews={ratingSummary.total_reviews}
+                  selectedTheme={selectedTheme}
+                />
+              </div>
+            </div>
           </div>
         </main>
         <ElegantFooter store={store} branding={branding} />
+      </div>
+    )
+  }
+
+  // ─── THEME: FLORAL ─────────────────────────────────────────────────────────
+  if (selectedTheme === 'floral') {
+    return (
+      <div className="min-h-screen bg-[#FAF3F0]/20" dir="rtl" style={commonStyles}>
+        <FloralHeader store={store} branding={branding} slug={slug} />
+        <main className="mx-auto max-w-7xl px-6 py-24">
+          <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 items-start">
+            {/* Gallery */}
+            <div className="lg:sticky lg:top-32 rounded-[2.5rem] overflow-hidden border border-rose-50 shadow-sm">
+              <ImageGallery images={galleryImages} productName={product.name} />
+            </div>
+
+            {/* Details */}
+            <div className="space-y-10">
+              <div className="space-y-4">
+                <span className="inline-block px-4 py-1.5 rounded-full bg-rose-50 text-[var(--primary)] text-sm font-bold border border-rose-100">
+                  {product.category || 'باقات زهور'}
+                </span>
+                <h1 className="text-4xl md:text-5xl font-serif italic text-[#2B2B2B] leading-tight">
+                  {product.name}
+                </h1>
+                
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, idx) => (
+                      <Star key={idx} className={`h-5 w-5 ${idx < Math.round(ratingSummary.average_rating || 5) ? 'fill-[var(--primary)] text-[var(--primary)]' : 'text-zinc-200'}`} />
+                    ))}
+                  </div>
+                  <span className="text-sm font-bold text-zinc-500">
+                    ({ratingSummary.total_reviews} تقييم)
+                  </span>
+                </div>
+
+                <div className="flex items-baseline gap-4 pt-4">
+                  <div className="text-3xl font-black text-[var(--primary)]">
+                    {Number(product.price).toLocaleString()} ج.م
+                  </div>
+                  {product.original_price && Number(product.original_price) > Number(product.price) && (
+                    <div className="text-lg font-bold text-zinc-400 line-through">
+                      {Number(product.original_price).toLocaleString()} ج.م
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {product.description && (
+                <div className="p-6 rounded-[2rem] bg-white border border-rose-50">
+                  <p className="text-base text-zinc-500 font-medium leading-relaxed">
+                    {product.description}
+                  </p>
+                </div>
+              )}
+
+              <div className="pt-6">
+                <CheckoutBox product={product} storeId={store.id} storeSlug={slug} selectedTheme={selectedTheme} />
+              </div>
+
+              <div className="pt-16 mt-16 border-t border-rose-100/50">
+                <ProductReviews
+                  productId={product.id}
+                  storeId={store.id}
+                  initialReviews={reviews as any}
+                  averageRating={ratingSummary.average_rating}
+                  totalReviews={ratingSummary.total_reviews}
+                  selectedTheme={selectedTheme}
+                />
+              </div>
+            </div>
+          </div>
+        </main>
+        <FloralFooter store={store} branding={branding} />
       </div>
     )
   }
@@ -186,7 +265,7 @@ export default async function StoreProductPage({ params }: PageProps) {
               <h1 className="text-4xl md:text-5xl font-black text-zinc-900 leading-tight">
                 {product.name}
               </h1>
-              
+
               <div className="flex items-center gap-4 flex-wrap">
                 {ratingSummary.total_reviews > 0 && (
                   <div className="flex items-center gap-2">
@@ -238,8 +317,8 @@ export default async function StoreProductPage({ params }: PageProps) {
             </div>
 
             {/* Product Reviews */}
-            <ProductReviews 
-              productId={product.id} 
+            <ProductReviews
+              productId={product.id}
               storeId={store.id}
               initialReviews={reviews as any}
               averageRating={ratingSummary.average_rating}

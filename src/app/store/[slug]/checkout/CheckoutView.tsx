@@ -14,6 +14,10 @@ import {
   ElegantHeader, 
   ElegantFooter 
 } from '@/components/store/themes/ElegantTheme'
+import {
+  FloralHeader,
+  FloralFooter
+} from '@/components/store/themes/FloralTheme'
 
 export default function CheckoutView({ params, storeData }: { params: { slug: string }, storeData: any }) {
   const { slug } = params
@@ -250,6 +254,139 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
           </div>
         </main>
         <ElegantFooter store={store} branding={branding} />
+      </div>
+    )
+  }
+
+  // ─── THEME: FLORAL ─────────────────────────────────────────────────────────
+  if (selectedTheme === 'floral') {
+    return (
+      <div className="min-h-screen bg-[#FAF3F0]/20" dir="rtl" style={commonStyles}>
+        <FloralHeader store={store} branding={branding} slug={slug} />
+        <main className="mx-auto max-w-5xl px-6 py-24">
+          <div className="text-center mb-16 space-y-4">
+            <h1 className="text-4xl md:text-5xl font-serif italic text-[#2B2B2B]">تأكيد الطلب</h1>
+            <p className="text-zinc-500 font-medium">خطوة أخيرة لتأكيد باقتك المميزة</p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+             {/* Form */}
+             <div className="space-y-12">
+                <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-rose-50 shadow-sm space-y-8">
+                   <div className="flex items-center gap-3 border-b border-rose-50 pb-4">
+                      <div className="h-10 w-10 bg-rose-50 rounded-full flex items-center justify-center">
+                         <User className="h-5 w-5 text-[var(--primary)]" />
+                      </div>
+                      <h3 className="text-lg font-serif text-[#2B2B2B]">بيانات المستلم</h3>
+                   </div>
+                   <div className="space-y-6">
+                      <div className="space-y-2">
+                         <label className="text-sm font-bold text-zinc-600">الاسم بالكامل</label>
+                         <input value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full bg-[#FAF3F0]/40 border border-rose-50 rounded-2xl p-4 text-sm focus:ring-1 focus:ring-[var(--primary)] focus:border-[var(--primary)] transition-all placeholder:text-zinc-400" placeholder="الاسم هنا..." />
+                         {errors.name && <p className="text-xs font-bold text-rose-500 pt-1">{errors.name}</p>}
+                      </div>
+                      <div className="space-y-2">
+                         <label className="text-sm font-bold text-zinc-600">رقم الهاتف</label>
+                         <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} className="w-full bg-[#FAF3F0]/40 border border-rose-50 rounded-2xl p-4 text-sm focus:ring-1 focus:ring-[var(--primary)] focus:border-[var(--primary)] transition-all text-right placeholder:text-zinc-400" dir="ltr" placeholder="01234567890" />
+                         {errors.phone && <p className="text-xs font-bold text-rose-500 pt-1">{errors.phone}</p>}
+                      </div>
+                      <div className="space-y-2">
+                         <label className="text-sm font-bold text-zinc-600">العنوان بالتفصيل</label>
+                         <textarea value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="w-full bg-[#FAF3F0]/40 border border-rose-50 rounded-2xl p-4 text-sm h-32 focus:ring-1 focus:ring-[var(--primary)] focus:border-[var(--primary)] transition-all resize-none placeholder:text-zinc-400" placeholder="المدينة، الشارع، رقم المنزل..." />
+                         {errors.address && <p className="text-xs font-bold text-rose-500 pt-1">{errors.address}</p>}
+                      </div>
+                   </div>
+                </div>
+
+                <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-rose-50 shadow-sm space-y-8">
+                   <div className="flex items-center gap-3 border-b border-rose-50 pb-4">
+                      <div className="h-10 w-10 bg-emerald-50 rounded-full flex items-center justify-center">
+                         <CreditCard className="h-5 w-5 text-emerald-600" />
+                      </div>
+                      <h3 className="text-lg font-serif text-[#2B2B2B]">طريقة الدفع</h3>
+                   </div>
+                   <div className="grid grid-cols-1 gap-4">
+                      {['الدفع عند الاستلام', 'تحويل بنكي / محافظ إلكترونية'].map(method => {
+                        const isCOD = method === 'الدفع عند الاستلام';
+                        const showDeposit = isCOD && settings?.cod_deposit_required;
+                        return (
+                          <button key={method} onClick={() => setPaymentMethod(method)} className={`p-6 text-right rounded-2xl border transition-all duration-300 ${paymentMethod === method ? 'border-[var(--primary)] bg-rose-50/50' : 'border-zinc-100 hover:border-rose-100 bg-zinc-50/50'}`}>
+                             <div className="flex flex-col gap-1">
+                                <span className={`text-sm font-bold ${paymentMethod === method ? 'text-[var(--primary)]' : 'text-zinc-600'}`}>{method}</span>
+                                {showDeposit && (
+                                   <span className={`text-xs font-medium ${paymentMethod === method ? 'text-zinc-600' : 'text-zinc-400'}`}>
+                                      مطلوب مقدم {settings.deposit_percentage}% ({(finalPrice * settings.deposit_percentage / 100).toLocaleString()} ج.م)
+                                   </span>
+                                )}
+                             </div>
+                          </button>
+                        );
+                      })}
+                   </div>
+                </div>
+             </div>
+
+             {/* Summary */}
+             <div className="space-y-8 lg:sticky lg:top-32">
+                <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-rose-50 shadow-sm space-y-8">
+                   <h3 className="text-lg font-serif text-[#2B2B2B] border-b border-rose-50 pb-4">ملخص الطلب</h3>
+                   <div className="space-y-4">
+                      {items.map(item => (
+                        <div key={item.id} className="flex justify-between items-center group bg-[#FAF3F0]/20 p-4 rounded-2xl border border-rose-50/50">
+                           <div className="flex items-center gap-3">
+                              <span className="h-6 w-6 rounded-full bg-white border border-rose-100 flex items-center justify-center text-xs font-bold text-[var(--primary)]">{item.quantity}</span>
+                              <span className="text-sm font-bold text-[#2B2B2B] truncate max-w-[120px] sm:max-w-[150px]">{item.name}</span>
+                           </div>
+                           <span className="text-sm font-black text-[var(--primary)]">{(item.price * item.quantity).toLocaleString()} ج.م</span>
+                        </div>
+                      ))}
+                   </div>
+
+                   <div className="pt-6 border-t border-rose-50 space-y-4">
+                      <div className="flex justify-between items-center text-sm">
+                         <span className="font-bold text-zinc-500">المجموع الفرعي</span>
+                         <span className="font-bold text-[#2B2B2B]">{totalPrice.toLocaleString()} ج.م</span>
+                      </div>
+                      {discount > 0 && (
+                         <div className="flex justify-between items-center text-sm text-emerald-600 bg-emerald-50 p-3 rounded-xl border border-emerald-100">
+                            <span className="font-bold">خصم ({discount}%)</span>
+                            <span className="font-bold">-{(totalPrice * discount / 100).toLocaleString()} ج.م</span>
+                         </div>
+                      )}
+                      <div className="flex justify-between items-end pt-4">
+                          <span className="text-base font-bold text-zinc-600">الإجمالي الكلي</span>
+                          <span className="text-3xl font-black text-[var(--primary)]">{finalPrice.toLocaleString()} ج.م</span>
+                       </div>
+                    </div>
+
+                    {/* Coupon Section */}
+                    <div className="space-y-3 pt-6 border-t border-rose-50">
+                       <label className="text-sm font-bold text-zinc-600">كوبون الخصم</label>
+                       <div className="flex gap-2">
+                          <input 
+                            value={couponInput} 
+                            onChange={e => setCouponInput(e.target.value)} 
+                            className="flex-1 bg-[#FAF3F0]/40 border border-rose-50 rounded-xl p-4 text-sm focus:ring-1 focus:ring-[var(--primary)] focus:border-[var(--primary)] transition-all uppercase placeholder:text-zinc-400" 
+                            placeholder="أدخل الكود..." 
+                          />
+                          <button 
+                            onClick={handleApplyCoupon} 
+                            disabled={isValidatingCoupon || !!appliedCoupon || !couponInput.trim()}
+                            className="px-6 py-4 bg-zinc-900 text-white rounded-xl text-sm font-bold hover:bg-zinc-800 transition-all disabled:opacity-50 whitespace-nowrap"
+                          >
+                            {isValidatingCoupon ? '...' : appliedCoupon ? 'مطبق' : 'تطبيق'}
+                          </button>
+                       </div>
+                    </div>
+
+                    <button onClick={handleCheckout} disabled={submitting} className="w-full h-16 mt-6 bg-[var(--primary)] text-white rounded-full flex items-center justify-center text-sm font-bold hover:bg-[var(--primary)]/90 transition-all shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none">
+                       {submitting ? 'جاري التنفيذ...' : 'تأكيد الطلب الآن'}
+                    </button>
+                </div>
+             </div>
+          </div>
+        </main>
+        <FloralFooter store={store} branding={branding} />
       </div>
     )
   }

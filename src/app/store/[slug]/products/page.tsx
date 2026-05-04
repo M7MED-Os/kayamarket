@@ -7,11 +7,16 @@ import Link from 'next/link'
 import { ArrowRight, ShoppingBag, ArrowLeft } from 'lucide-react'
 import StoreHeader from '@/components/StoreHeader'
 import StoreFooter from '@/components/StoreFooter'
-import { 
-  ElegantHeader, 
-  ElegantFooter, 
-  ElegantProductCard 
+import {
+  ElegantHeader,
+  ElegantFooter,
+  ElegantProductCard
 } from '@/components/store/themes/ElegantTheme'
+import {
+  FloralHeader,
+  FloralFooter,
+  FloralProductCard
+} from '@/components/store/themes/FloralTheme'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -52,9 +57,9 @@ export default async function AllProductsPage({ params, searchParams }: PageProp
 
   let products = productsWithRatings
   const catFilter = typeof currentCategory === 'string' ? currentCategory : Array.isArray(currentCategory) ? currentCategory[0] : null;
-  
+
   if (catFilter) {
-    products = products.filter(p => 
+    products = products.filter(p =>
       p.category?.toString().trim().toLowerCase() === catFilter.trim().toLowerCase()
     )
   }
@@ -98,6 +103,38 @@ export default async function AllProductsPage({ params, searchParams }: PageProp
           )}
         </main>
         <ElegantFooter store={store} branding={branding} />
+      </div>
+    )
+  }
+
+  // ─── THEME: FLORAL ─────────────────────────────────────────────────────────
+  if (selectedTheme === 'floral') {
+    return (
+      <div className="min-h-screen bg-[#FAF3F0]/20" dir="rtl" style={commonStyles}>
+        <FloralHeader store={store} branding={branding} slug={slug} />
+        
+        <main className="mx-auto max-w-7xl px-6 py-24">
+          <div className="text-center mb-16 space-y-4">
+            <h1 className="text-4xl md:text-5xl font-serif italic text-[#2B2B2B]">الباقات والزهور</h1>
+            <p className="text-zinc-500 font-medium">اختر ما يعبر عن مشاعرك من بين {productsWithRatings.length} منتجاً متاحاً</p>
+          </div>
+
+          <ProductFilters categories={categories} currentCategory={currentCategory as string} slug={`${slug}/products`} searchQuery={searchQuery as string} />
+
+          {products.length === 0 ? (
+            <div className="text-center py-24 bg-white rounded-[2.5rem] border border-rose-50 mt-12 shadow-sm">
+              <p className="text-xl font-serif italic text-zinc-500">عذراً، لا توجد زهور تطابق طلبك</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12 mt-12">
+              {products.map((product) => (
+                <FloralProductCard key={product.id} product={product} slug={slug} />
+              ))}
+            </div>
+          )}
+        </main>
+
+        <FloralFooter store={store} branding={branding} />
       </div>
     )
   }

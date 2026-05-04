@@ -15,9 +15,9 @@ const STATUS_STEPS = [
   { id: 'delivered', label: 'تم التوصيل', icon: PackageCheck },
 ]
 
-import { 
-  ElegantHeader, 
-  ElegantFooter 
+import {
+  ElegantHeader,
+  ElegantFooter
 } from '@/components/store/themes/ElegantTheme'
 
 export default function TrackOrderClient({ order, store, branding, slug }: any) {
@@ -27,7 +27,7 @@ export default function TrackOrderClient({ order, store, branding, slug }: any) 
   const [productComment, setProductComment] = useState('')
   const [isSubmittingStore, setIsSubmittingStore] = useState(false)
   const [isSubmittingProduct, setIsSubmittingProduct] = useState(false)
-  
+
   const [storeSubmitted, setStoreSubmitted] = useState(false)
   const [productSubmitted, setProductSubmitted] = useState(false)
 
@@ -35,7 +35,7 @@ export default function TrackOrderClient({ order, store, branding, slug }: any) 
   const isCancelled = order.status === 'cancelled'
 
   const currentStepIndex = STATUS_STEPS.findIndex(s => s.id === (order.status === 'paid' ? 'delivered' : order.status))
-  
+
   const primaryColor = branding?.primary_color || '#0ea5e9'
   const selectedTheme = (branding as any)?.selected_theme || 'default'
 
@@ -94,79 +94,79 @@ export default function TrackOrderClient({ order, store, branding, slug }: any) 
         <ElegantHeader store={store} branding={branding} slug={slug} />
         <main className="mx-auto max-w-4xl px-6 py-20">
           <div className="text-center mb-16 space-y-4">
-             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">تتبع الطلب</span>
-             <h1 className="text-4xl font-light text-zinc-900 tracking-tighter">تفاصيل <span className="font-bold underline decoration-zinc-200 underline-offset-8">الفاتورة</span></h1>
-             <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest pt-2">#{order.id.split('-')[0]}</p>
+            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">تتبع الطلب</span>
+            <h1 className="text-4xl font-light text-zinc-900 tracking-tighter">تفاصيل <span className="font-bold underline decoration-zinc-200 underline-offset-8">الفاتورة</span></h1>
+            <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest pt-2">#{order.id.split('-')[0]}</p>
           </div>
 
           <div className="grid grid-cols-1 gap-12">
-             {/* Status */}
-             <div className="border border-zinc-100 p-10 space-y-8">
-                <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">حالة الطلب</h3>
-                {isCancelled ? (
-                  <div className="text-rose-500 font-bold uppercase tracking-widest">تم إلغاء الطلب</div>
-                ) : (
-                  <div className="flex flex-wrap gap-12">
-                    {STATUS_STEPS.map((step, idx) => {
-                      const isCompleted = currentStepIndex >= idx
-                      return (
-                        <div key={step.id} className="flex items-center gap-3">
-                           <div className={`h-2 w-2 rounded-full ${isCompleted ? 'bg-zinc-900' : 'bg-zinc-100'}`} />
-                           <span className={`text-[10px] font-black uppercase tracking-widest ${isCompleted ? 'text-zinc-900' : 'text-zinc-200'}`}>
-                              {step.label}
-                           </span>
-                        </div>
-                      )
-                    })}
-                  </div>
-                )}
-             </div>
+            {/* Status */}
+            <div className="border border-zinc-100 p-10 space-y-8">
+              <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">حالة الطلب</h3>
+              {isCancelled ? (
+                <div className="text-rose-500 font-bold uppercase tracking-widest">تم إلغاء الطلب</div>
+              ) : (
+                <div className="flex flex-wrap gap-12">
+                  {STATUS_STEPS.map((step, idx) => {
+                    const isCompleted = currentStepIndex >= idx
+                    return (
+                      <div key={step.id} className="flex items-center gap-3">
+                        <div className={`h-2 w-2 rounded-full ${isCompleted ? 'bg-zinc-900' : 'bg-zinc-100'}`} />
+                        <span className={`text-[10px] font-black uppercase tracking-widest ${isCompleted ? 'text-zinc-900' : 'text-zinc-200'}`}>
+                          {step.label}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+            </div>
 
-             {/* Order Details */}
-             <div className="grid grid-cols-1 md:grid-cols-3 border border-zinc-100 divide-y md:divide-y-0 md:divide-x divide-x-reverse divide-zinc-100">
-                <div className="p-10 space-y-2">
-                   <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">المنتج</span>
-                   <p className="text-lg font-bold text-zinc-900 uppercase tracking-wide">{order.product_name}</p>
-                </div>
-                <div className="p-10 space-y-2">
-                   <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">الإجمالي</span>
-                   <p className="text-lg font-bold text-zinc-900">{order.final_price} ج.م</p>
-                </div>
-                <div className="p-10 space-y-2">
-                   <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">التاريخ</span>
-                   <p className="text-lg font-bold text-zinc-900">{new Date(order.created_at).toLocaleDateString('ar-EG')}</p>
-                </div>
-             </div>
+            {/* Order Details */}
+            <div className="grid grid-cols-1 md:grid-cols-3 border border-zinc-100 divide-y md:divide-y-0 md:divide-x divide-x-reverse divide-zinc-100">
+              <div className="p-10 space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">المنتج</span>
+                <p className="text-lg font-bold text-zinc-900 uppercase tracking-wide">{order.product_name}</p>
+              </div>
+              <div className="p-10 space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">الإجمالي</span>
+                <p className="text-lg font-bold text-zinc-900">{order.final_price} ج.م</p>
+              </div>
+              <div className="p-10 space-y-2">
+                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">التاريخ</span>
+                <p className="text-lg font-bold text-zinc-900">{new Date(order.created_at).toLocaleDateString('ar-EG')}</p>
+              </div>
+            </div>
 
-             {/* Reviews */}
-             {isDelivered && (
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                  <div className="border border-zinc-100 p-10 space-y-8">
-                     <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">تقييم المتجر</h3>
-                     {storeSubmitted ? (
-                        <div className="text-sm font-bold text-zinc-400 italic">شكراً لتقييمك</div>
-                     ) : (
-                        <form onSubmit={handleStoreReview} className="space-y-6">
-                           {renderStars(storeRating, setStoreRating)}
-                           <textarea value={storeComment} onChange={(e) => setStoreComment(e.target.value)} className="w-full bg-zinc-50 border-none text-sm p-4 h-24 focus:ring-1 focus:ring-zinc-900 transition-all" placeholder="تعليقك..." />
-                           <button type="submit" className="w-full bg-zinc-900 text-white py-4 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-colors">إرسال</button>
-                        </form>
-                     )}
-                  </div>
-                  <div className="border border-zinc-100 p-10 space-y-8">
-                     <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">تقييم المنتج</h3>
-                     {productSubmitted ? (
-                        <div className="text-sm font-bold text-zinc-400 italic">شكراً لتقييمك</div>
-                     ) : (
-                        <form onSubmit={handleProductReview} className="space-y-6">
-                           {renderStars(productRating, setProductRating)}
-                           <textarea value={productComment} onChange={(e) => setProductComment(e.target.value)} className="w-full bg-zinc-50 border-none text-sm p-4 h-24 focus:ring-1 focus:ring-zinc-900 transition-all" placeholder="تعليقك..." />
-                           <button type="submit" className="w-full bg-zinc-900 text-white py-4 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-colors">إرسال</button>
-                        </form>
-                     )}
-                  </div>
-               </div>
-             )}
+            {/* Reviews */}
+            {isDelivered && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div className="border border-zinc-100 p-10 space-y-8">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">تقييم المتجر</h3>
+                  {storeSubmitted ? (
+                    <div className="text-sm font-bold text-zinc-400 italic">شكراً لتقييمك</div>
+                  ) : (
+                    <form onSubmit={handleStoreReview} className="space-y-6">
+                      {renderStars(storeRating, setStoreRating)}
+                      <textarea value={storeComment} onChange={(e) => setStoreComment(e.target.value)} className="w-full bg-zinc-50 border-none text-sm p-4 h-24 focus:ring-1 focus:ring-zinc-900 transition-all" placeholder="تعليقك..." />
+                      <button type="submit" className="w-full bg-zinc-900 text-white py-4 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-colors">إرسال</button>
+                    </form>
+                  )}
+                </div>
+                <div className="border border-zinc-100 p-10 space-y-8">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">تقييم المنتج</h3>
+                  {productSubmitted ? (
+                    <div className="text-sm font-bold text-zinc-400 italic">شكراً لتقييمك</div>
+                  ) : (
+                    <form onSubmit={handleProductReview} className="space-y-6">
+                      {renderStars(productRating, setProductRating)}
+                      <textarea value={productComment} onChange={(e) => setProductComment(e.target.value)} className="w-full bg-zinc-50 border-none text-sm p-4 h-24 focus:ring-1 focus:ring-zinc-900 transition-all" placeholder="تعليقك..." />
+                      <button type="submit" className="w-full bg-zinc-900 text-white py-4 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-colors">إرسال</button>
+                    </form>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </main>
         <ElegantFooter store={store} branding={branding} />
@@ -198,25 +198,24 @@ export default function TrackOrderClient({ order, store, branding, slug }: any) 
           ) : (
             <div className="relative">
               <div className="absolute top-1/2 left-0 right-0 h-1 bg-slate-100 -translate-y-1/2 hidden sm:block rounded-full" />
-              <div 
-                className="absolute top-1/2 right-0 h-1 hidden sm:block rounded-full transition-all duration-1000" 
-                style={{ background: 'var(--primary)', width: `${(Math.max(0, currentStepIndex) / (STATUS_STEPS.length - 1)) * 100}%` }} 
+              <div
+                className="absolute top-1/2 right-0 h-1 hidden sm:block rounded-full transition-all duration-1000"
+                style={{ background: 'var(--primary)', width: `${(Math.max(0, currentStepIndex) / (STATUS_STEPS.length - 1)) * 100}%` }}
               />
-              
+
               <div className="relative flex flex-col sm:flex-row justify-between gap-6 sm:gap-0">
                 {STATUS_STEPS.map((step, idx) => {
                   const Icon = step.icon
                   const isCompleted = currentStepIndex >= idx
                   const isCurrent = currentStepIndex === idx
-                  
+
                   return (
                     <div key={step.id} className="flex sm:flex-col items-center gap-4 sm:gap-2 relative z-10">
-                      <div 
-                        className={`h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center border-4 transition-all duration-500 ${
-                          isCompleted 
-                            ? 'bg-white text-white border-transparent shadow-lg' 
+                      <div
+                        className={`h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center border-4 transition-all duration-500 ${isCompleted
+                            ? 'bg-white text-white border-transparent shadow-lg'
                             : 'bg-white text-slate-300 border-slate-100'
-                        }`}
+                          }`}
                         style={isCompleted ? { background: 'var(--primary)', boxShadow: '0 4px 20px color-mix(in srgb, var(--primary) 30%, transparent)' } : {}}
                       >
                         <Icon className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={isCurrent ? 3 : 2} />
@@ -262,7 +261,7 @@ export default function TrackOrderClient({ order, store, branding, slug }: any) 
             <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-8">
               <h2 className="text-xl font-black text-slate-900 mb-2 text-center">قيم تجربتك مع المتجر</h2>
               <p className="text-slate-500 text-sm font-medium text-center mb-6">رأيك يهمنا ويساعدنا على تقديم خدمة أفضل!</p>
-              
+
               {storeSubmitted ? (
                 <div className="text-center py-8">
                   <div className="h-16 w-16 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto mb-4">
@@ -297,7 +296,7 @@ export default function TrackOrderClient({ order, store, branding, slug }: any) 
             <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-8">
               <h2 className="text-xl font-black text-slate-900 mb-2 text-center">قيم المنتج الذي استلمته</h2>
               <p className="text-slate-500 text-sm font-medium text-center mb-6">هل أعجبك المنتج؟ شاركنا رأيك.</p>
-              
+
               {productSubmitted ? (
                 <div className="text-center py-8">
                   <div className="h-16 w-16 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto mb-4">
@@ -329,7 +328,7 @@ export default function TrackOrderClient({ order, store, branding, slug }: any) 
             </div>
           </div>
         )}
-        
+
         <div className="mt-8 text-center">
           <Link href={`/store/${slug}`} className="inline-block px-8 py-4 rounded-2xl bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 hover:shadow-sm transition-all">
             العودة للمتجر

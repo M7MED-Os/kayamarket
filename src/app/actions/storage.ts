@@ -11,13 +11,13 @@ export async function uploadImage(formData: FormData) {
     const { storeId } = await assertMerchant(supabase)
 
     const file = formData.get('file') as File
-    const category = formData.get('category') as string // 'products' or 'logos'
+    const category = formData.get('category') as string // 'products', 'logos', 'banners', or 'categories'
 
     if (!file || !(file instanceof File)) {
       return { success: false, error: 'لم يتم اختيار ملف' }
     }
 
-    if (!['products', 'logos', 'banners'].includes(category)) {
+    if (!['products', 'logos', 'banners', 'categories'].includes(category)) {
       return { success: false, error: 'الفئة غير صالحة' }
     }
 

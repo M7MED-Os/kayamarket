@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import StoreHeader from '@/components/StoreHeader'
 import TestimonialsMarquee from '@/components/TestimonialsMarquee'
+import Providers from '@/components/Providers'
 
 // ─── Section Helpers ──────────────────────────────────────────────────────────
 function isSectionEnabled(branding: any, sectionId: string): boolean {
@@ -296,18 +297,27 @@ interface PageProps {
   params: Promise<{ slug: string }>
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
-
 import StoreFooter from '@/components/StoreFooter'
-import { 
-  ElegantHeader, 
-  ElegantHero, 
-  ElegantCategories, 
-  ElegantBestsellers, 
-  ElegantFeatures, 
+import {
+  ElegantHeader,
+  ElegantHero,
+  ElegantCategories,
+  ElegantBestsellers,
+  ElegantFeatures,
   ElegantTestimonials,
   ElegantFooter,
   ElegantFAQ
 } from '@/components/store/themes/ElegantTheme'
+import {
+  FloralHeader,
+  FloralHero,
+  FloralCategories,
+  FloralProductCard,
+  FloralFeatures,
+  FloralTestimonials,
+  FloralFAQ,
+  FloralFooter
+} from '@/components/store/themes/FloralTheme'
 
 export default async function StorePage({ params, searchParams }: PageProps) {
   const { slug } = await params
@@ -362,52 +372,93 @@ export default async function StorePage({ params, searchParams }: PageProps) {
   // ─── THEME: ELEGANT ────────────────────────────────────────────────────────
   if (selectedTheme === 'elegant') {
     return (
-      <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
-        {shown('announcement') && ((branding as any)?.announcement_enabled === true || (branding as any)?.announcement_enabled === 'true') && (
-          <AnnouncementBar text={(branding as any)?.announcement_text || ''} branding={branding} />
-        )}
-        <ElegantHeader store={store} branding={branding} slug={slug} />
-        <ElegantHero branding={branding} store={store} slug={slug} />
-        <ElegantCategories categories={dbCategories || []} slug={slug} />
-        <ElegantBestsellers products={productsWithRatings} slug={slug} branding={branding} />
-        <ElegantFeatures />
-        
-        {shown('testimonials') && (
-          <ElegantTestimonials reviews={storeReviews || []} />
-        )}
+      <Providers>
+        <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
+          {shown('announcement') && ((branding as any)?.announcement_enabled === true || (branding as any)?.announcement_enabled === 'true') && (
+            <AnnouncementBar text={(branding as any)?.announcement_text || ''} branding={branding} />
+          )}
+          <ElegantHeader store={store} branding={branding} slug={slug} />
+          <ElegantHero branding={branding} store={store} slug={slug} />
+          <ElegantCategories categories={dbCategories || []} slug={slug} />
+          <ElegantBestsellers products={productsWithRatings} slug={slug} branding={branding} />
+          {shown('features') && <ElegantFeatures branding={branding} />}
 
-        {shown('faq') && <ElegantFAQ branding={branding} />}
-        {shown('footer') && <ElegantFooter store={store} branding={branding} />}
-      </div>
+          {shown('testimonials') && (
+            <ElegantTestimonials reviews={storeReviews || []} />
+          )}
+
+          {shown('faq') && <ElegantFAQ branding={branding} />}
+          {shown('footer') && <ElegantFooter store={store} branding={branding} />}
+        </div>
+      </Providers>
+    )
+  }
+
+  // ─── THEME: FLORAL ─────────────────────────────────────────────────────────
+  if (selectedTheme === 'floral') {
+    return (
+      <Providers>
+        <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
+          {shown('announcement') && ((branding as any)?.announcement_enabled === true || (branding as any)?.announcement_enabled === 'true') && (
+            <AnnouncementBar text={(branding as any)?.announcement_text || ''} branding={branding} />
+          )}
+          <FloralHeader store={store} branding={branding} slug={slug} />
+          <FloralHero branding={branding} store={store} slug={slug} />
+          {shown('categories') && <FloralCategories categories={dbCategories || []} slug={slug} />}
+
+          {shown('bestsellers') && (
+            <section className="py-28 bg-white">
+              <div className="mx-auto max-w-7xl px-6">
+                <div className="text-center mb-16 space-y-3">
+                  <span className="text-xs font-black text-[var(--primary)] uppercase tracking-[0.25em]">مختاراتنا لك</span>
+                  <h2 className="text-4xl md:text-5xl font-serif italic text-[#2B2B2B]">الأكثر مبيعاً</h2>
+                </div>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-8">
+                  {productsWithRatings.slice(0, 8).map(product => (
+                    <FloralProductCard key={product.id} product={product} slug={slug} />
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {shown('features') && <FloralFeatures branding={branding} />}
+          {shown('testimonials') && <FloralTestimonials reviews={storeReviews || []} />}
+          {shown('faq') && <FloralFAQ branding={branding} />}
+          {shown('footer') && <FloralFooter store={store} branding={branding} />}
+        </div>
+      </Providers>
     )
   }
 
   // ─── THEME: DEFAULT (MESH) ─────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
-      {/* 1. Announcement */}
-      {shown('announcement') && ((branding as any)?.announcement_enabled === true || (branding as any)?.announcement_enabled === 'true') && (
-        <AnnouncementBar text={(branding as any)?.announcement_text || ''} branding={branding} />
-      )}
-      {/* 2. Header */}
-      <StoreHeader store={store} branding={branding} slug={slug} />
-      <Hero branding={branding} store={store} slug={slug} />
-      <CategoryHighlights categories={dbCategories || []} slug={slug} branding={branding} />
-      <Bestsellers products={productsWithRatings} slug={slug} branding={branding} />
-      <Features branding={branding} />
+    <Providers>
+      <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
+        {/* 1. Announcement */}
+        {shown('announcement') && ((branding as any)?.announcement_enabled === true || (branding as any)?.announcement_enabled === 'true') && (
+          <AnnouncementBar text={(branding as any)?.announcement_text || ''} branding={branding} />
+        )}
+        {/* 2. Header */}
+        <StoreHeader store={store} branding={branding} slug={slug} />
+        <Hero branding={branding} store={store} slug={slug} />
+        <CategoryHighlights categories={dbCategories || []} slug={slug} branding={branding} />
+        <Bestsellers products={productsWithRatings} slug={slug} branding={branding} />
+        <Features branding={branding} />
 
-      {/* Testimonials / Reviews Section */}
-      {shown('testimonials') && (
-        <section className="bg-zinc-50/50 py-24 md:py-32 overflow-hidden border-y border-zinc-100">
-          <div className="mx-auto max-w-7xl px-6">
-            <SectionHeader title="آراء العملاء" subtitle="ثقة نعتز بها" />
-            <TestimonialsMarquee reviews={storeReviews || []} />
-          </div>
-        </section>
-      )}
+        {/* Testimonials / Reviews Section */}
+        {shown('testimonials') && (
+          <section className="bg-zinc-50/50 py-24 md:py-32 overflow-hidden border-y border-zinc-100">
+            <div className="mx-auto max-w-7xl px-6">
+              <SectionHeader title="آراء العملاء" subtitle="ثقة نعتز بها" />
+              <TestimonialsMarquee reviews={storeReviews || []} />
+            </div>
+          </section>
+        )}
 
-      {shown('faq') && <FAQ branding={branding} />}
-      {shown('footer') && <StoreFooter store={store} branding={branding} slug={slug} />}
-    </div>
+        {shown('faq') && <FAQ branding={branding} />}
+        {shown('footer') && <StoreFooter store={store} branding={branding} slug={slug} />}
+      </div>
+    </Providers>
   )
 }

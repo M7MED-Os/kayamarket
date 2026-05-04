@@ -255,6 +255,13 @@ export default function SettingsForm({ initialStore, initialBranding, initialSet
          preview: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2670&auto=format&fit=crop'
       },
       {
+         id: 'floral',
+         name: 'بلوم — Bloom 🌸',
+         desc: 'ثيم رومانسي فاخر للورود والهدايا. تصميم عاطفي بألوان وردية ناعمة وأشكال قوسية أنيقة.',
+         requiredPlan: 'growth',
+         preview: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2670&auto=format&fit=crop'
+      },
+      {
          id: 'dark-vogue',
          name: 'دارك فوغ (Dark Vogue)',
          desc: 'ثيم غامق بلمسات ذهبية للمنتجات الفاخرة.',

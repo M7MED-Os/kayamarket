@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { 
-  Palette, Plus, Shield, Check, Info, 
-  ExternalLink, Lock, Eye, Settings2 
+import {
+  Palette, Plus, Shield, Check, Info,
+  ExternalLink, Lock, Eye, Settings2
 } from 'lucide-react'
 import Image from 'next/image'
 
@@ -25,6 +25,15 @@ const MOCK_THEMES = [
     required_plan: 'basic',
     preview_url: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2670&auto=format&fit=crop',
     active_stores: 45,
+  },
+  {
+    id: 'floral',
+    name: 'بلوم — Bloom 🌸',
+    description: 'ثيم رومانسي فاخر مخصص لمتاجر الورود والهدايا. تصميم عاطفي مدروس بفلسفة البخاء وتحويل الزوار إلى عملاء.',
+    is_free: false,
+    required_plan: 'basic',
+    preview_url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2670&auto=format&fit=crop',
+    active_stores: 18,
   },
   {
     id: 'dark-vogue',
@@ -70,7 +79,7 @@ export default function ThemesPage() {
             <Check className="h-7 w-7" />
           </div>
           <div>
-            <div className="text-2xl font-black text-slate-900">1</div>
+            <div className="text-2xl font-black text-slate-900">{themes.filter(t => t.is_free).length}</div>
             <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">ثيمات مجانية</div>
           </div>
         </div>
@@ -79,7 +88,7 @@ export default function ThemesPage() {
             <Shield className="h-7 w-7" />
           </div>
           <div>
-            <div className="text-2xl font-black text-slate-900">2</div>
+            <div className="text-2xl font-black text-slate-900">{themes.filter(t => !t.is_free).length}</div>
             <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">ثيمات مدفوعة</div>
           </div>
         </div>
@@ -91,9 +100,9 @@ export default function ThemesPage() {
           <div key={theme.id} className="group bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-slate-200/50 transition-all duration-500 flex flex-col">
             {/* Preview */}
             <div className="relative h-56 w-full overflow-hidden">
-              <img 
-                src={theme.preview_url} 
-                alt={theme.name} 
+              <img
+                src={theme.preview_url}
+                alt={theme.name}
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-6">
@@ -102,7 +111,7 @@ export default function ThemesPage() {
                   معاينة الثيم
                 </button>
               </div>
-              
+
               {/* Badge */}
               <div className="absolute top-4 left-4">
                 {theme.is_free ? (

@@ -21,13 +21,13 @@ export async function getCategories() {
   }
 }
 
-export async function createCategory(name: string) {
+export async function createCategory(name: string, image_url: string | null = null) {
   const supabase = await createClient()
   try {
     const { storeId } = await assertMerchant(supabase)
     const { error } = await supabase
       .from('categories')
-      .insert({ store_id: storeId, name })
+      .insert({ store_id: storeId, name, image_url })
     
     if (error) throw error
     revalidatePath('/admin/products')
@@ -37,13 +37,16 @@ export async function createCategory(name: string) {
   }
 }
 
-export async function updateCategory(id: string, name: string) {
+export async function updateCategory(id: string, name: string, image_url: string | null = null) {
   const supabase = await createClient()
   try {
     const { storeId } = await assertMerchant(supabase)
+    
+    // We only update image_url if it's provided or explicitly set. 
+    // Wait, let's just always update it to the value passed, since we load the existing one in the UI.
     const { error } = await supabase
       .from('categories')
-      .update({ name })
+      .update({ name, image_url })
       .eq('id', id)
       .eq('store_id', storeId)
     

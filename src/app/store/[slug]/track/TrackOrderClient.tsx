@@ -9,6 +9,10 @@ import {
   ElegantHeader, 
   ElegantFooter 
 } from '@/components/store/themes/ElegantTheme'
+import {
+  FloralHeader,
+  FloralFooter
+} from '@/components/store/themes/FloralTheme'
 import StoreHeader from '@/components/StoreHeader'
 import StoreFooter from '@/components/StoreFooter'
 
@@ -253,6 +257,166 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
           )}
         </main>
         <ElegantFooter store={store} branding={branding} />
+      </div>
+    )
+  }
+
+  // ─── THEME: FLORAL ─────────────────────────────────────────────────────────
+  if (selectedTheme === 'floral') {
+    return (
+      <div className="min-h-screen bg-[#FAF3F0]/20" dir="rtl" style={{ '--primary': primaryColor } as any}>
+        <FloralHeader store={store} branding={branding} slug={slug} />
+        <main className="mx-auto max-w-4xl px-6 py-24">
+          {!order ? (
+            <div className="max-w-md mx-auto space-y-10 p-10 bg-white rounded-[2.5rem] border border-rose-50 shadow-sm">
+               <div className="text-center space-y-4">
+                  <h1 className="text-4xl font-serif italic text-[#2B2B2B]">أين باقتي؟</h1>
+                  <p className="text-sm font-medium text-zinc-500">ادخل بيانات طلبك لنخبرك بمكان زهورك</p>
+               </div>
+               <form onSubmit={handleSearch} className="space-y-6">
+                  <div className="space-y-2">
+                     <label className="text-sm font-bold text-zinc-600">كود الطلب</label>
+                     <input value={orderId} onChange={e => setOrderId(e.target.value)} className="w-full bg-[#FAF3F0]/40 border border-rose-50 rounded-2xl p-4 text-sm focus:ring-1 focus:ring-[var(--primary)] focus:border-[var(--primary)] transition-all uppercase placeholder:text-zinc-400" placeholder="مثال: ABC-123" />
+                  </div>
+                  <div className="space-y-2">
+                     <label className="text-sm font-bold text-zinc-600">رقم الهاتف</label>
+                     <input value={phone} onChange={e => setPhone(e.target.value)} className="w-full bg-[#FAF3F0]/40 border border-rose-50 rounded-2xl p-4 text-sm focus:ring-1 focus:ring-[var(--primary)] focus:border-[var(--primary)] transition-all text-right placeholder:text-zinc-400" dir="ltr" placeholder="01234567890" />
+                  </div>
+                  <button type="submit" disabled={isSearching} className="w-full h-14 bg-[var(--primary)] text-white rounded-full flex items-center justify-center text-sm font-bold hover:bg-[var(--primary)]/90 transition-all shadow-md hover:shadow-lg disabled:opacity-50">
+                     {isSearching ? 'جاري البحث...' : 'تتبع باقتي'}
+                  </button>
+               </form>
+            </div>
+          ) : (
+            <div className="space-y-16 animate-in fade-in slide-in-from-bottom-8 duration-1000 bg-white p-8 md:p-12 rounded-[2.5rem] border border-rose-50 shadow-sm">
+               <div className="flex justify-between items-end border-b border-rose-50 pb-8">
+                  <div className="space-y-2">
+                     <h2 className="text-3xl font-serif italic text-[#2B2B2B]">حالة باقتك</h2>
+                     <p className="text-sm font-bold text-zinc-400 uppercase">كود: {order.id.split('-')[0].toUpperCase()}</p>
+                  </div>
+                  <button onClick={() => setOrder(null)} className="text-sm font-bold text-[var(--primary)] flex items-center gap-2 hover:opacity-80 transition-opacity bg-rose-50 px-4 py-2 rounded-full">
+                     <ArrowRight className="h-4 w-4" /> تتبع طلب آخر
+                  </button>
+               </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                  {STATUS_STEPS.map((step, idx) => {
+                    const currentStepIndex = STATUS_STEPS.findIndex(s => s.id === (order.status === 'paid' ? 'delivered' : order.status))
+                    const isCompleted = currentStepIndex >= idx
+                    const isCurrent = currentStepIndex === idx
+                    return (
+                      <div key={step.id} className={`p-4 rounded-2xl border ${isCompleted ? 'bg-rose-50/50 border-rose-100' : 'bg-zinc-50/50 border-zinc-100'} transition-colors duration-500`}>
+                         <div className="flex flex-col gap-3">
+                            <step.icon className={`h-6 w-6 ${isCompleted ? 'text-[var(--primary)]' : 'text-zinc-300'}`} />
+                            <div>
+                               <span className={`text-sm font-bold block ${isCompleted ? 'text-[#2B2B2B]' : 'text-zinc-400'}`}>{step.label}</span>
+                               {isCurrent && <span className="text-xs text-[var(--primary)] font-bold animate-pulse">الحالة الحالية</span>}
+                            </div>
+                         </div>
+                      </div>
+                    )
+                  })}
+               </div>
+
+               <div className="bg-[#FAF3F0]/20 rounded-2xl p-8 space-y-8 border border-rose-50">
+                  <h3 className="text-lg font-serif text-[#2B2B2B] border-b border-rose-50 pb-4">تفاصيل الباقات</h3>
+                  <div className="space-y-4">
+                     {(order.order_items || []).map((item: any) => (
+                        <div key={item.id} className="flex justify-between items-center bg-white p-4 rounded-xl border border-rose-50">
+                           <div className="space-y-1">
+                              <p className="text-sm font-bold text-[#2B2B2B]">{item.product_name}</p>
+                              <p className="text-xs text-zinc-500 font-medium">الكمية: {item.quantity}</p>
+                           </div>
+                           <span className="text-sm font-black text-[var(--primary)]">{(item.price * item.quantity).toLocaleString()} ج.م</span>
+                        </div>
+                     ))}
+                  </div>
+
+                  <div className="flex flex-col md:flex-row justify-between items-end gap-6 pt-6 border-t border-rose-50">
+                     <div className="space-y-1">
+                        <span className="text-sm font-bold text-zinc-500">الإجمالي النهائي</span>
+                        <p className="text-3xl font-black text-[var(--primary)]">{order.final_price.toLocaleString()} ج.م</p>
+                     </div>
+                     <div className="space-y-1 text-left">
+                        <span className="text-sm font-bold text-zinc-500">تاريخ الطلب</span>
+                        <p className="text-sm font-bold text-[#2B2B2B]">{new Date(order.created_at).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                     </div>
+                  </div>
+               </div>
+
+               {/* Feedback in Floral */}
+               {(order.status === 'delivered' || order.status === 'paid') && (
+                 <div className="pt-16 border-t border-rose-50 space-y-12">
+                    <div className="text-center space-y-4">
+                       <h3 className="text-3xl font-serif italic text-[#2B2B2B]">هل نالت زهورنا إعجابك؟</h3>
+                       <p className="text-zinc-500">رأيك يساعدنا في تقديم باقات أجمل</p>
+                    </div>
+
+                    {isSubmitted ? (
+                      <div className="text-center p-12 bg-[#FAF3F0]/40 rounded-[2rem] border border-rose-50">
+                         <div className="h-16 w-16 rounded-full bg-[var(--primary)] text-white flex items-center justify-center mx-auto mb-6 shadow-md">
+                            <CheckCircle className="h-8 w-8" />
+                         </div>
+                         <h4 className="text-xl font-serif text-[#2B2B2B]">شكراً لمشاركتك مشاعرك معنا!</h4>
+                      </div>
+                    ) : (
+                      <form onSubmit={handleCombinedReview} className="max-w-xl mx-auto space-y-10">
+                         <div className="space-y-8">
+                            <div className="bg-[#FAF3F0]/40 p-8 rounded-[2rem] border border-rose-50 text-center space-y-6">
+                               <p className="text-sm font-bold text-[#2B2B2B]">كيف كانت تجربتك مع المتجر؟</p>
+                               <div className="flex justify-center gap-2">
+                                  {[1, 2, 3, 4, 5].map(s => (
+                                    <button 
+                                      key={s} type="button" onClick={() => setStoreRating(s)} 
+                                      className={`h-12 w-12 rounded-full flex items-center justify-center transition-all duration-300 ${s <= storeRating ? 'bg-[var(--primary)] text-white shadow-md' : 'bg-white text-zinc-300 hover:bg-rose-50'}`}
+                                    >
+                                       <Star className={`h-5 w-5 ${s <= storeRating ? 'fill-current' : ''}`} strokeWidth={2} />
+                                    </button>
+                                  ))}
+                               </div>
+                               <textarea 
+                                 value={storeComment} onChange={e => setStoreComment(e.target.value)} 
+                                 className="w-full bg-white border border-rose-50 rounded-2xl p-4 text-sm h-24 focus:ring-1 focus:ring-[var(--primary)] transition-all resize-none" 
+                                 placeholder="أخبرنا ما الذي أعجبك أكثر..." 
+                               />
+                            </div>
+
+                            {Object.keys(productReviews).map(pid => {
+                               const productItem = order.order_items?.find((i: any) => i.product_id === pid) || { product_name: order.product_name }
+                               return (
+                                 <div key={pid} className="bg-white p-8 rounded-[2rem] border border-rose-50 text-center space-y-6">
+                                    <p className="text-sm font-bold text-[#2B2B2B]">رأيك في {productItem.product_name}</p>
+                                    <div className="flex justify-center gap-2">
+                                       {[1, 2, 3, 4, 5].map(s => (
+                                          <button 
+                                            key={s} type="button" onClick={() => setProductReviews(prev => ({ ...prev, [pid]: { ...prev[pid], rating: s } }))} 
+                                            className={`h-12 w-12 rounded-full flex items-center justify-center transition-all duration-300 ${s <= productReviews[pid].rating ? 'bg-[var(--primary)] text-white shadow-md' : 'bg-[#FAF3F0]/40 text-zinc-300 hover:bg-rose-50'}`}
+                                          >
+                                             <Star className={`h-5 w-5 ${s <= productReviews[pid].rating ? 'fill-current' : ''}`} strokeWidth={2} />
+                                          </button>
+                                       ))}
+                                    </div>
+                                    <textarea 
+                                      value={productReviews[pid].comment} onChange={e => setProductReviews(prev => ({ ...prev, [pid]: { ...prev[pid], comment: e.target.value } }))} 
+                                      className="w-full bg-[#FAF3F0]/40 border border-rose-50 rounded-2xl p-4 text-sm h-24 focus:ring-1 focus:ring-[var(--primary)] transition-all resize-none" 
+                                      placeholder="رأيك في الباقة وتنسيقها..." 
+                                    />
+                                 </div>
+                               )
+                            })}
+                         </div>
+
+                         <button type="submit" disabled={isSubmitting} className="w-full h-14 bg-[var(--primary)] text-white rounded-full flex items-center justify-center text-sm font-bold hover:bg-[var(--primary)]/90 transition-all shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:transform-none">
+                            {isSubmitting ? 'جاري الإرسال...' : 'إرسال التقييمات'}
+                         </button>
+                      </form>
+                    )}
+                 </div>
+               )}
+            </div>
+          )}
+        </main>
+        <FloralFooter store={store} branding={branding} />
       </div>
     )
   }

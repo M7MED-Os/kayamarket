@@ -241,12 +241,13 @@ export const ElegantBestsellers = ({ products, slug }: any) => {
 }
 
 // ─── ELEGANT FEATURES ───────────────────────────────────────────────────────
-export const ElegantFeatures = () => {
-  const features = [
+export const ElegantFeatures = ({ branding }: { branding?: any }) => {
+  const defaultFeatures = [
     { title: 'جودة استثنائية', desc: 'نختار أجود الخامات لضمان رضاكم' },
     { title: 'شحن فاخر', desc: 'تغليف آمن وتوصيل سريع لباب المنزل' },
     { title: 'دعم متواصل', desc: 'فريقنا متاح دائماً للإجابة على استفساراتكم' }
   ]
+  const features = branding?.features_data?.length > 0 ? branding.features_data : defaultFeatures
 
   return (
     <section className="py-24 bg-zinc-50 border-y border-zinc-100" dir="rtl">

@@ -64,8 +64,9 @@ export async function updateStoreSettings(formData: FormData) {
     const policies = formData.get('policies') as string
 
     // --- Update Store Data (Name & Phone & Domain) ---
-    const { data: store } = await supabase.from('stores').select('plan').eq('id', storeId).single()
+    const { data: store } = await supabase.from('stores').select('plan, slug').eq('id', storeId).single()
     const plan = (store?.plan || 'starter') as PlanTier
+    const storeSlug = store?.slug || ''
     const dynamicConfigs = await getDynamicPlanConfigs(supabase)
     const config = dynamicConfigs[plan] || getPlanConfig(plan)
 
@@ -168,8 +169,12 @@ export async function updateStoreSettings(formData: FormData) {
 
     if (settingsError) throw new Error('فشل حفظ السياسات: ' + settingsError.message)
 
-    // Success: Revalidate once
+    // Success: Revalidate — bust all caches so theme shows immediately
     revalidatePath('/admin/settings')
+    revalidateTag('stores')
+    if (storeSlug) {
+      revalidatePath(`/store/${storeSlug}`, 'layout')
+    }
 
     return { success: true }
   } catch (error: any) {
