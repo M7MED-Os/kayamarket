@@ -190,7 +190,7 @@ export default async function InvoicePage({
             <header className="border-b border-zinc-100 py-8 no-print">
                <div className="mx-auto max-w-4xl px-6 flex justify-between items-center">
                   <h1 className="text-xl font-light italic tracking-tighter text-zinc-900 uppercase">{storeName}</h1>
-                  <Link href={storeBackHref} className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-900 flex items-center gap-2">
+                  <Link href={storeBackHref} className="text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-[var(--primary)] flex items-center gap-2 transition-colors">
                      العودة للمتجر <ArrowRight className="h-3 w-3 rotate-180" />
                   </Link>
                </div>
@@ -198,10 +198,10 @@ export default async function InvoicePage({
 
             <main className="mx-auto max-w-4xl px-6 py-16 print:p-0">
                <div className="mb-16 text-center space-y-4 no-print">
-                  <div className="inline-flex items-center justify-center h-16 w-16 rounded-full border border-zinc-900 mb-4">
-                     <CheckCircle2 className="h-8 w-8 text-zinc-900" />
+                  <div className="inline-flex items-center justify-center h-16 w-16 rounded-none border border-[var(--primary)] mb-4">
+                     <CheckCircle2 className="h-8 w-8 text-[var(--primary)]" />
                   </div>
-                  <h2 className="text-3xl font-light tracking-tighter text-zinc-900">تم استلام طلبك بنجاح</h2>
+                  <h2 className="text-3xl font-light tracking-tighter text-zinc-900 uppercase">تم استلام <span className="font-bold italic text-[var(--primary)]">طلبك</span> بنجاح</h2>
                   <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">شكراً لتسوقكم من {storeName}</p>
 
                   <div className="pt-8 flex justify-center">
@@ -214,7 +214,7 @@ export default async function InvoicePage({
                         hasPdfInvoice={config.hasPdfInvoice}
                         storeName={storeName}
                         whatsappUrl={whatsappUrl}
-                        primaryColor="#000"
+                        primaryColor={primaryColor}
                      />
                   </div>
                </div>
@@ -227,7 +227,10 @@ export default async function InvoicePage({
                         ) : (
                            <h1 className="text-3xl font-light italic tracking-tighter text-zinc-900 uppercase">{storeName}</h1>
                         )}
-                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{storeBranding?.tagline}</p>
+                        <div className="flex items-center gap-2">
+                           <div className="h-px w-8 bg-[var(--primary)]/30" />
+                           <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{storeBranding?.tagline || 'فاتورة معتمدة'}</p>
+                        </div>
                      </div>
                      <div className="text-right md:text-left space-y-2">
                         <span className="text-[10px] font-black uppercase tracking-widest text-zinc-300">رقم الفاتورة</span>
@@ -238,34 +241,40 @@ export default async function InvoicePage({
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-16 border-y border-zinc-50 py-12">
                      <div className="space-y-6">
-                        <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-900">بيانات العميل</h4>
+                        <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-900 flex items-center gap-2">
+                           <div className="h-1 w-1 bg-[var(--primary)]" />
+                           بيانات العميل
+                        </h4>
                         <div className="space-y-4">
                            <div className="flex items-center gap-3">
-                              <User className="h-4 w-4 text-zinc-300" />
+                              <User className="h-4 w-4 text-[var(--primary)]/40" />
                               <span className="text-sm font-bold text-zinc-900">{order.customer_name}</span>
                            </div>
                            <div className="flex items-center gap-3">
-                              <Phone className="h-4 w-4 text-zinc-300" />
+                              <Phone className="h-4 w-4 text-[var(--primary)]/40" />
                               <span className="text-sm font-bold text-zinc-900" dir="ltr">{order.customer_phone}</span>
                            </div>
                            <div className="flex items-start gap-3">
-                              <MapPin className="h-4 w-4 text-zinc-300 mt-0.5" />
+                              <MapPin className="h-4 w-4 text-[var(--primary)]/40 mt-0.5" />
                               <span className="text-sm font-bold text-zinc-900 leading-relaxed">{order.customer_address}</span>
                            </div>
                         </div>
                      </div>
                      <div className="space-y-6">
-                        <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-900">تفاصيل الدفع</h4>
+                        <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-900 flex items-center gap-2">
+                           <div className="h-1 w-1 bg-[var(--primary)]" />
+                           تفاصيل الدفع
+                        </h4>
                         <div className="space-y-4">
                            <div className="flex items-center gap-3">
-                              <Wallet className="h-4 w-4 text-zinc-300" />
+                              <Wallet className="h-4 w-4 text-[var(--primary)]/40" />
                               <span className="text-sm font-bold text-zinc-900">{order.payment_method === 'cod' ? 'الدفع عند الاستلام' : order.payment_method}</span>
                            </div>
                            {depositAmount > 0 && order.payment_method === 'cod' && (
-                              <div className="bg-zinc-50 p-6 space-y-3">
+                              <div className="bg-zinc-50 p-6 space-y-3 border-r-2 border-[var(--primary)]">
                                  <div className="flex justify-between items-center">
                                     <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">العربون المطلوب</span>
-                                    <span className="text-sm font-black text-zinc-900">{depositAmount.toLocaleString()} ج.م</span>
+                                    <span className="text-sm font-black text-[var(--primary)]">{depositAmount.toLocaleString()} ج.م</span>
                                  </div>
                                  <div className="flex justify-between items-center">
                                     <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">المتبقي</span>
@@ -278,13 +287,16 @@ export default async function InvoicePage({
                   </div>
 
                   <div className="space-y-8">
-                     <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-900">المنتجات</h4>
+                     <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-900 flex items-center gap-2">
+                        <div className="h-1 w-1 bg-[var(--primary)]" />
+                        المنتجات
+                     </h4>
                      <div className="space-y-6">
                         {(items.length > 0 ? items : [{ product_name: order.product_name, quantity: 1, product_price: order.product_price }]).map((item: any, idx: number) => (
                            <div key={idx} className="flex justify-between items-center group">
                               <div className="flex items-center gap-6">
-                                 <span className="text-[10px] font-bold text-zinc-300 italic">{item.quantity}x</span>
-                                 <span className="text-sm font-bold text-zinc-900 uppercase tracking-wide">{item.product_name}</span>
+                                 <span className="text-[10px] font-bold text-[var(--primary)] italic">{item.quantity}x</span>
+                                 <span className="text-sm font-bold text-zinc-900 uppercase tracking-wide group-hover:text-[var(--primary)] transition-colors">{item.product_name}</span>
                               </div>
                               <span className="text-sm font-light text-zinc-400">{(item.product_price * item.quantity).toLocaleString()} ج.م</span>
                            </div>
@@ -294,17 +306,17 @@ export default async function InvoicePage({
                      <div className="pt-12 border-t border-zinc-100 space-y-4">
                         <div className="flex justify-between items-center">
                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">المجموع الفرعي</span>
-                           <span className="text-sm font-bold">{productPrice.toLocaleString()} ج.م</span>
+                           <span className="text-sm font-bold text-zinc-900">{productPrice.toLocaleString()} ج.م</span>
                         </div>
                         {discountPct > 0 && (
-                           <div className="flex justify-between items-center text-zinc-900">
+                           <div className="flex justify-between items-center text-[var(--primary)]">
                               <span className="text-[10px] font-black uppercase tracking-widest italic">خصم ({order.coupon_code || discountPct + '%'})</span>
                               <span className="text-sm font-bold">-{(productPrice * discountPct / 100).toLocaleString()} ج.م</span>
                            </div>
                         )}
                         <div className="flex justify-between items-end pt-8">
                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-900">الإجمالي الكلي</span>
-                           <span className="text-4xl font-light text-zinc-900 tracking-tighter">{finalPrice.toLocaleString()} ج.م</span>
+                           <span className="text-4xl font-bold text-[var(--primary)] tracking-tighter">{finalPrice.toLocaleString()} ج.م</span>
                         </div>
                      </div>
                   </div>

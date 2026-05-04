@@ -66,9 +66,9 @@ export default function ProductReviews({
         <div className={isElegant ? 'text-right space-y-2' : 'text-center md:text-right'}>
           <h2 className={`${isElegant ? 'text-3xl font-light tracking-tighter' : 'text-2xl font-black'} text-zinc-900`}>تقييمات العملاء</h2>
           <div className="flex items-center justify-center md:justify-start gap-4">
-            <span className={`font-black ${isElegant ? 'text-4xl text-zinc-900' : 'text-2xl text-zinc-800'}`}>{averageRating.toFixed(1)}</span>
+            <span className={`font-black ${isElegant ? 'text-4xl text-[var(--primary)]' : 'text-2xl text-zinc-800'}`}>{averageRating.toFixed(1)}</span>
             <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">({totalReviews} تقييم)</span>
-            <div className={`flex items-center gap-1 ${isElegant ? 'text-zinc-900' : 'text-amber-400'}`}>
+            <div className={`flex items-center gap-1 ${isElegant ? 'text-[var(--primary)]' : 'text-amber-400'}`}>
               {[1, 2, 3, 4, 5].map(s => (
                 <Star key={s} className={`h-4 w-4 ${s <= Math.round(averageRating) ? 'fill-current' : isElegant ? 'text-zinc-100' : 'text-zinc-200'}`} strokeWidth={isElegant ? 1 : 2} />
               ))}
@@ -78,7 +78,7 @@ export default function ProductReviews({
         
         <button
           onClick={() => setFormVisible(!formVisible)}
-          className={`${isElegant ? 'h-14 px-10 bg-zinc-900 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800' : 'rounded-2xl bg-zinc-900 px-6 py-4 text-sm font-bold shadow-lg shadow-zinc-200'} text-white transition-all active:scale-95 w-full md:w-auto`}
+          className={`${isElegant ? 'h-14 px-10 bg-[var(--primary)] text-[10px] font-black uppercase tracking-widest hover:brightness-125 disabled:brightness-75 rounded-none' : 'rounded-2xl bg-zinc-900 px-6 py-4 text-sm font-bold shadow-lg shadow-zinc-200'} text-white transition-all active:scale-95 w-full md:w-auto`}
         >
           {formVisible ? 'إلغاء' : 'أضف تقييمك'}
         </button>
@@ -103,7 +103,7 @@ export default function ProductReviews({
                     onClick={() => setRating(star)}
                   >
                     <Star 
-                      className={`h-10 w-10 ${star <= (hoverRating || rating) ? (isElegant ? 'fill-zinc-900 text-zinc-900' : 'fill-amber-400 text-amber-400') : (isElegant ? 'text-zinc-100' : 'text-zinc-200')}`} 
+                      className={`h-10 w-10 ${star <= (hoverRating || rating) ? (isElegant ? 'fill-[var(--primary)] text-[var(--primary)]' : 'fill-amber-400 text-amber-400') : (isElegant ? 'text-zinc-100' : 'text-zinc-200')}`} 
                       strokeWidth={isElegant ? 1 : 2}
                     />
                   </button>
@@ -119,7 +119,7 @@ export default function ProductReviews({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="اسمك الكامل"
-                className={`w-full ${isElegant ? 'bg-zinc-50 border-none p-6 italic' : 'rounded-xl border border-zinc-200 bg-white px-4 py-3 focus:border-amber-400 focus:ring-2 focus:ring-amber-100'} text-sm outline-none transition-all`}
+                className={`w-full ${isElegant ? 'bg-zinc-50 border-none p-6 italic rounded-none focus:ring-1 focus:ring-[var(--primary)]' : 'rounded-xl border border-zinc-200 bg-white px-4 py-3 focus:border-amber-400 focus:ring-2 focus:ring-amber-100'} text-sm outline-none transition-all`}
               />
             </div>
 
@@ -130,14 +130,14 @@ export default function ProductReviews({
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="اكتب تجربتك مع المنتج هنا..."
                 rows={4}
-                className={`w-full ${isElegant ? 'bg-zinc-50 border-none p-6 italic' : 'rounded-xl border border-zinc-200 bg-white px-4 py-3 focus:border-amber-400 focus:ring-2 focus:ring-amber-100'} text-sm outline-none transition-all resize-none`}
+                className={`w-full ${isElegant ? 'bg-zinc-50 border-none p-6 italic rounded-none focus:ring-1 focus:ring-[var(--primary)]' : 'rounded-xl border border-zinc-200 bg-white px-4 py-3 focus:border-amber-400 focus:ring-2 focus:ring-amber-100'} text-sm outline-none transition-all resize-none`}
               />
             </div>
 
             <button
               type="submit"
               disabled={isSubmitting || !name.trim()}
-              className={`w-full h-16 flex items-center justify-center gap-3 ${isElegant ? 'bg-zinc-900 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-zinc-800 shadow-xl' : 'rounded-xl bg-amber-500 text-sm font-bold hover:bg-amber-600 shadow-md'} text-white transition disabled:opacity-50`}
+              className={`w-full h-16 flex items-center justify-center gap-3 ${isElegant ? 'bg-[var(--primary)] text-[10px] font-black uppercase tracking-[0.2em] hover:brightness-125 disabled:brightness-75 rounded-none shadow-xl' : 'rounded-xl bg-amber-500 text-sm font-bold hover:bg-amber-600 shadow-md'} text-white transition disabled:opacity-50`}
             >
               <Send className="h-4 w-4" />
               {isSubmitting ? 'جاري الإرسال...' : 'إرسال التقييم'}
@@ -155,25 +155,29 @@ export default function ProductReviews({
         ) : (
           <div className={isElegant ? 'grid grid-cols-1 md:grid-cols-2 gap-8' : 'space-y-6'}>
             {reviews.map((review) => (
-              <div key={review.id} className={`${isElegant ? 'p-10 border border-zinc-100 hover:border-zinc-900' : 'p-6 rounded-3xl bg-zinc-50 border border-zinc-100'} transition-all duration-700`}>
-                <div className="flex items-start gap-4">
+              <div key={review.id} className={`${isElegant ? 'p-8 border border-zinc-100 hover:border-[var(--primary)]' : 'p-6 rounded-3xl bg-zinc-50 border border-zinc-100'} transition-all duration-700`}>
+                <div className="flex gap-4">
                   {!isElegant && (
                     <div className="h-12 w-12 rounded-full bg-zinc-200 flex items-center justify-center text-zinc-500 shrink-0">
                       <UserCircle2 className="h-7 w-7" />
                     </div>
                   )}
-                  <div className="flex-1 space-y-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
-                      <p className={`font-black text-zinc-900 ${isElegant ? 'text-xs uppercase tracking-widest' : 'text-sm'}`}>{review.customer_name}</p>
-                      <p className="text-[9px] font-black text-zinc-300 uppercase tracking-widest">
+                  <div className="flex-1 min-w-0 space-y-4">
+                    <div className="flex justify-between items-center gap-4">
+                      <p className={`font-black text-zinc-900 truncate ${isElegant ? 'text-xs uppercase tracking-widest' : 'text-sm'}`}>
+                        {review.customer_name}
+                      </p>
+                      <p className="text-[9px] font-black text-zinc-300 uppercase tracking-widest whitespace-nowrap">
                         {new Date(review.created_at).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' })}
                       </p>
                     </div>
-                    <div className={`flex gap-1 ${isElegant ? 'text-zinc-900' : 'text-amber-400'}`}>
+                    
+                    <div className={`flex gap-1 ${isElegant ? 'text-[var(--primary)]' : 'text-amber-400'}`}>
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star key={star} className={`h-3 w-3 ${star <= review.rating ? 'fill-current' : 'text-zinc-100'}`} strokeWidth={1} />
                       ))}
                     </div>
+
                     {review.comment && (
                       <p className={`text-zinc-600 leading-relaxed ${isElegant ? 'text-sm font-light italic' : 'text-sm font-bold'}`}>
                         "{review.comment}"

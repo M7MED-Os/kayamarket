@@ -109,6 +109,21 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
     toast.success('تمت الإضافة للسلة')
   }
 
+  const [showCartHint, setShowCartHint] = useState(false)
+
+  useEffect(() => {
+    let timer: any
+    if (showCartHint) {
+      timer = setTimeout(() => setShowCartHint(false), 5000)
+    }
+    return () => clearTimeout(timer)
+  }, [showCartHint])
+
+  const handleAddToCartWithHint = () => {
+    handleAddToCart()
+    setShowCartHint(true)
+  }
+
   if (isElegant) {
     return (
       <div className="space-y-10">
@@ -134,7 +149,7 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
 
            {product.stock !== null && (
               <div className="flex items-center gap-2">
-                 <div className={`h-1 w-1 rounded-full ${product.stock > 0 ? 'bg-zinc-900' : 'bg-zinc-200'}`} />
+                 <div className={`h-1 w-1 rounded-none ${product.stock > 0 ? 'bg-[var(--primary)]' : 'bg-zinc-200'}`} />
                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
                     {product.stock > 0 ? `متوفر: ${product.stock} قطعة` : 'نفذت الكمية'}
                  </span>
@@ -146,29 +161,29 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
                  <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">الاسم</label>
-                 <input value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-zinc-900 transition-all" placeholder="الاسم بالكامل..." />
+                 <input value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all rounded-none" placeholder="الاسم بالكامل..." />
               </div>
               <div className="space-y-1">
                  <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">رقم الهاتف</label>
-                 <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-zinc-900 transition-all text-right" dir="ltr" placeholder="01234567890" />
+                 <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all text-right rounded-none" dir="ltr" placeholder="01234567890" />
               </div>
            </div>
            <div className="space-y-1">
               <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">العنوان</label>
-              <input value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-zinc-900 transition-all" placeholder="المدينة، الشارع، رقم المنزل..." />
+              <input value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all rounded-none" placeholder="المدينة، الشارع، رقم المنزل..." />
            </div>
 
             <div className="space-y-4">
               <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">طريقة الدفع</label>
               <div className="flex flex-col sm:flex-row gap-4">
                  {['الدفع عند الاستلام', 'تحويل بنكي / محافظ إلكترونية'].map(m => (
-                    <button key={m} onClick={() => setPaymentMethod(m)} className={`flex-1 p-4 text-[10px] font-black uppercase tracking-widest border transition-all duration-500 ${paymentMethod === m ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-100 text-zinc-400 hover:border-zinc-300'}`}>
+                    <button key={m} onClick={() => setPaymentMethod(m)} className={`flex-1 p-4 text-[10px] font-black uppercase tracking-widest border transition-all duration-500 rounded-none ${paymentMethod === m ? 'border-[var(--primary)] bg-[var(--primary)] text-white' : 'border-zinc-100 text-zinc-400 hover:border-[var(--primary)]/30'}`}>
                        {m}
                     </button>
                  ))}
               </div>
               {paymentMethod === 'الدفع عند الاستلام' && settings.cod_deposit_required && (
-                <div className="p-4 bg-zinc-50 border border-zinc-100 text-[10px] font-black uppercase tracking-widest text-zinc-900 flex justify-between items-center">
+                <div className="p-4 bg-zinc-50 border border-zinc-100 text-[10px] font-black uppercase tracking-widest text-zinc-900 flex justify-between items-center rounded-none">
                   <span>مقدم مطلوب ({settings.deposit_percentage}%)</span>
                   <span>{finalPrice ? ((finalPrice * settings.deposit_percentage) / 100).toLocaleString() : '0'} ج.م</span>
                 </div>
@@ -182,13 +197,13 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
                  <input 
                    value={couponCode} 
                    onChange={e => setCouponCode(e.target.value)} 
-                   className="flex-1 bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-zinc-900 transition-all uppercase tracking-widest" 
+                   className="flex-1 bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all uppercase tracking-widest rounded-none" 
                    placeholder="أدخل الكود..." 
                  />
                  <button 
                    onClick={applyCoupon} 
                    disabled={loading || !couponCode}
-                   className="px-8 bg-zinc-900 text-white text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-all disabled:opacity-50"
+                   className="px-8 bg-[var(--primary)] text-white text-[10px] font-black uppercase tracking-widest hover:brightness-125 transition-all disabled:brightness-75 rounded-none"
                  >
                    تطبيق
                  </button>
@@ -198,17 +213,24 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
 
            <div className="pt-6 space-y-4">
               <div className="flex gap-4">
-                 <div className="flex items-center bg-zinc-50 px-2 py-2 gap-2">
-                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 flex items-center justify-center text-zinc-400 hover:text-zinc-900 transition-colors"><Minus className="h-4 w-4" /></button>
+                 <div className="flex items-center bg-zinc-50 px-2 py-2 gap-2 rounded-none">
+                    <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 flex items-center justify-center text-zinc-400 hover:text-[var(--primary)] transition-colors"><Minus className="h-4 w-4" /></button>
                     <span className="text-base font-black w-8 text-center">{quantity}</span>
-                    <button onClick={() => setQuantity(quantity + 1)} className="w-12 h-12 flex items-center justify-center text-zinc-400 hover:text-zinc-900 transition-colors"><Plus className="h-4 w-4" /></button>
+                    <button onClick={() => setQuantity(quantity + 1)} className="w-12 h-12 flex items-center justify-center text-zinc-400 hover:text-[var(--primary)] transition-colors"><Plus className="h-4 w-4" /></button>
                  </div>
-                 <button onClick={handleAddToCart} className="flex-1 bg-white border border-zinc-900 text-zinc-900 h-14 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-zinc-900 hover:text-white transition-all duration-500">
-                    <ShoppingCart className="h-4 w-4" />
-                    إضافة للسلة
-                 </button>
+                 <div className="flex-1 relative">
+                    <button onClick={handleAddToCartWithHint} className="w-full bg-white border border-[var(--primary)] text-[var(--primary)] h-14 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[var(--primary)] hover:text-white transition-all duration-500 rounded-none">
+                       <ShoppingCart className="h-4 w-4" />
+                       إضافة للسلة
+                    </button>
+                    {showCartHint && (
+                      <div className="absolute bottom-full mb-3 left-0 right-0 bg-zinc-900 text-white text-[9px] font-black px-4 py-2 rounded-none text-center animate-in fade-in slide-in-from-bottom-2 duration-300 uppercase tracking-widest shadow-xl z-20">
+                        هذا الزر يقوم بإضافة المنتج لسلة المشتريات
+                      </div>
+                    )}
+                 </div>
               </div>
-              <button onClick={handleOrder} disabled={loading} className="w-full bg-zinc-900 text-white h-16 flex items-center justify-center text-[10px] font-black uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors shadow-lg disabled:opacity-50">
+              <button onClick={handleOrder} disabled={loading} className="w-full bg-[var(--primary)] text-white h-16 flex items-center justify-center text-[10px] font-black uppercase tracking-[0.2em] hover:brightness-125 transition-all shadow-lg disabled:brightness-75 rounded-none">
                  {loading ? 'جاري التنفيذ...' : 'تأكيد الطلب الآن'}
               </button>
            </div>

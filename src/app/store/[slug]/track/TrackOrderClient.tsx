@@ -104,13 +104,13 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                <form onSubmit={handleSearch} className="space-y-6">
                   <div className="space-y-1">
                      <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">كود الطلب</label>
-                     <input value={orderId} onChange={e => setOrderId(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm focus:ring-1 focus:ring-zinc-900 transition-all uppercase" placeholder="مثال: ABC-123" />
+                     <input value={orderId} onChange={e => setOrderId(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm focus:ring-1 focus:ring-[var(--primary)] transition-all uppercase rounded-none" placeholder="مثال: ABC-123" />
                   </div>
                   <div className="space-y-1">
                      <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">رقم الهاتف</label>
-                     <input value={phone} onChange={e => setPhone(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm focus:ring-1 focus:ring-zinc-900 transition-all text-right" dir="ltr" placeholder="01234567890" />
+                     <input value={phone} onChange={e => setPhone(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm focus:ring-1 focus:ring-[var(--primary)] transition-all text-right rounded-none" dir="ltr" placeholder="01234567890" />
                   </div>
-                  <button type="submit" disabled={isSearching} className="w-full h-16 bg-zinc-900 text-white flex items-center justify-center text-[10px] font-black uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors shadow-lg disabled:opacity-50">
+                  <button type="submit" disabled={isSearching} className="w-full h-16 bg-[var(--primary)] text-white flex items-center justify-center text-[10px] font-black uppercase tracking-[0.2em] hover:brightness-125 transition-all shadow-lg disabled:brightness-75 rounded-none">
                      {isSearching ? 'جاري البحث...' : 'تتبع الآن'}
                   </button>
                </form>
@@ -122,7 +122,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                      <h2 className="text-3xl font-light text-zinc-900 tracking-tighter">حالة <span className="font-bold">الطلب</span></h2>
                      <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">كود: {order.id.split('-')[0].toUpperCase()}</p>
                   </div>
-                  <button onClick={() => setOrder(null)} className="text-[10px] font-black uppercase tracking-widest text-zinc-900 flex items-center gap-2 hover:opacity-60 transition-opacity">
+                  <button onClick={() => setOrder(null)} className="text-[10px] font-black uppercase tracking-widest text-zinc-900 flex items-center gap-2 hover:text-[var(--primary)] transition-all">
                      <ArrowRight className="h-3 w-3" /> بحث جديد
                   </button>
                </div>
@@ -134,18 +134,18 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                     const isCurrent = currentStepIndex === idx
                     return (
                       <div key={step.id} className="space-y-6">
-                         <div className={`h-[2px] w-full transition-all duration-1000 ${isCompleted ? 'bg-zinc-900' : 'bg-zinc-100'}`} />
+                         <div className={`h-[2px] w-full transition-all duration-1000 ${isCompleted ? 'bg-[var(--primary)]' : 'bg-zinc-100'}`} />
                          <div className="flex flex-col gap-2">
-                            <span className={`text-[10px] font-black uppercase tracking-[0.3em] ${isCompleted ? 'text-zinc-900' : 'text-zinc-300'}`}>0{idx + 1}</span>
+                            <span className={`text-[10px] font-black uppercase tracking-[0.3em] ${isCompleted ? 'text-[var(--primary)]' : 'text-zinc-300'}`}>0{idx + 1}</span>
                             <span className={`text-xs font-bold uppercase tracking-wider ${isCompleted ? 'text-zinc-900' : 'text-zinc-300'}`}>{step.label}</span>
-                            {isCurrent && <div className="h-1 w-1 rounded-full bg-zinc-900 animate-pulse" />}
+                            {isCurrent && <div className="h-1.5 w-1.5 rounded-none bg-[var(--primary)] animate-pulse" />}
                          </div>
                       </div>
                     )
                   })}
                </div>
 
-               <div className="bg-zinc-50/50 border border-zinc-100 p-12 space-y-12">
+               <div className="bg-zinc-50/50 border border-zinc-100 p-12 space-y-12 rounded-none">
                   <div className="space-y-8">
                      <div className="flex items-center gap-4">
                         <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-900">محتويات الطلب</h3>
@@ -155,10 +155,10 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                         {(order.order_items || []).map((item: any) => (
                            <div key={item.id} className="flex justify-between items-end pb-4 border-b border-zinc-50 last:border-0">
                               <div className="space-y-1">
-                                 <p className="text-sm font-bold text-zinc-900">{item.product_name}</p>
+                                 <p className="text-sm font-bold text-zinc-900 hover:text-[var(--primary)] transition-colors">{item.product_name}</p>
                                  <p className="text-[10px] text-zinc-400 font-black uppercase tracking-widest">الكمية: {item.quantity}</p>
                               </div>
-                              <span className="text-sm font-light text-zinc-900">{(item.price * item.quantity).toLocaleString()} ج.م</span>
+                              <span className="text-sm font-light text-zinc-900">{(Number(item.product_price || item.price || 0) * Number(item.quantity || 1)).toLocaleString()} ج.م</span>
                            </div>
                         ))}
                      </div>
@@ -167,7 +167,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                   <div className="flex flex-col md:flex-row justify-between gap-12 pt-8 border-t border-zinc-100">
                      <div className="space-y-2">
                         <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400">الإجمالي النهائي</span>
-                        <p className="text-4xl font-light tracking-tighter text-zinc-900">{order.final_price} ج.م</p>
+                        <p className="text-4xl font-light tracking-tighter text-[var(--primary)]">{Number(order.final_price || order.total_price || 0).toLocaleString()} ج.م</p>
                      </div>
                      <div className="space-y-2 md:text-left">
                         <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400">تاريخ الطلب</span>
@@ -181,15 +181,15 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                  <div className="pt-24 border-t border-zinc-100 space-y-16">
                     <div className="text-center space-y-4">
                        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">نود معرفة رأيك</span>
-                       <h3 className="text-4xl font-light text-zinc-900 tracking-tighter">تجربة <span className="font-bold italic">استثنائية؟</span></h3>
+                       <h3 className="text-4xl font-light text-zinc-900 tracking-tighter">تجربة <span className="font-bold italic text-[var(--primary)]">استثنائية؟</span></h3>
                     </div>
 
                     {isSubmitted ? (
-                      <div className="text-center py-20 bg-zinc-50 border border-zinc-100 animate-in zoom-in duration-700">
-                         <div className="h-12 w-12 rounded-full border border-zinc-900 flex items-center justify-center mx-auto mb-6">
-                            <CheckCircle className="h-5 w-5 text-zinc-900" />
+                      <div className="text-center py-20 bg-zinc-50 border border-zinc-100 animate-in zoom-in duration-700 rounded-none">
+                         <div className="h-12 w-12 rounded-none border border-[var(--primary)] flex items-center justify-center mx-auto mb-6">
+                            <CheckCircle className="h-5 w-5 text-[var(--primary)]" />
                          </div>
-                         <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-900">شكراً لمشاركتك قصتك معنا</p>
+                         <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--primary)]">شكراً لمشاركتك قصتك معنا</p>
                       </div>
                     ) : (
                       <form onSubmit={handleCombinedReview} className="max-w-xl mx-auto space-y-16">
@@ -203,7 +203,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                                       key={s} 
                                       type="button" 
                                       onClick={() => setStoreRating(s)} 
-                                      className={`h-10 w-10 flex items-center justify-center transition-all duration-500 ${s <= storeRating ? 'bg-zinc-900 text-white' : 'bg-zinc-50 text-zinc-300 hover:bg-zinc-100'}`}
+                                      className={`h-10 w-10 flex items-center justify-center transition-all duration-500 rounded-none ${s <= storeRating ? 'bg-[var(--primary)] text-white' : 'bg-zinc-50 text-zinc-300 hover:bg-[var(--primary)]/10 hover:text-[var(--primary)]'}`}
                                     >
                                        <Star className={`h-4 w-4 ${s <= storeRating ? 'fill-current' : ''}`} strokeWidth={1} />
                                     </button>
@@ -212,7 +212,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                                <textarea 
                                  value={storeComment} 
                                  onChange={e => setStoreComment(e.target.value)} 
-                                 className="w-full bg-zinc-50 border-none p-6 text-xs h-32 focus:ring-1 focus:ring-zinc-900 transition-all italic" 
+                                 className="w-full bg-zinc-50 border-none p-6 text-xs h-32 focus:ring-1 focus:ring-[var(--primary)] transition-all italic rounded-none" 
                                  placeholder="أخبرنا بالمزيد عن تجربتك..." 
                                />
                             </div>
@@ -229,7 +229,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                                             key={s} 
                                             type="button" 
                                             onClick={() => setProductReviews(prev => ({ ...prev, [pid]: { ...prev[pid], rating: s } }))} 
-                                            className={`h-10 w-10 flex items-center justify-center transition-all duration-500 ${s <= productReviews[pid].rating ? 'bg-zinc-900 text-white' : 'bg-zinc-50 text-zinc-300'}`}
+                                            className={`h-10 w-10 flex items-center justify-center transition-all duration-500 rounded-none ${s <= productReviews[pid].rating ? 'bg-[var(--primary)] text-white' : 'bg-zinc-50 text-zinc-300 hover:bg-[var(--primary)]/10 hover:text-[var(--primary)]'}`}
                                           >
                                              <Star className={`h-4 w-4 ${s <= productReviews[pid].rating ? 'fill-current' : ''}`} strokeWidth={1} />
                                           </button>
@@ -238,7 +238,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                                     <textarea 
                                       value={productReviews[pid].comment} 
                                       onChange={e => setProductReviews(prev => ({ ...prev, [pid]: { ...prev[pid], comment: e.target.value } }))} 
-                                      className="w-full bg-zinc-50 border-none p-6 text-xs h-32 focus:ring-1 focus:ring-zinc-900 transition-all italic" 
+                                      className="w-full bg-zinc-50 border-none p-6 text-xs h-32 focus:ring-1 focus:ring-[var(--primary)] transition-all italic rounded-none" 
                                       placeholder={`رأيك في المنتج...`} 
                                     />
                                  </div>
@@ -246,7 +246,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                             })}
                          </div>
 
-                         <button type="submit" disabled={isSubmitting} className="w-full h-16 bg-zinc-900 text-white flex items-center justify-center text-[10px] font-black uppercase tracking-[0.3em] hover:bg-zinc-800 transition-all shadow-xl disabled:opacity-50">
+                         <button type="submit" disabled={isSubmitting} className="w-full h-16 bg-[var(--primary)] text-white flex items-center justify-center text-[10px] font-black uppercase tracking-[0.3em] hover:brightness-125 transition-all shadow-xl disabled:brightness-75 rounded-none">
                             {isSubmitting ? 'جاري الإرسال...' : 'إرسال التقييمات'}
                          </button>
                       </form>
@@ -256,7 +256,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
             </div>
           )}
         </main>
-        <ElegantFooter store={store} branding={branding} />
+        <ElegantFooter store={store} branding={branding} slug={slug} />
       </div>
     )
   }
@@ -327,7 +327,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                               <p className="text-sm font-bold text-[#2B2B2B]">{item.product_name}</p>
                               <p className="text-xs text-zinc-500 font-medium">الكمية: {item.quantity}</p>
                            </div>
-                           <span className="text-sm font-black text-[var(--primary)]">{(item.price * item.quantity).toLocaleString()} ج.م</span>
+                           <span className="text-sm font-black text-[var(--primary)]">{(Number(item.price || 0) * Number(item.quantity || 1)).toLocaleString()} ج.م</span>
                         </div>
                      ))}
                   </div>
@@ -335,7 +335,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
                   <div className="flex flex-col md:flex-row justify-between items-end gap-6 pt-6 border-t border-rose-50">
                      <div className="space-y-1">
                         <span className="text-sm font-bold text-zinc-500">الإجمالي النهائي</span>
-                        <p className="text-3xl font-black text-[var(--primary)]">{order.final_price.toLocaleString()} ج.م</p>
+                        <p className="text-3xl font-black text-[var(--primary)]">{Number(order.final_price || 0).toLocaleString()} ج.م</p>
                      </div>
                      <div className="space-y-1 text-left">
                         <span className="text-sm font-bold text-zinc-500">تاريخ الطلب</span>
@@ -564,7 +564,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
               <div className="w-full sm:w-auto flex gap-8 sm:gap-12 justify-between sm:justify-end border-t sm:border-t-0 sm:border-r border-slate-100 pt-6 sm:pt-0 sm:pr-8">
                 <div className="text-right sm:text-center">
                   <h3 className="font-bold text-slate-400 text-sm mb-2">الإجمالي</h3>
-                  <p className="font-black text-slate-900 text-xl" dir="ltr">{order.final_price} <span className="text-sm text-slate-500">ج.م</span></p>
+                  <p className="font-black text-slate-900 text-xl" dir="ltr">{Number(order.final_price || 0).toLocaleString()} <span className="text-sm text-slate-500">ج.م</span></p>
                 </div>
                 <div className="text-right sm:text-center">
                   <h3 className="font-bold text-slate-400 text-sm mb-2">تاريخ الطلب</h3>

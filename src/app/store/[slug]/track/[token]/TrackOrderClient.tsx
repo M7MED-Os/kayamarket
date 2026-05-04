@@ -93,26 +93,30 @@ export default function TrackOrderClient({ order, store, branding, slug }: any) 
       <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
         <ElegantHeader store={store} branding={branding} slug={slug} />
         <main className="mx-auto max-w-4xl px-6 py-20">
-          <div className="text-center mb-16 space-y-4">
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">تتبع الطلب</span>
-            <h1 className="text-4xl font-light text-zinc-900 tracking-tighter">تفاصيل <span className="font-bold underline decoration-zinc-200 underline-offset-8">الفاتورة</span></h1>
-            <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest pt-2">#{order.id.split('-')[0]}</p>
+          <div className="flex flex-col items-center text-center mb-16 space-y-4">
+            <div className="h-px w-12 bg-[var(--primary)]/30 mb-2" />
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--primary)]">تتبع الطلب</span>
+            <h1 className="text-4xl md:text-5xl font-light text-zinc-900 tracking-tighter uppercase">تفاصيل <span className="font-bold italic text-[var(--primary)]">الفاتورة</span></h1>
+            <p className="text-[10px] font-black text-zinc-300 uppercase tracking-[0.3em] pt-2">رقم الطلب: #{order.id.split('-')[0]}</p>
           </div>
 
           <div className="grid grid-cols-1 gap-12">
             {/* Status */}
-            <div className="border border-zinc-100 p-10 space-y-8">
-              <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">حالة الطلب</h3>
+            <div className="border border-zinc-100 p-10 rounded-[3rem] bg-zinc-50/30 space-y-8">
+              <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900 flex items-center gap-2">
+                <div className="h-1.5 w-1.5 rounded-full bg-[var(--primary)]" />
+                حالة الطلب
+              </h3>
               {isCancelled ? (
-                <div className="text-rose-500 font-bold uppercase tracking-widest">تم إلغاء الطلب</div>
+                <div className="text-rose-500 font-bold uppercase tracking-widest bg-rose-50 p-4 rounded-2xl text-center border border-rose-100">تم إلغاء الطلب</div>
               ) : (
-                <div className="flex flex-wrap gap-12">
+                <div className="flex flex-wrap gap-8 md:gap-12 justify-center md:justify-start">
                   {STATUS_STEPS.map((step, idx) => {
                     const isCompleted = currentStepIndex >= idx
                     return (
                       <div key={step.id} className="flex items-center gap-3">
-                        <div className={`h-2 w-2 rounded-full ${isCompleted ? 'bg-zinc-900' : 'bg-zinc-100'}`} />
-                        <span className={`text-[10px] font-black uppercase tracking-widest ${isCompleted ? 'text-zinc-900' : 'text-zinc-200'}`}>
+                        <div className={`h-3 w-3 rounded-full transition-all duration-700 ${isCompleted ? 'bg-[var(--primary)] shadow-[0_0_10px_var(--primary)]' : 'bg-zinc-200'}`} />
+                        <span className={`text-[11px] font-black uppercase tracking-widest transition-colors ${isCompleted ? 'text-zinc-900' : 'text-zinc-300'}`}>
                           {step.label}
                         </span>
                       </div>
@@ -123,45 +127,51 @@ export default function TrackOrderClient({ order, store, branding, slug }: any) 
             </div>
 
             {/* Order Details */}
-            <div className="grid grid-cols-1 md:grid-cols-3 border border-zinc-100 divide-y md:divide-y-0 md:divide-x divide-x-reverse divide-zinc-100">
-              <div className="p-10 space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">المنتج</span>
-                <p className="text-lg font-bold text-zinc-900 uppercase tracking-wide">{order.product_name}</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 border border-zinc-100 rounded-[3rem] overflow-hidden divide-y md:divide-y-0 md:divide-x divide-x-reverse divide-zinc-100 shadow-sm">
+              <div className="p-10 space-y-2 bg-white">
+                <span className="text-[10px] font-black uppercase tracking-widest text-[var(--primary)]">المنتج</span>
+                <p className="text-xl font-bold text-zinc-900 uppercase tracking-tight">{order.product_name}</p>
               </div>
-              <div className="p-10 space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">الإجمالي</span>
-                <p className="text-lg font-bold text-zinc-900">{order.final_price} ج.م</p>
+              <div className="p-10 space-y-2 bg-zinc-50/20">
+                <span className="text-[10px] font-black uppercase tracking-widest text-[var(--primary)]">الإجمالي</span>
+                <p className="text-xl font-bold text-[var(--primary)]">{Number(order.final_price).toLocaleString()} ج.م</p>
               </div>
-              <div className="p-10 space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">التاريخ</span>
-                <p className="text-lg font-bold text-zinc-900">{new Date(order.created_at).toLocaleDateString('ar-EG')}</p>
+              <div className="p-10 space-y-2 bg-white">
+                <span className="text-[10px] font-black uppercase tracking-widest text-[var(--primary)]">تاريخ الطلب</span>
+                <p className="text-xl font-bold text-zinc-900">{new Date(order.created_at).toLocaleDateString('ar-EG')}</p>
               </div>
             </div>
 
             {/* Reviews */}
             {isDelivered && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                <div className="border border-zinc-100 p-10 space-y-8">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">تقييم المتجر</h3>
+                <div className="border border-zinc-100 p-10 rounded-[3rem] bg-white space-y-8 shadow-sm">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900 text-center">تقييم المتجر</h3>
                   {storeSubmitted ? (
-                    <div className="text-sm font-bold text-zinc-400 italic">شكراً لتقييمك</div>
+                    <div className="text-center py-6">
+                      <CheckCircle className="h-10 w-10 text-emerald-500 mx-auto mb-4" />
+                      <p className="text-sm font-bold text-zinc-400 italic">شكراً لتقييمك للمتجر</p>
+                    </div>
                   ) : (
                     <form onSubmit={handleStoreReview} className="space-y-6">
                       {renderStars(storeRating, setStoreRating)}
-                      <textarea value={storeComment} onChange={(e) => setStoreComment(e.target.value)} className="w-full bg-zinc-50 border-none text-sm p-4 h-24 focus:ring-1 focus:ring-zinc-900 transition-all" placeholder="تعليقك..." />
-                      <button type="submit" className="w-full bg-zinc-900 text-white py-4 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-colors">إرسال</button>
+                      <textarea value={storeComment} onChange={(e) => setStoreComment(e.target.value)} className="w-full bg-zinc-50 border border-zinc-100 rounded-2xl text-sm p-6 h-32 focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] transition-all outline-none resize-none" placeholder="كيف كانت تجربتك مع المتجر؟" />
+                      <button type="submit" className="w-full bg-[var(--primary)] text-white py-5 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:brightness-110 transition-all shadow-lg shadow-[var(--primary)]/20 active:scale-95">إرسال التقييم</button>
                     </form>
                   )}
                 </div>
-                <div className="border border-zinc-100 p-10 space-y-8">
-                  <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">تقييم المنتج</h3>
+                <div className="border border-zinc-100 p-10 rounded-[3rem] bg-white space-y-8 shadow-sm">
+                  <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900 text-center">تقييم المنتج</h3>
                   {productSubmitted ? (
-                    <div className="text-sm font-bold text-zinc-400 italic">شكراً لتقييمك</div>
+                    <div className="text-center py-6">
+                      <CheckCircle className="h-10 w-10 text-emerald-500 mx-auto mb-4" />
+                      <p className="text-sm font-bold text-zinc-400 italic">شكراً لتقييمك للمنتج</p>
+                    </div>
                   ) : (
                     <form onSubmit={handleProductReview} className="space-y-6">
                       {renderStars(productRating, setProductRating)}
-                      <textarea value={productComment} onChange={(e) => setProductComment(e.target.value)} className="w-full bg-zinc-50 border-none text-sm p-4 h-24 focus:ring-1 focus:ring-zinc-900 transition-all" placeholder="تعليقك..." />
-                      <button type="submit" className="w-full bg-zinc-900 text-white py-4 text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-colors">إرسال</button>
+                      <textarea value={productComment} onChange={(e) => setProductComment(e.target.value)} className="w-full bg-zinc-50 border border-zinc-100 rounded-2xl text-sm p-6 h-32 focus:ring-2 focus:ring-[var(--primary)]/20 focus:border-[var(--primary)] transition-all outline-none resize-none" placeholder="ما رأيك في جودة المنتج؟" />
+                      <button type="submit" className="w-full bg-zinc-900 text-white py-5 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-all active:scale-95">إرسال التقييم</button>
                     </form>
                   )}
                 </div>

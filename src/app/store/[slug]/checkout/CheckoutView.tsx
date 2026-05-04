@@ -141,9 +141,10 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
       <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
         <ElegantHeader store={store} branding={branding} slug={slug} />
         <main className="mx-auto max-w-5xl px-6 py-20">
-          <div className="text-center mb-16 space-y-4">
-             <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">الدفع</span>
-             <h1 className="text-4xl font-light text-zinc-900 tracking-tighter">إكمال <span className="font-bold underline decoration-zinc-200 underline-offset-8">الطلب</span></h1>
+          <div className="flex flex-col items-center text-center mb-16 space-y-4">
+            <div className="h-px w-12 bg-[var(--primary)]/30 mb-2" />
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--primary)]">الدفع</span>
+            <h1 className="text-4xl md:text-5xl font-light text-zinc-900 tracking-tighter uppercase">إكمال <span className="font-bold italic text-[var(--primary)]">الطلب</span></h1>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
@@ -154,17 +155,17 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
                    <div className="space-y-6">
                       <div className="space-y-2">
                          <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">الاسم بالكامل</label>
-                         <input value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm focus:ring-1 focus:ring-zinc-900 transition-all" placeholder="الاسم هنا..." />
+                         <input value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm focus:ring-1 focus:ring-[var(--primary)] transition-all rounded-none" placeholder="الاسم هنا..." />
                          {errors.name && <p className="text-[10px] font-bold text-rose-500 pt-1">{errors.name}</p>}
                       </div>
                       <div className="space-y-2">
                          <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">رقم الهاتف</label>
-                         <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm focus:ring-1 focus:ring-zinc-900 transition-all text-right" dir="ltr" placeholder="01234567890" />
+                         <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm focus:ring-1 focus:ring-[var(--primary)] transition-all text-right rounded-none" dir="ltr" placeholder="01234567890" />
                          {errors.phone && <p className="text-[10px] font-bold text-rose-500 pt-1">{errors.phone}</p>}
                       </div>
                       <div className="space-y-2">
                          <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">العنوان بالتفصيل</label>
-                         <textarea value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm h-32 focus:ring-1 focus:ring-zinc-900 transition-all resize-none" placeholder="المدينة، الشارع، رقم المنزل..." />
+                         <textarea value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm h-32 focus:ring-1 focus:ring-[var(--primary)] transition-all resize-none rounded-none" placeholder="المدينة، الشارع، رقم المنزل..." />
                          {errors.address && <p className="text-[10px] font-bold text-rose-500 pt-1">{errors.address}</p>}
                       </div>
                    </div>
@@ -176,15 +177,21 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
                       {['الدفع عند الاستلام', 'تحويل بنكي / محافظ إلكترونية'].map(method => {
                         const isCOD = method === 'الدفع عند الاستلام';
                         const showDeposit = isCOD && settings?.cod_deposit_required;
+                        const isSelected = paymentMethod === method;
                         return (
-                          <button key={method} onClick={() => setPaymentMethod(method)} className={`p-6 text-right border transition-all duration-500 ${paymentMethod === method ? 'border-zinc-900 bg-zinc-900 text-white' : 'border-zinc-100 text-zinc-400 hover:border-zinc-300'}`}>
-                             <div className="flex flex-col gap-1">
-                                <span className="text-xs font-black uppercase tracking-widest">{method}</span>
-                                {showDeposit && (
-                                   <span className={`text-[9px] font-bold uppercase ${paymentMethod === method ? 'text-zinc-400' : 'text-zinc-500'}`}>
-                                      مطلوب مقدم {settings.deposit_percentage}% ({(finalPrice * settings.deposit_percentage / 100).toLocaleString()} ج.م)
-                                   </span>
-                                )}
+                          <button key={method} onClick={() => setPaymentMethod(method)} className={`p-8 text-right border rounded-none transition-all duration-500 ${isSelected ? 'border-[var(--primary)] bg-zinc-50 shadow-xl shadow-[var(--primary)]/5' : 'border-zinc-100 text-zinc-400 hover:border-[var(--primary)]/30'}`}>
+                             <div className="flex justify-between items-center">
+                                <div className="flex flex-col gap-1">
+                                   <span className={`text-xs font-black uppercase tracking-widest ${isSelected ? 'text-[var(--primary)]' : ''}`}>{method}</span>
+                                   {showDeposit && (
+                                      <span className={`text-[10px] font-bold uppercase ${isSelected ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                                         مطلوب مقدم {settings.deposit_percentage}% ({(finalPrice * settings.deposit_percentage / 100).toLocaleString()} ج.م)
+                                      </span>
+                                   )}
+                                </div>
+                                <div className={`h-6 w-6 rounded-none border flex items-center justify-center transition-all ${isSelected ? 'border-[var(--primary)] bg-[var(--primary)]' : 'border-zinc-100'}`}>
+                                   {isSelected && <div className="h-1.5 w-1.5 bg-white rounded-none" />}
+                                </div>
                              </div>
                           </button>
                         );
@@ -195,16 +202,19 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
 
              {/* Summary */}
              <div className="space-y-12">
-                <div className="bg-zinc-50 p-6 sm:p-10 space-y-10">
-                   <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">ملخص الطلب</h3>
+                <div className="bg-zinc-50 p-8 sm:p-12 rounded-none border border-zinc-100 space-y-10 shadow-sm">
+                   <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900 text-center flex items-center justify-center gap-2">
+                     <div className="h-px w-3 bg-[var(--primary)]" />
+                     ملخص الطلب
+                   </h3>
                    <div className="space-y-6">
                       {items.map(item => (
                         <div key={item.id} className="flex justify-between items-center group">
                            <div className="flex items-center gap-4">
-                              <span className="text-[10px] font-bold text-zinc-400 italic">{item.quantity}x</span>
-                              <span className="text-sm font-bold text-zinc-900 uppercase tracking-wide truncate max-w-[120px] sm:max-w-[150px]">{item.name}</span>
+                              <span className="h-6 w-6 rounded-none bg-white flex items-center justify-center text-[10px] font-bold text-[var(--primary)] shadow-sm border border-zinc-100">{item.quantity}</span>
+                              <span className="text-sm font-bold text-zinc-900 uppercase tracking-wide truncate max-w-[120px] sm:max-w-[150px] group-hover:text-[var(--primary)] transition-colors">{item.name}</span>
                            </div>
-                           <span className="text-sm font-light text-zinc-400">{(item.price * item.quantity).toLocaleString()} ج.م</span>
+                           <span className="text-sm font-bold text-[var(--primary)]">{(item.price * item.quantity).toLocaleString()} ج.م</span>
                         </div>
                       ))}
                    </div>
@@ -215,40 +225,40 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
                          <span className="text-sm font-bold text-zinc-900">{totalPrice.toLocaleString()} ج.م</span>
                       </div>
                       {discount > 0 && (
-                         <div className="flex justify-between items-center text-emerald-600">
+                         <div className="flex justify-between items-center text-emerald-600 bg-emerald-50/50 p-3 rounded-none border border-emerald-100">
                             <span className="text-[10px] font-black uppercase tracking-widest">خصم ({discount}%)</span>
                             <span className="text-sm font-bold">-{(totalPrice * discount / 100).toLocaleString()} ج.م</span>
                          </div>
                       )}
-                      <div className="flex justify-between items-end pt-4">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-zinc-900">الإجمالي الكلي</span>
-                          <span className="text-3xl font-light text-zinc-900 tracking-tighter">{finalPrice.toLocaleString()} ج.م</span>
-                       </div>
-                    </div>
+                      <div className="flex justify-between items-end pt-6">
+                           <span className="text-[10px] font-black uppercase tracking-widest text-zinc-900">الإجمالي الكلي</span>
+                           <span className="text-4xl font-bold text-[var(--primary)] tracking-tighter">{finalPrice.toLocaleString()} ج.م</span>
+                        </div>
+                     </div>
 
-                    {/* Coupon Section */}
-                    <div className="space-y-4 pt-4">
-                       <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">كوبون الخصم</label>
-                       <div className="flex flex-col sm:flex-row gap-3">
-                          <input 
-                            value={couponInput} 
-                            onChange={e => setCouponInput(e.target.value)} 
-                            className="flex-1 bg-zinc-50 border border-zinc-100 sm:border-none p-4 sm:p-5 text-sm focus:ring-1 focus:ring-zinc-900 transition-all uppercase tracking-widest outline-none" 
-                            placeholder="أدخل الكود..." 
-                          />
-                          <button 
-                            onClick={handleApplyCoupon} 
-                            disabled={isValidatingCoupon || !!appliedCoupon || !couponInput.trim()}
-                            className="w-full sm:w-auto px-6 sm:px-10 py-4 sm:py-0 bg-zinc-900 text-white text-[10px] font-black uppercase tracking-widest hover:bg-zinc-800 transition-all disabled:opacity-50 whitespace-nowrap"
-                          >
-                            {isValidatingCoupon ? '...' : appliedCoupon ? 'مطبق' : 'تطبيق'}
-                          </button>
-                       </div>
-                    </div>
+                     {/* Coupon Section */}
+                     <div className="space-y-4 pt-6 border-t border-zinc-200">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">كوبون الخصم</label>
+                        <div className="flex flex-col sm:flex-row gap-3">
+                           <input 
+                             value={couponInput} 
+                             onChange={e => setCouponInput(e.target.value)} 
+                             className="flex-1 bg-white border border-zinc-100 rounded-none p-6 text-sm focus:ring-1 focus:ring-[var(--primary)] transition-all uppercase tracking-widest outline-none shadow-sm" 
+                             placeholder="أدخل الكود..." 
+                           />
+                           <button 
+                             onClick={handleApplyCoupon} 
+                             disabled={isValidatingCoupon || !!appliedCoupon || !couponInput.trim()}
+                             className="w-full sm:w-auto px-10 py-5 bg-[var(--primary)] text-white text-[11px] font-black uppercase tracking-widest hover:brightness-125 transition-all disabled:brightness-75 whitespace-nowrap rounded-none shadow-lg"
+                           >
+                             {isValidatingCoupon ? '...' : appliedCoupon ? 'مطبق' : 'تطبيق'}
+                           </button>
+                        </div>
+                     </div>
 
-                    <button onClick={handleCheckout} disabled={submitting} className="w-full h-20 bg-zinc-900 text-white flex items-center justify-center text-xs font-black uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors shadow-lg disabled:opacity-50">
-                       {submitting ? 'جاري التنفيذ...' : 'تأكيد الطلب الآن'}
-                    </button>
+                     <button onClick={handleCheckout} disabled={submitting} className="w-full h-24 bg-[var(--primary)] text-white rounded-none flex items-center justify-center text-[11px] font-black uppercase tracking-[0.3em] hover:brightness-125 transition-all shadow-2xl active:scale-95 disabled:brightness-75">
+                        {submitting ? 'جاري التنفيذ...' : 'تأكيد الطلب الآن'}
+                     </button>
                 </div>
              </div>
           </div>
@@ -493,7 +503,7 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
                       onClick={() => method.enabled && setPaymentMethod(method.label)}
                       disabled={!method.enabled}
                       className={`flex items-center gap-4 p-4 rounded-xl md:rounded-2xl border-2 transition-all text-right 
-                        ${!method.enabled ? 'opacity-50 grayscale cursor-not-allowed border-zinc-100' : 
+                        ${!method.enabled ? 'opacity-50 cursor-not-allowed border-zinc-100' : 
                           paymentMethod === method.label ? 'border-[var(--primary)] bg-[var(--primary)]/5' : 'border-zinc-100 hover:border-[var(--primary)]/30'}`}
                     >
                       <div className={`h-10 w-10 md:h-12 md:w-12 rounded-lg md:rounded-xl flex items-center justify-center shrink-0 ${paymentMethod === method.label ? 'bg-[var(--primary)] text-white' : 'bg-zinc-50 text-zinc-400'}`}>

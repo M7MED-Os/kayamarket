@@ -4,7 +4,7 @@ import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { ArrowLeft, MessageSquare, ShoppingBag, Heart, Star, Share2, MapPin } from 'lucide-react'
+import { ArrowLeft, MessageSquare, ShoppingBag, Heart, Star, Share2, MapPin, Truck } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import toast from 'react-hot-toast'
@@ -12,10 +12,19 @@ import toast from 'react-hot-toast'
 // ─── ELEGANT PRODUCT CARD ───────────────────────────────────────────────────
 export const ElegantProductCard = ({ product, slug }: any) => {
   const { toggleItem, isInWishlist } = useWishlist()
+  const [showHint, setShowHint] = React.useState(false)
   const isWishlisted = isInWishlist(product.id)
   const productImage = product.image_url || (product.images && product.images.length > 0 ? product.images[0] : 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2670&auto=format&fit=crop')
 
   const { addItem } = useCart()
+
+  React.useEffect(() => {
+    let timer: any
+    if (showHint) {
+      timer = setTimeout(() => setShowHint(false), 5000)
+    }
+    return () => clearTimeout(timer)
+  }, [showHint])
 
   const handleWishlist = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -37,38 +46,46 @@ export const ElegantProductCard = ({ product, slug }: any) => {
       image_url: productImage,
       quantity: 1 
     })
+    setShowHint(true)
     toast.success('تمت الإضافة للسلة')
   }
 
   return (
     <Link href={`/store/${slug}/products/${product.id}`} className="group space-y-6">
-      <div className="relative aspect-[3/4] overflow-hidden bg-zinc-50 border border-zinc-100 transition-all duration-700 group-hover:border-zinc-900">
+      <div className="relative aspect-[3/4] overflow-hidden bg-zinc-50 border border-zinc-100/50 transition-all duration-700 group-hover:border-[var(--primary)]/30 group-hover:shadow-2xl group-hover:shadow-[var(--primary)]/5">
         <Image
           src={productImage}
           alt={product.name}
           fill
-          className="object-cover lg:grayscale lg:group-hover:grayscale-0 transition-all duration-700 scale-110 group-hover:scale-100"
+          className="object-cover transition-all duration-700 scale-110 group-hover:scale-100"
         />
         <div className="absolute top-3 left-3 flex flex-col gap-2">
           <button
             onClick={handleWishlist}
-            className={`h-8 w-8 md:h-10 md:w-10 flex items-center justify-center rounded-full backdrop-blur-md border transition-all hover:scale-110 active:scale-95 ${isWishlisted ? 'bg-rose-500 text-white border-rose-500' : 'bg-white/90 text-zinc-400 border-zinc-100 hover:text-rose-500'}`}
+            className={`h-8 w-8 md:h-10 md:w-10 flex items-center justify-center rounded-none backdrop-blur-md border transition-all hover:scale-110 active:scale-95 ${isWishlisted ? 'bg-rose-500 text-white border-rose-500' : 'bg-white/90 text-zinc-400 border-zinc-100 hover:text-rose-500'}`}
           >
             <Heart className={`h-4 w-4 md:h-5 md:w-5 ${isWishlisted ? 'fill-current' : ''}`} strokeWidth={1.5} />
           </button>
           
-          <button
-            onClick={handleAddToCart}
-            className="h-8 w-8 md:h-10 md:w-10 flex items-center justify-center rounded-full bg-zinc-900/90 text-white backdrop-blur-md border border-zinc-900 transition-all hover:scale-110 active:scale-95 shadow-lg"
-          >
-            <ShoppingBag className="h-4 w-4 md:h-5 md:w-5" strokeWidth={1.5} />
-          </button>
+          <div className="relative flex items-center gap-2">
+            <button
+              onClick={handleAddToCart}
+              className="h-8 w-8 md:h-10 md:w-10 flex items-center justify-center rounded-none bg-[var(--primary)] text-white backdrop-blur-md border border-[var(--primary)]/20 transition-all hover:brightness-110 active:scale-95 shadow-lg"
+            >
+              <ShoppingBag className="h-4 w-4 md:h-5 md:w-5" strokeWidth={1.5} />
+            </button>
+            {showHint && (
+              <div className="absolute right-full mr-3 whitespace-nowrap bg-zinc-900 text-white text-[9px] font-black px-3 py-2 rounded-none animate-in fade-in slide-in-from-left-2 duration-300 uppercase tracking-widest shadow-xl">
+                تمت الإضافة للسلة بنجاح
+              </div>
+            )}
+          </div>
         </div>
       </div>
       <div className="space-y-2 text-center">
         <h3 className="text-sm font-bold text-zinc-900 group-hover:text-[var(--primary)] transition-colors uppercase tracking-wider">{product.name}</h3>
         <div className="flex flex-col items-center gap-0.5">
-          <div className="text-lg font-light text-zinc-900 tracking-tighter">
+          <div className="text-lg font-bold text-[var(--primary)] tracking-tighter">
             {Number(product.price).toLocaleString()} ج.م
           </div>
           {product.original_price && Number(product.original_price) > Number(product.price) && (
@@ -102,14 +119,14 @@ export const ElegantHero = ({ branding, store, slug }: any) => {
   } else if (words.length === 2) {
     renderedTitle = (
       <div className="flex flex-col -space-y-4">
-        <span className="text-4xl md:text-6xl font-light text-zinc-300 tracking-wide uppercase leading-tight">{words[0]}</span>
+        <span className="text-4xl md:text-6xl font-light text-[var(--primary)]/20 tracking-wide uppercase leading-tight">{words[0]}</span>
         <span className="text-7xl md:text-9xl font-black text-[var(--primary)] leading-[0.85]">{words[1]}</span>
       </div>
     )
   } else if (words.length === 3) {
     renderedTitle = (
       <div className="flex flex-col -space-y-4">
-        <span className="text-4xl md:text-6xl font-light text-zinc-300 tracking-wide uppercase leading-tight">{words[0]}</span>
+        <span className="text-4xl md:text-6xl font-light text-[var(--primary)]/20 tracking-wide uppercase leading-tight">{words[0]}</span>
         <span className="text-7xl md:text-9xl font-black text-zinc-900 leading-[0.85]">
           {words[1]} <span className="text-[var(--primary)]">{words[2]}</span>
         </span>
@@ -121,7 +138,7 @@ export const ElegantHero = ({ branding, store, slug }: any) => {
     const rest = words.slice(2).join(' ')
     renderedTitle = (
       <div className="flex flex-col -space-y-4">
-        <span className="text-4xl md:text-6xl font-light text-zinc-300 tracking-wide uppercase leading-tight">{firstTwo}</span>
+        <span className="text-4xl md:text-6xl font-light text-[var(--primary)]/20 tracking-wide uppercase leading-tight">{firstTwo}</span>
         <span className="text-7xl md:text-9xl font-black text-[var(--primary)] leading-[0.85]">{rest}</span>
       </div>
     )
@@ -147,14 +164,14 @@ export const ElegantHero = ({ branding, store, slug }: any) => {
             <div className={`flex flex-col sm:flex-row items-center gap-6 w-full lg:w-auto justify-center ${hasImage ? 'lg:justify-start' : ''}`}>
               <Link
                 href={`/store/${slug}/products`}
-                className="w-full sm:w-auto bg-zinc-900 text-white px-10 py-5 text-sm font-black uppercase tracking-widest hover:bg-zinc-800 transition-all duration-500 shadow-2xl shadow-zinc-200 flex items-center justify-center gap-3"
+                className="w-full sm:w-auto bg-[var(--primary)] text-white px-10 py-5 text-sm font-black uppercase tracking-widest hover:brightness-125 transition-all duration-500 shadow-2xl flex items-center justify-center gap-3 rounded-none disabled:brightness-75"
               >
                 {ctaText}
                 <ArrowLeft className="h-4 w-4" />
               </Link>
               <Link
                 href={`https://wa.me/${store.whatsapp_phone?.replace(/\D/g, '')}?text=${encodeURIComponent('مرحباً، أود الاستفسار عن بعض المنتجات.')}`}
-                className="w-full sm:w-auto border border-zinc-200 text-zinc-900 px-10 py-5 text-sm font-black uppercase tracking-widest hover:bg-zinc-50 transition-all duration-500 flex items-center justify-center gap-3"
+                className="w-full sm:w-auto border border-zinc-200 text-zinc-900 px-10 py-5 text-sm font-black uppercase tracking-widest hover:bg-zinc-50 transition-all duration-500 flex items-center justify-center gap-3 rounded-none"
               >
                 <MessageSquare className="h-4 w-4" />
                 تواصل معنا
@@ -172,7 +189,7 @@ export const ElegantHero = ({ branding, store, slug }: any) => {
                     src={sideImage}
                     alt={store.name}
                     fill
-                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 scale-105 group-hover:scale-100"
+                    className="object-cover transition-all duration-1000 scale-105 group-hover:scale-100"
                   />
                 </div>
               </div>
@@ -190,8 +207,9 @@ export const ElegantCategories = ({ categories, slug }: any) => {
     <section className="py-24 bg-white border-b border-zinc-100" dir="rtl">
       <div className="mx-auto max-w-7xl px-6">
         <div className="flex flex-col items-center text-center mb-16 space-y-4">
-          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">التصنيفات</span>
-          <h2 className="text-4xl font-light text-zinc-900 tracking-tighter">اختر <span className="font-bold italic">أسلوبك</span></h2>
+          <div className="h-px w-12 bg-[var(--primary)]/30 mb-2" />
+          <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--primary)]">التصنيفات</span>
+          <h2 className="text-4xl md:text-5xl font-light text-zinc-900 tracking-tighter uppercase">اختر <span className="font-bold italic text-[var(--primary)]">أسلوبك</span></h2>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -201,9 +219,9 @@ export const ElegantCategories = ({ categories, slug }: any) => {
                 src={cat.image_url || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2670&auto=format&fit=crop'}
                 alt={cat.name}
                 fill
-                className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110"
+                className="object-cover transition-all duration-1000 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-500 flex items-center justify-center">
+              <div className="absolute inset-0 bg-[var(--primary)]/10 group-hover:bg-[var(--primary)]/40 transition-colors duration-500 flex items-center justify-center">
                 <h3 className="text-white text-sm font-black uppercase tracking-[0.2em]">{cat.name}</h3>
               </div>
             </Link>
@@ -219,12 +237,13 @@ export const ElegantBestsellers = ({ products, slug }: any) => {
   return (
     <section className="py-24 bg-white" dir="rtl">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 border-b border-zinc-100 pb-12">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20 border-b border-zinc-100 pb-12">
           <div className="space-y-4">
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--primary)]">الأكثر طلباً</span>
-            <h2 className="text-4xl lg:text-5xl font-light text-zinc-900 tracking-tighter">القطع <span className="font-bold underline decoration-zinc-200 underline-offset-8">المميزة</span></h2>
+            <div className="h-px w-12 bg-[var(--primary)]/30 mb-2" />
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--primary)]">الأكثر طلباً</span>
+            <h2 className="text-4xl md:text-5xl font-light text-zinc-900 tracking-tighter uppercase">القطع <span className="font-bold italic text-[var(--primary)]">المميزة</span></h2>
           </div>
-          <Link href={`/store/${slug}/products`} className="text-sm font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors flex items-center gap-2 group">
+          <Link href={`/store/${slug}/products`} className="text-xs font-black uppercase tracking-widest text-zinc-400 hover:text-[var(--primary)] transition-all flex items-center gap-2 group">
             عرض كل المنتجات
             <ArrowLeft className="h-4 w-4 group-hover:-translate-x-2 transition-transform" />
           </Link>
@@ -245,14 +264,15 @@ export const ElegantFeatures = ({ branding }: { branding?: any }) => {
   const defaultFeatures = [
     { title: 'جودة استثنائية', desc: 'نختار أجود الخامات لضمان رضاكم' },
     { title: 'شحن فاخر', desc: 'تغليف آمن وتوصيل سريع لباب المنزل' },
-    { title: 'دعم متواصل', desc: 'فريقنا متاح دائماً للإجابة على استفساراتكم' }
+    { title: 'دعم متواصل', desc: 'فريقنا متاح دائماً للإجابة على استفساراتكم' },
+    { title: 'دفع آمن', desc: 'طرق دفع متنوعة ومشفرة تماماً' }
   ]
   const features = branding?.features_data?.length > 0 ? branding.features_data : defaultFeatures
 
   return (
     <section className="py-24 bg-zinc-50 border-y border-zinc-100" dir="rtl">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-16">
           {features.map((f: { title: string, desc: string }, i: number) => (
             <div key={i} className="text-center space-y-4">
               <span className="text-[10px] font-black text-[var(--primary)] uppercase tracking-[0.4em]">0{i + 1}</span>
@@ -280,20 +300,23 @@ export const ElegantHeader = ({ store, branding, slug }: any) => {
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-8">
-          <Link href={`/store/${slug}`} className={`text-xs font-black uppercase tracking-widest transition-colors ${isActive(`/store/${slug}`) ? 'text-zinc-900' : 'text-zinc-400 hover:text-zinc-900'}`}>الرئيسية</Link>
-          <Link href={`/store/${slug}/products`} className={`text-xs font-black uppercase tracking-widest transition-colors ${isActive(`/store/${slug}/products`) ? 'text-zinc-900' : 'text-zinc-400 hover:text-zinc-900'}`}>المنتجات</Link>
-          <Link href={`/store/${slug}/track`} className={`text-xs font-black uppercase tracking-widest transition-colors ${isActive(`/store/${slug}/track`) ? 'text-zinc-900' : 'text-zinc-400 hover:text-zinc-900'}`}>تتبع الطلب</Link>
+          <Link href={`/store/${slug}`} className={`text-xs font-black uppercase tracking-widest transition-colors ${isActive(`/store/${slug}`) ? 'text-[var(--primary)]' : 'text-zinc-400 hover:text-[var(--primary)]'}`}>الرئيسية</Link>
+          <Link href={`/store/${slug}/products`} className={`text-xs font-black uppercase tracking-widest transition-colors ${isActive(`/store/${slug}/products`) ? 'text-[var(--primary)]' : 'text-zinc-400 hover:text-[var(--primary)]'}`}>المنتجات</Link>
+          <Link href={`/store/${slug}/track`} className={`text-xs font-black uppercase tracking-widest transition-colors ${isActive(`/store/${slug}/track`) ? 'text-[var(--primary)]' : 'text-zinc-400 hover:text-[var(--primary)]'}`}>تتبع الطلب</Link>
         </nav>
 
         {/* Mobile Left Actions (Cart/Wishlist) */}
         <div className="flex md:hidden items-center gap-4">
-           <Link href={`/store/${slug}/cart`} className="relative text-zinc-400">
+           <Link href={`/store/${slug}/cart`} className="relative text-zinc-400 hover:text-[var(--primary)] transition-colors">
              <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
-             {totalItems > 0 && <span className="absolute -top-2 -right-2 bg-zinc-900 text-white text-[7px] h-3.5 w-3.5 rounded-full flex items-center justify-center font-black">{totalItems}</span>}
+             {totalItems > 0 && <span className="absolute -top-2 -right-2 bg-[var(--primary)] text-white text-[7px] h-3.5 w-3.5 rounded-none flex items-center justify-center font-black shadow-lg">{totalItems}</span>}
            </Link>
-           <Link href={`/store/${slug}/wishlist`} className="relative text-zinc-400">
+           <Link href={`/store/${slug}/wishlist`} className="relative text-zinc-400 hover:text-rose-500 transition-colors">
              <Heart className="h-5 w-5" strokeWidth={1.5} />
-             {wishlistItems.length > 0 && <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-[7px] h-3.5 w-3.5 rounded-full flex items-center justify-center font-black">{wishlistItems.length}</span>}
+             {wishlistItems.length > 0 && <span className="absolute -top-2 -right-2 bg-rose-500 text-white text-[7px] h-3.5 w-3.5 rounded-none flex items-center justify-center font-black shadow-lg shadow-rose-500/20">{wishlistItems.length}</span>}
+           </Link>
+           <Link href={`/store/${slug}/track`} className={`relative transition-colors ${isActive(`/store/${slug}/track`) ? 'text-[var(--primary)]' : 'text-zinc-400 hover:text-[var(--primary)]'}`}>
+             <Truck className="h-5 w-5" strokeWidth={1.5} />
            </Link>
         </div>
 
@@ -301,7 +324,7 @@ export const ElegantHeader = ({ store, branding, slug }: any) => {
         <Link href={`/store/${slug}`} className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center">
           {branding?.logo_url ? (
             <div className="relative h-8 w-24 md:h-10 md:w-32">
-              <Image src={branding.logo_url} alt={store.name} fill className="object-contain grayscale" />
+              <Image src={branding.logo_url} alt={store.name} fill className="object-contain" />
             </div>
           ) : (
             <span className="text-xl md:text-2xl font-light tracking-tighter text-zinc-900 italic uppercase">
@@ -312,34 +335,35 @@ export const ElegantHeader = ({ store, branding, slug }: any) => {
 
         {/* Mobile Right Actions (Home/Products) */}
         <div className="flex md:hidden items-center gap-4">
-           <Link href={`/store/${slug}`} className={`text-[9px] font-black uppercase tracking-widest ${isActive(`/store/${slug}`) ? 'text-zinc-900' : 'text-zinc-400'}`}>الرئيسية</Link>
-           <Link href={`/store/${slug}/products`} className={`text-[9px] font-black uppercase tracking-widest ${isActive(`/store/${slug}/products`) ? 'text-zinc-900' : 'text-zinc-400'}`}>المنتجات</Link>
+           <Link href={`/store/${slug}`} className={`text-[9px] font-black uppercase tracking-widest transition-colors ${isActive(`/store/${slug}`) ? 'text-[var(--primary)]' : 'text-zinc-400'}`}>الرئيسية</Link>
+           <Link href={`/store/${slug}/products`} className={`text-[9px] font-black uppercase tracking-widest transition-colors ${isActive(`/store/${slug}/products`) ? 'text-[var(--primary)]' : 'text-zinc-400'}`}>المنتجات</Link>
         </div>
 
         {/* Desktop Right Actions */}
-        <div className="hidden md:flex items-center gap-6">
-          <Link href={`/store/${slug}/wishlist`} className="group relative text-zinc-400 hover:text-rose-500 transition-colors">
-            <Heart className="h-5 w-5" strokeWidth={1.5} />
-            {wishlistItems.length > 0 && (
-              <span className="absolute -top-2 -left-2 bg-rose-500 text-white text-[8px] font-black h-4 w-4 rounded-full flex items-center justify-center shadow-lg">
-                {wishlistItems.length}
-              </span>
-            )}
-          </Link>
-          <Link href={`/store/${slug}/cart`} className="group relative text-zinc-400 hover:text-zinc-900 transition-colors">
-            <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
-            {totalItems > 0 && (
-              <span className="absolute -top-2 -left-2 bg-zinc-900 text-white text-[8px] font-black h-4 w-4 rounded-full flex items-center justify-center shadow-lg">
-                {totalItems}
-              </span>
-            )}
-          </Link>
-          <Link href={`https://wa.me/${store.whatsapp_phone?.replace(/\D/g, '')}?text=${encodeURIComponent('مرحباً، أود الاستفسار عن بعض المنتجات.')}`} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-zinc-900 border border-zinc-900 px-5 py-2 hover:bg-zinc-900 hover:text-white transition-all duration-500">
-            <MessageSquare className="h-3 w-3" />
-            مساعدة
-          </Link>
-        </div>
+          <div className="hidden md:flex items-center gap-6">
+            <Link href={`/store/${slug}/wishlist`} className="group relative text-zinc-400 hover:text-rose-500 transition-colors">
+              <Heart className="h-5 w-5" strokeWidth={1.5} />
+              {wishlistItems.length > 0 && (
+                <span className="absolute -top-2 -left-2 bg-rose-500 text-white text-[8px] font-black h-4 w-4 rounded-none flex items-center justify-center shadow-lg shadow-rose-500/20">
+                  {wishlistItems.length}
+                </span>
+              )}
+            </Link>
+            <Link href={`/store/${slug}/cart`} className="group relative text-zinc-400 hover:text-[var(--primary)] transition-colors">
+              <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -left-2 bg-[var(--primary)] text-white text-[8px] font-black h-4 w-4 rounded-none flex items-center justify-center shadow-lg">
+                  {totalItems}
+                </span>
+              )}
+            </Link>
+            <Link href={`https://wa.me/${store.whatsapp_phone?.replace(/\D/g, '')}?text=${encodeURIComponent('مرحباً، أود الاستفسار عن بعض المنتجات.')}`} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white bg-[var(--primary)] px-5 py-2 hover:brightness-125 transition-all duration-500 rounded-none disabled:brightness-75">
+              <MessageSquare className="h-3 w-3" />
+              مساعدة
+            </Link>
+          </div>
       </div>
+      <div className="h-1 w-full bg-gradient-to-r from-transparent via-[var(--primary)]/20 to-transparent" />
     </header>
   )
 }
@@ -368,9 +392,10 @@ export const ElegantTestimonials = ({ reviews }: { reviews: any[] }) => {
 
   return (
     <section className="bg-white py-24 border-y border-zinc-100 overflow-hidden select-none" dir="rtl">
-      <div className="mx-auto max-w-7xl px-6 text-center mb-16">
-        <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400 mb-4 block">قالوا عنا</span>
-        <h2 className="text-4xl font-light text-zinc-900 italic tracking-tighter">ثقة نعتز بها</h2>
+      <div className="mx-auto max-w-7xl px-6 flex flex-col items-center text-center mb-16 space-y-4">
+        <div className="h-px w-12 bg-[var(--primary)]/30 mb-2" />
+        <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--primary)]">قالوا عنا</span>
+        <h2 className="text-4xl md:text-5xl font-light text-zinc-900 tracking-tighter uppercase">ثقة <span className="font-bold italic text-[var(--primary)]">نعتز بها</span></h2>
       </div>
 
       <div className="relative w-full" dir="ltr">
@@ -396,7 +421,7 @@ export const ElegantTestimonials = ({ reviews }: { reviews: any[] }) => {
                     {[1, 2, 3, 4, 5].map((star) => (
                       <Star
                         key={star}
-                        className={`h-3 w-3 ${star <= Math.round(review.rating) ? 'text-zinc-900 fill-zinc-900' : 'text-zinc-100'}`}
+                        className={`h-3 w-3 ${star <= Math.round(review.rating) ? 'text-[var(--primary)] fill-[var(--primary)]' : 'text-zinc-100'}`}
                         strokeWidth={1}
                       />
                     ))}
@@ -405,7 +430,7 @@ export const ElegantTestimonials = ({ reviews }: { reviews: any[] }) => {
                     "{review.comment}"
                   </p>
                   <div className="pt-6 border-t border-zinc-50 flex items-center justify-between">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-900">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-[var(--primary)]">
                       {review.reviewer_name || review.customer_name || 'عميل مجهول'}
                     </span>
                     <span className="text-[9px] font-bold text-zinc-300 uppercase tracking-widest">
@@ -451,8 +476,12 @@ export const ElegantFooter = ({ store, branding }: any) => {
             <div className="space-y-4">
               <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-900">روابط سريعة</h4>
               <ul className="space-y-2">
-                <li><Link href="#" className="text-[10px] font-bold text-zinc-400 hover:text-zinc-900 transition-colors">السياسات</Link></li>
-                <li><Link href="#" className="text-[10px] font-bold text-zinc-400 hover:text-zinc-900 transition-colors">الأسئلة الشائعة</Link></li>
+                <li><Link href="#" className="text-[10px] font-bold text-zinc-400 hover:text-[var(--primary)] transition-all flex items-center gap-2 group/link">
+                  السياسات
+                </Link></li>
+                <li><Link href="#faq-section" className="text-[10px] font-bold text-zinc-400 hover:text-[var(--primary)] transition-all flex items-center gap-2 group/link">
+                  الأسئلة الشائعة
+                </Link></li>
               </ul>
             </div>
             <div className="space-y-4">
@@ -460,7 +489,7 @@ export const ElegantFooter = ({ store, branding }: any) => {
               <ul className="space-y-3">
                 {store.whatsapp_phone && (
                   <li>
-                    <Link href={`https://wa.me/${store.whatsapp_phone?.replace(/\D/g, '')}?text=${encodeURIComponent('مرحباً، أود الاستفسار عن بعض المنتجات.')}`} className="group flex items-center gap-2 text-[10px] font-bold text-zinc-400 hover:text-zinc-900 transition-colors">
+                    <Link href={`https://wa.me/${store.whatsapp_phone?.replace(/\D/g, '')}?text=${encodeURIComponent('مرحباً، أود الاستفسار عن بعض المنتجات.')}`} className="group flex items-center gap-2 text-[10px] font-bold text-zinc-400 hover:text-[var(--primary)] transition-colors">
                       <MessageSquare className="h-3 w-3 opacity-40 group-hover:opacity-100" />
                       واتساب
                     </Link>
@@ -468,7 +497,7 @@ export const ElegantFooter = ({ store, branding }: any) => {
                 )}
                 {branding.facebook_url && (
                   <li>
-                    <Link href={branding.facebook_url} className="group flex items-center gap-2 text-[10px] font-bold text-zinc-400 hover:text-zinc-900 transition-colors">
+                    <Link href={branding.facebook_url} className="group flex items-center gap-2 text-[10px] font-bold text-zinc-400 hover:text-[var(--primary)] transition-colors">
                       <svg className="h-3 w-3 opacity-40 group-hover:opacity-100 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path></svg>
                       فيسبوك
                     </Link>
@@ -476,7 +505,7 @@ export const ElegantFooter = ({ store, branding }: any) => {
                 )}
                 {branding.instagram_url && (
                   <li>
-                    <Link href={branding.instagram_url} className="group flex items-center gap-2 text-[10px] font-bold text-zinc-400 hover:text-zinc-900 transition-colors">
+                    <Link href={branding.instagram_url} className="group flex items-center gap-2 text-[10px] font-bold text-zinc-400 hover:text-[var(--primary)] transition-colors">
                       <svg className="h-3 w-3 opacity-40 group-hover:opacity-100 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"></path></svg>
                       انستجرام
                     </Link>
@@ -484,7 +513,7 @@ export const ElegantFooter = ({ store, branding }: any) => {
                 )}
                 {branding.tiktok_url && (
                   <li>
-                    <Link href={branding.tiktok_url} className="group flex items-center gap-2 text-[10px] font-bold text-zinc-400 hover:text-zinc-900 transition-colors">
+                    <Link href={branding.tiktok_url} className="group flex items-center gap-2 text-[10px] font-bold text-zinc-400 hover:text-[var(--primary)] transition-colors">
                       <Share2 className="h-3 w-3 opacity-40 group-hover:opacity-100" />
                       تيك توك
                     </Link>
@@ -522,18 +551,19 @@ export const ElegantFAQ = ({ branding }: any) => {
   if (faqs.length === 0) return null
 
   return (
-    <section className="py-24 bg-white" dir="rtl">
+    <section id="faq-section" className="py-24 bg-white" dir="rtl">
       <div className="mx-auto max-w-3xl px-6">
-        <div className="text-center mb-16 space-y-4">
-          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">الأسئلة الشائعة</span>
-          <h2 className="text-3xl font-light text-zinc-900 tracking-tighter">كل ما <span className="font-bold">تود معرفته</span></h2>
+        <div className="flex flex-col items-center text-center mb-16 space-y-4">
+          <div className="h-px w-12 bg-[var(--primary)]/30 mb-2" />
+          <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--primary)]">الأسئلة الشائعة</span>
+          <h2 className="text-4xl md:text-5xl font-light text-zinc-900 tracking-tighter uppercase">كل ما <span className="font-bold italic text-[var(--primary)]">تود معرفته</span></h2>
         </div>
 
         <div className="space-y-8">
           {faqs.map((faq: any, i: number) => (
             <div key={i} className="border-b border-zinc-100 pb-8 group">
               <h3 className="text-lg font-bold text-zinc-900 mb-4 flex items-center gap-4">
-                <span className="text-[10px] font-black text-zinc-300">0{i + 1}</span>
+                <span className="text-[10px] font-black text-[var(--primary)]">0{i + 1}</span>
                 {faq.q || faq.question}
               </h3>
               <p className="text-sm text-zinc-400 leading-relaxed pr-10">{faq.a || faq.answer}</p>

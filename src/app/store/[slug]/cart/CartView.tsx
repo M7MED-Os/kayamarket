@@ -34,16 +34,20 @@ export default function CartView({ params, storeData }: { params: { slug: string
       <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
         <ElegantHeader store={store} branding={branding} slug={slug} />
         <main className="mx-auto max-w-5xl px-6 py-20">
-          <div className="text-center mb-16 space-y-4">
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">سلتك</span>
-            <h1 className="text-4xl font-light text-zinc-900 tracking-tighter">مراجعة <span className="font-bold underline decoration-zinc-200 underline-offset-8">المشتريات</span></h1>
+          <div className="flex flex-col items-center text-center mb-16 space-y-4">
+            <div className="h-px w-12 bg-[var(--primary)]/30 mb-2" />
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--primary)]">سلتك</span>
+            <h1 className="text-4xl md:text-5xl font-light text-zinc-900 tracking-tighter uppercase">مراجعة <span className="font-bold italic text-[var(--primary)]">المشتريات</span></h1>
           </div>
 
           {items.length === 0 ? (
-            <div className="text-center py-32 border border-zinc-100 bg-zinc-50/50">
+            <div className="text-center py-32 border border-zinc-100 bg-zinc-50/50 rounded-none">
+              <div className="h-20 w-20 bg-white rounded-none flex items-center justify-center mx-auto mb-6 shadow-sm border border-zinc-50">
+                 <ShoppingBag className="h-8 w-8 text-zinc-200" />
+              </div>
               <p className="text-lg font-light italic text-zinc-400 mb-8">سلتك فارغة حالياً</p>
-              <Link href={`/store/${slug}`} className="text-xs font-black uppercase tracking-widest text-zinc-900 border border-zinc-900 px-10 py-4 hover:bg-zinc-900 hover:text-white transition-all duration-500">
-                تصفح المنتجات
+              <Link href={`/store/${slug}`} className="text-[10px] font-black uppercase tracking-widest text-white bg-[var(--primary)] px-12 py-5 hover:brightness-125 transition-all duration-500 rounded-none disabled:brightness-75">
+                ابدأ التسوق الآن
               </Link>
             </div>
           ) : (
@@ -51,37 +55,37 @@ export default function CartView({ params, storeData }: { params: { slug: string
               <div className="lg:col-span-2 space-y-12">
                 {items.map((item) => (
                   <div key={item.id} className="flex gap-10 items-start pb-10 border-b border-zinc-100 group">
-                    <div className="relative h-40 w-32 bg-zinc-50 border border-zinc-50 overflow-hidden lg:grayscale lg:group-hover:grayscale-0 transition-all duration-700">
+                    <div className="relative h-40 w-32 bg-zinc-50 border border-zinc-50 rounded-none overflow-hidden transition-all duration-700">
                       {item.image_url && <img src={item.image_url} alt={item.name} className="h-full w-full object-cover scale-110 group-hover:scale-100 transition-transform duration-700" />}
                     </div>
                     <div className="flex-1 space-y-6">
                       <div className="flex justify-between items-start">
                         <div className="space-y-1">
-                          <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-widest">{item.name}</h3>
+                          <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-widest group-hover:text-[var(--primary)] transition-colors">{item.name}</h3>
                           <div className="flex items-center gap-3">
-                            <div className="text-lg font-light text-zinc-900">{item.price.toLocaleString()} ج.م</div>
+                            <div className="text-lg font-bold text-[var(--primary)]">{item.price.toLocaleString()} ج.م</div>
                             {(item as any).original_price && (item as any).original_price > item.price && (
                               <div className="text-xs font-light text-zinc-300 line-through italic">{(item as any).original_price.toLocaleString()} ج.م</div>
                             )}
                           </div>
                         </div>
-                        <button onClick={() => removeItem(item.id)} className="text-zinc-200 hover:text-zinc-900 transition-colors">
+                        <button onClick={() => removeItem(item.id)} className="text-zinc-200 hover:text-[var(--primary)] transition-colors">
                           <Trash2 className="h-4 w-4" strokeWidth={1} />
                         </button>
                       </div>
 
                       <div className="flex items-center justify-between pt-4">
-                        <div className="flex items-center border border-zinc-100 p-1">
+                        <div className="flex items-center border border-zinc-100 p-1 rounded-none">
                           <button
                             onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                            className="h-10 w-10 flex items-center justify-center text-zinc-400 hover:text-zinc-900 hover:bg-zinc-50 transition-all active:scale-90"
+                            className="h-10 w-10 flex items-center justify-center text-zinc-400 hover:text-[var(--primary)] hover:bg-zinc-50 transition-all active:scale-90"
                           >
                             <Minus className="h-3 w-3" />
                           </button>
                           <span className="text-sm font-black w-8 text-center tabular-nums">{item.quantity}</span>
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="h-10 w-10 flex items-center justify-center text-zinc-400 hover:text-zinc-900 hover:bg-zinc-50 transition-all active:scale-90"
+                            className="h-10 w-10 flex items-center justify-center text-zinc-400 hover:text-[var(--primary)] hover:bg-zinc-50 transition-all active:scale-90"
                           >
                             <Plus className="h-3 w-3" />
                           </button>
@@ -96,13 +100,13 @@ export default function CartView({ params, storeData }: { params: { slug: string
               </div>
 
               <div className="lg:col-span-1">
-                <div className="bg-zinc-50 p-10 space-y-8 sticky top-28">
+                <div className="bg-zinc-50 p-10 space-y-8 sticky top-28 rounded-none border border-zinc-100 shadow-sm">
                   <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">ملخص الطلب</h3>
                   <div className="flex justify-between items-end border-b border-zinc-200 pb-4">
                     <span className="text-xs font-bold text-zinc-400 uppercase">الإجمالي</span>
-                    <span className="text-3xl font-light text-zinc-900 tracking-tighter">{totalPrice.toLocaleString()} ج.م</span>
+                    <span className="text-3xl font-bold text-[var(--primary)] tracking-tighter">{totalPrice.toLocaleString()} ج.م</span>
                   </div>
-                  <Link href={`/store/${slug}/checkout`} className="w-full h-16 bg-zinc-900 text-white flex items-center justify-center text-xs font-black uppercase tracking-[0.2em] hover:bg-zinc-800 transition-colors shadow-lg">
+                  <Link href={`/store/${slug}/checkout`} className="w-full h-16 bg-[var(--primary)] text-white flex items-center justify-center text-xs font-black uppercase tracking-[0.2em] hover:brightness-125 transition-all shadow-lg rounded-none disabled:brightness-75">
                     إتمام الطلب
                   </Link>
                 </div>

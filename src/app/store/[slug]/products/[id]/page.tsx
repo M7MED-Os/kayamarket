@@ -90,24 +90,29 @@ export default async function StoreProductPage({ params }: PageProps) {
           <div className="grid grid-cols-1 gap-20 lg:grid-cols-2 items-start">
             {/* Gallery */}
             <div className="lg:sticky lg:top-28">
-              <div className="relative">
+              <div className="relative group">
                 <ImageGallery images={galleryImages} productName={product.name} />
+                <div className="absolute top-6 left-6 z-10">
+                  <div className="bg-[var(--primary)] text-white text-[10px] font-black px-4 py-2 rounded-full uppercase tracking-widest shadow-xl shadow-[var(--primary)]/20">
+                    {product.stock !== null && product.stock > 0 ? 'متوفر حالياً' : 'نفذت الكمية'}
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Details */}
             <div className="space-y-12">
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">المنتج</span>
-                  <div className="h-px flex-1 bg-zinc-100" />
+              <div className="space-y-8">
+                <div className="flex flex-col space-y-4">
+                  <div className="h-px w-12 bg-[var(--primary)]/30" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--primary)]">تفاصيل المنتج</span>
                 </div>
-                <h1 className="text-5xl font-light text-zinc-900 leading-tight tracking-tighter">
+                <h1 className="text-5xl md:text-6xl font-light text-zinc-900 leading-tight tracking-tighter uppercase">
                   {product.name}
                 </h1>
-                <div className="flex items-baseline gap-4">
-                  <div className="text-3xl font-light text-zinc-900 tracking-tighter">
-                    {Number(product.price).toLocaleString()} ج.م
+                <div className="flex items-center gap-6">
+                  <div className="text-4xl font-bold text-[var(--primary)] tracking-tighter">
+                    {Number(product.price).toLocaleString()} <span className="text-sm font-black opacity-60">ج.م</span>
                   </div>
                   {product.original_price && Number(product.original_price) > Number(product.price) && (
                     <div className="text-lg font-bold text-zinc-300 line-through decoration-zinc-100">
@@ -118,16 +123,19 @@ export default async function StoreProductPage({ params }: PageProps) {
               </div>
 
               {product.description && (
-                <p className="text-lg text-zinc-500 font-light leading-relaxed italic border-r-2 border-zinc-100 pr-6 py-2">
-                  {product.description}
-                </p>
+                <div className="relative">
+                  <div className="absolute -right-6 top-0 bottom-0 w-1 bg-[var(--primary)]/10" />
+                  <p className="text-xl text-zinc-500 font-light leading-relaxed italic pr-4">
+                    {product.description}
+                  </p>
+                </div>
               )}
 
               <div className="pt-8">
                 <CheckoutBox product={product} storeId={store.id} storeSlug={slug} selectedTheme={selectedTheme} />
               </div>
 
-              <div className="pt-12 border-t border-zinc-100">
+              <div className="pt-16 border-t border-zinc-100">
                 <ProductReviews
                   productId={product.id}
                   storeId={store.id}

@@ -83,16 +83,20 @@ export default async function AllProductsPage({ params, searchParams }: PageProp
       <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
         <ElegantHeader store={store} branding={branding} slug={slug} />
         <main className="mx-auto max-w-7xl px-6 py-20">
-          <div className="text-center mb-20 space-y-4">
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">المتجر</span>
-            <h1 className="text-5xl font-light text-zinc-900 tracking-tighter">كل <span className="font-bold underline decoration-zinc-200 underline-offset-8">المنتجات</span></h1>
+          <div className="flex flex-col items-center text-center mb-20 space-y-4">
+            <div className="h-px w-12 bg-[var(--primary)]/30 mb-2" />
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--primary)]">المتجر</span>
+            <h1 className="text-4xl md:text-5xl font-light text-zinc-900 tracking-tighter uppercase">كل <span className="font-bold italic text-[var(--primary)]">المنتجات</span></h1>
           </div>
 
           <ProductFilters categories={categories} currentCategory={currentCategory as string} slug={`${slug}/products`} searchQuery={searchQuery as string} />
 
           {products.length === 0 ? (
-            <div className="text-center py-32 border border-zinc-100 bg-zinc-50/50 mt-12">
-              <p className="text-lg font-light italic text-zinc-400">عذراً، لم نجد أي قطع تطابق بحثك</p>
+            <div className="text-center py-32 border border-zinc-100 bg-zinc-50/50 rounded-[3rem] mt-12">
+              <div className="h-20 w-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm">
+                 <ShoppingBag className="h-8 w-8 text-zinc-200" />
+              </div>
+              <p className="text-lg font-light italic text-zinc-400">عذراً، لم نجد أي قطع تطابق بحثك حالياً</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-16 mt-12">

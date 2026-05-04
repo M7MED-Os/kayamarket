@@ -35,15 +35,19 @@ export default function WishlistView({ params, storeData }: { params: { slug: st
       <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
         <ElegantHeader store={store} branding={branding} slug={slug} />
         <main className="mx-auto max-w-7xl px-6 py-20">
-          <div className="text-center mb-16 space-y-4">
-            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">قائمتك</span>
-            <h1 className="text-4xl font-light text-zinc-900 tracking-tighter">المنتجات <span className="font-bold underline decoration-zinc-200 underline-offset-8">المفضلة</span></h1>
+          <div className="flex flex-col items-center text-center mb-16 space-y-4">
+            <div className="h-px w-12 bg-[var(--primary)]/30 mb-2" />
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--primary)]">قائمتك</span>
+            <h1 className="text-4xl md:text-5xl font-light text-zinc-900 tracking-tighter uppercase">المنتجات <span className="font-bold italic text-[var(--primary)]">المفضلة</span></h1>
           </div>
 
           {items.length === 0 ? (
-            <div className="text-center py-32 border border-zinc-100 bg-zinc-50/50">
-              <p className="text-lg font-light italic text-zinc-400 mb-8">قائمة المفضلات فارغة</p>
-              <Link href={`/store/${slug}`} className="text-xs font-black uppercase tracking-widest text-zinc-900 border border-zinc-900 px-10 py-4 hover:bg-zinc-900 hover:text-white transition-all duration-500">
+            <div className="text-center py-32 border border-zinc-100 bg-zinc-50/50 rounded-[3rem]">
+              <div className="h-24 w-24 bg-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-sm">
+                 <Heart className="h-10 w-10 text-zinc-200" />
+              </div>
+              <p className="text-lg font-light italic text-zinc-400 mb-8">قائمة المفضلات فارغة حالياً</p>
+              <Link href={`/store/${slug}/products`} className="inline-flex bg-[var(--primary)] text-white px-12 py-5 text-xs font-black uppercase tracking-widest hover:brightness-110 transition-all shadow-xl shadow-[var(--primary)]/20 rounded-2xl">
                 استكشف المنتجات
               </Link>
             </div>
