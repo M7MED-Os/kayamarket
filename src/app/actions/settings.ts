@@ -171,9 +171,9 @@ export async function updateStoreSettings(formData: FormData) {
 
     // Success: Revalidate — bust all caches so theme shows immediately
     revalidatePath('/admin/settings')
-    revalidateTag('stores')
     if (storeSlug) {
       revalidatePath(`/store/${storeSlug}`, 'layout')
+      revalidatePath('/', 'layout') // Global refresh for store settings
     }
 
     return { success: true }
