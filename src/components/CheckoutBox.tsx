@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Product } from '@/types/product'
 import { createClient } from '@/lib/supabase/client'
 import { CheckCircle2, Banknote, CreditCard, Truck, HeartHandshake, ShieldCheck, ShoppingCart, Minus, Plus } from 'lucide-react'
+import WishlistButton from './WishlistButton'
 import { createOrder } from '@/app/actions/order'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
@@ -104,40 +105,30 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
   }
 
   const handleAddToCart = () => {
-    addItem({ id: product.id, name: product.name, price: product.price ?? 0, original_price: product.original_price ?? undefined, image_url: product.image_url ?? undefined, description: product.description ?? undefined, quantity })
+    const newItem = { id: product.id, name: product.name, price: product.price ?? 0, original_price: product.original_price ?? undefined, image_url: product.image_url ?? undefined, description: product.description ?? undefined, quantity }
+    addItem(newItem)
+    
+    // Immediate fallback persistence
+    try {
+      const saved = localStorage.getItem('cart')
+      const items = saved ? JSON.parse(saved) : []
+      const existing = items.find((i: any) => i.id === newItem.id)
+      let next
+      if (existing) {
+        next = items.map((i: any) => i.id === newItem.id ? { ...i, quantity: i.quantity + newItem.quantity } : i)
+      } else {
+        next = [...items, newItem]
+      }
+      localStorage.setItem('cart', JSON.stringify(next))
+    } catch (e) {}
+
     toast.success('تمت الإضافة للسلة')
-  }
-
-  const [showCartHint, setShowCartHint] = useState(false)
-
-  useEffect(() => {
-    let timer: any
-    if (showCartHint) {
-      timer = setTimeout(() => setShowCartHint(false), 5000)
-    }
-    return () => clearTimeout(timer)
-  }, [showCartHint])
-
-  const handleAddToCartWithHint = () => {
-    handleAddToCart()
-    setShowCartHint(true)
   }
 
   if (isElegant) {
     return (
       <div className="space-y-10">
         <div className="space-y-2">
-          <div className="flex items-baseline gap-3">
-            <span className="text-4xl font-light text-zinc-900 tracking-tighter">
-              {Number(finalPrice).toLocaleString()} ج.م
-            </span>
-            {(product.price && ((product.original_price && product.original_price > product.price) || discount > 0)) && (
-              <span className="text-xl line-through text-zinc-300 font-light italic">
-                {Number(product.original_price || product.price).toLocaleString()}
-              </span>
-            )}
-          </div>
-
           {/* Countdown Timer (Themed) */}
           {product.sale_end_date && new Date(product.sale_end_date) > new Date() && (
             <CountdownTimer endDate={product.sale_end_date} selectedTheme={selectedTheme} />
@@ -214,16 +205,12 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
                 <span className="text-base font-black w-8 text-center">{quantity}</span>
                 <button onClick={() => setQuantity(quantity + 1)} className="w-12 h-12 flex items-center justify-center text-zinc-400 hover:text-[var(--primary)] transition-colors"><Plus className="h-4 w-4" /></button>
               </div>
-              <div className="flex-1 relative">
-                <button onClick={handleAddToCartWithHint} className="w-full bg-white border border-[var(--primary)] text-[var(--primary)] h-14 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[var(--primary)] hover:text-white transition-all duration-500 rounded-none">
+              <div className="flex-1 relative flex gap-4">
+                <button onClick={handleAddToCart} className="flex-1 bg-white border border-[var(--primary)] text-[var(--primary)] h-14 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[var(--primary)] hover:text-white transition-all duration-500 rounded-none">
                   <ShoppingCart className="h-4 w-4" />
-                  إضافة للسلة
+                  <span className="hidden sm:inline">إضافة للسلة</span>
                 </button>
-                {showCartHint && (
-                  <div className="absolute bottom-full mb-3 left-0 right-0 bg-[var(--primary)] text-white text-[9px] font-black px-4 py-2 rounded-none text-center animate-in fade-in slide-in-from-bottom-2 duration-300 uppercase tracking-widest shadow-xl z-20">
-                    هذا الزر يقوم بإضافة المنتج لسلة المشتريات
-                  </div>
-                )}
+                <WishlistButton product={{...product, store_id: storeId}} />
               </div>
             </div>
             {/* Store Policies (Elegant) */}

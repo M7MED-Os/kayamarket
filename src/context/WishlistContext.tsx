@@ -18,6 +18,7 @@ interface WishlistContextType {
   toggleItem: (item: WishlistItem) => void
   isInWishlist: (id: string) => boolean
   totalItems: number
+  isInitialized: boolean
 }
 
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined)
@@ -59,7 +60,7 @@ export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const totalItems = items.length
 
   return (
-    <WishlistContext.Provider value={{ items, toggleItem, isInWishlist, totalItems }}>
+    <WishlistContext.Provider value={{ items, toggleItem, isInWishlist, totalItems, isInitialized }}>
       {children}
     </WishlistContext.Provider>
   )

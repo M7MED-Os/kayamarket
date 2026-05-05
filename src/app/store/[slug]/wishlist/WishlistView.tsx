@@ -1,5 +1,6 @@
 'use client'
 
+import React from 'react'
 import { useWishlist } from '@/context/WishlistContext'
 import Link from 'next/link'
 import { Heart, ArrowRight } from 'lucide-react'
@@ -21,9 +22,12 @@ import {
 
 export default function WishlistView({ params, storeData }: { params: { slug: string }, storeData: any }) {
   const { slug } = params
-  const { items } = useWishlist()
+  const { items, isInitialized } = useWishlist()
+  const [mounted, setMounted] = React.useState(false)
+  React.useEffect(() => { setMounted(true) }, [])
 
   if (!storeData?.store) return <div className="min-h-screen flex items-center justify-center font-black text-2xl">المتجر غير موجود</div>
+  if (!mounted || !isInitialized) return null
 
   const { store, branding } = storeData
   const primaryColor = branding?.primary_color || '#e11d48'
@@ -46,7 +50,7 @@ export default function WishlistView({ params, storeData }: { params: { slug: st
           {items.length === 0 ? (
             <div className="text-center py-32 border border-zinc-100 bg-zinc-50/50 rounded-[3rem]">
               <div className="h-24 w-24 bg-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-sm">
-                 <Heart className="h-10 w-10 text-zinc-200" />
+                <Heart className="h-10 w-10 text-zinc-200" />
               </div>
               <p className="text-lg font-light italic text-zinc-400 mb-8">قائمة المفضلات فارغة حالياً</p>
               <Link href={`/store/${slug}/products`} className="inline-flex bg-[var(--primary)] text-white px-12 py-5 text-xs font-black uppercase tracking-widest hover:brightness-110 transition-all shadow-xl shadow-[var(--primary)]/20 rounded-2xl">

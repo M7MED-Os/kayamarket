@@ -3,7 +3,7 @@ import { headers } from 'next/headers'
 import { getStoreById } from '@/lib/tenant/get-store'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { CheckCircle2, Wallet, ArrowRight, Building2, User, MapPin, Phone, MessageSquare, AlertTriangle } from 'lucide-react'
+import { CheckCircle2, Wallet, ArrowRight, Building2, User, MapPin, Phone, MessageSquare, AlertTriangle, Smartphone, CreditCard } from 'lucide-react'
 import InvoiceActions from '@/components/InvoiceActions'
 import CopyableText from '@/components/CopyableText'
 
@@ -268,9 +268,23 @@ export default async function InvoicePage({
                         <div className="space-y-4">
                            <div className="flex items-center gap-3">
                               <Wallet className="h-4 w-4 text-[var(--primary)]/40" />
-                              <span className="text-sm font-bold text-zinc-900">{order.payment_method === 'cod' ? 'الدفع عند الاستلام' : order.payment_method}</span>
+                              <span className="text-sm font-bold text-zinc-900">
+                                 {(() => {
+                                    const map: Record<string, string> = {
+                                       'cod': 'الدفع عند الاستلام',
+                                       'vodafone_cash': 'فودافون كاش',
+                                       'instapay': 'إنستا باي',
+                                       'bank_transfer': 'تحويل بنكي',
+                                       'wallet': 'محفظة إلكترونية',
+                                       'cib_smart_wallet': 'محفظة CIB الذكية',
+                                       'orange_cash': 'أورانج كاش',
+                                       'etisalat_cash': 'اتصالات كاش'
+                                    }
+                                    return map[order.payment_method] || (order.payment_method === 'cod' ? 'الدفع عند الاستلام' : order.payment_method)
+                                 })()}
+                              </span>
                            </div>
-                           {depositAmount > 0 && order.payment_method === 'cod' && (
+                           {depositAmount > 0 && order.payment_method?.includes('الدفع عند الاستلام') && (
                               <div className="bg-zinc-50 p-6 space-y-3 border-r-2 border-[var(--primary)]">
                                  <div className="flex justify-between items-center">
                                     <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">العربون المطلوب</span>
@@ -322,19 +336,49 @@ export default async function InvoicePage({
                   </div>
 
                   {(storeBranding?.invoice_instapay || storeBranding?.invoice_wallet) && (
-                     <div className="pt-16 border-t border-zinc-100 grid grid-cols-1 md:grid-cols-2 gap-12">
-                        {storeBranding?.invoice_instapay && (
-                           <div className="space-y-4">
-                              <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-400">إنستا باي (InstaPay)</h4>
-                              <CopyableText text={storeBranding.invoice_instapay} label="اضغط للنسخ" />
-                           </div>
-                        )}
-                        {storeBranding?.invoice_wallet && (
-                           <div className="space-y-4">
-                              <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-400">محفظة إلكترونية</h4>
-                              <CopyableText text={storeBranding.invoice_wallet} label="اضغط للنسخ" />
-                           </div>
-                        )}
+                     <div className="pt-16 border-t border-zinc-100">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                           {storeBranding?.invoice_instapay && (
+                              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-6 bg-zinc-50 rounded-2xl border border-zinc-100 hover:border-[var(--primary)]/30 transition-all group text-center sm:text-right">
+                                 <div className="h-12 w-12 rounded-xl bg-white flex items-center justify-center text-[var(--primary)] shadow-sm border border-zinc-100 group-hover:scale-110 transition-transform shrink-0">
+                                    <Smartphone className="h-6 w-6" />
+                                 </div>
+                                 <div className="flex-1 space-y-1 w-full">
+                                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">إنستا باي</p>
+                                    <div className="flex justify-center sm:justify-start whitespace-normal break-all">
+                                       <CopyableText text={storeBranding.invoice_instapay} label="اضغط للنسخ" />
+                                    </div>
+                                 </div>
+                              </div>
+                           )}
+                           {storeBranding?.invoice_wallet && (
+                              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-6 bg-zinc-50 rounded-2xl border border-zinc-100 hover:border-[var(--primary)]/30 transition-all group text-center sm:text-right">
+                                 <div className="h-12 w-12 rounded-xl bg-white flex items-center justify-center text-[var(--primary)] shadow-sm border border-zinc-100 group-hover:scale-110 transition-transform shrink-0">
+                                    <Wallet className="h-6 w-6" />
+                                 </div>
+                                 <div className="flex-1 space-y-1 w-full">
+                                    <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">المحفظة</p>
+                                    <div className="flex justify-center sm:justify-start whitespace-normal break-all">
+                                       <CopyableText text={storeBranding.invoice_wallet} label="اضغط للنسخ" />
+                                    </div>
+                                 </div>
+                              </div>
+                           )}
+                        </div>
+                     </div>
+                  )}
+
+                  {storeSettings?.policies && (
+                     <div className="pt-16 border-t border-zinc-100">
+                        <div className="bg-zinc-50/50 p-8 space-y-4 border border-zinc-100">
+                           <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-900 flex items-center gap-2">
+                              <div className="h-1 w-1 bg-[var(--primary)]" />
+                              سياسات المتجر
+                           </h4>
+                           <p className="text-xs text-zinc-500 leading-relaxed font-medium whitespace-pre-wrap">
+                              {storeSettings.policies}
+                           </p>
+                        </div>
                      </div>
                   )}
                </div>
@@ -503,19 +547,35 @@ export default async function InvoicePage({
                   </div>
 
                   {(storeBranding?.invoice_instapay || storeBranding?.invoice_wallet) && (
-                     <div className="pt-16 border-t border-rose-50 grid grid-cols-1 md:grid-cols-2 gap-12">
-                        {storeBranding?.invoice_instapay && (
-                           <div className="space-y-4">
-                              <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-400">حساب InstaPay</h4>
-                              <CopyableText text={storeBranding.invoice_instapay} label="اضغط لنسخ الحساب" />
-                           </div>
-                        )}
-                        {storeBranding?.invoice_wallet && (
-                           <div className="space-y-4">
-                              <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-400">رقم المحفظة الذكية</h4>
-                              <CopyableText text={storeBranding.invoice_wallet} label="اضغط لنسخ الرقم" />
-                           </div>
-                        )}
+                     <div className="pt-16 border-t border-rose-50">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                           {storeBranding?.invoice_instapay && (
+                              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-6 bg-rose-50/30 rounded-3xl border border-rose-100 hover:bg-rose-50 transition-all group text-center sm:text-right">
+                                 <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-[var(--primary)] shadow-sm border border-rose-100 group-hover:scale-110 transition-transform shrink-0">
+                                    <Smartphone className="h-6 w-6" />
+                                 </div>
+                                 <div className="flex-1 space-y-1 w-full">
+                                    <p className="text-[10px] font-black text-rose-300 uppercase tracking-widest">إنستا باي</p>
+                                    <div className="flex justify-center sm:justify-start whitespace-normal break-all">
+                                       <CopyableText text={storeBranding.invoice_instapay} label="اضغط للنسخ" />
+                                    </div>
+                                 </div>
+                              </div>
+                           )}
+                           {storeBranding?.invoice_wallet && (
+                              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-6 bg-rose-50/30 rounded-3xl border border-rose-100 hover:bg-rose-50 transition-all group text-center sm:text-right">
+                                 <div className="h-12 w-12 rounded-2xl bg-white flex items-center justify-center text-[var(--primary)] shadow-sm border border-rose-100 group-hover:scale-110 transition-transform shrink-0">
+                                    <Wallet className="h-6 w-6" />
+                                 </div>
+                                 <div className="flex-1 space-y-1 w-full">
+                                    <p className="text-[10px] font-black text-rose-300 uppercase tracking-widest">المحفظة</p>
+                                    <div className="flex justify-center sm:justify-start whitespace-normal break-all">
+                                       <CopyableText text={storeBranding.invoice_wallet} label="اضغط للنسخ" />
+                                    </div>
+                                 </div>
+                              </div>
+                           )}
+                        </div>
                      </div>
                   )}
 

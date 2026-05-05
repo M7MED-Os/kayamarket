@@ -12,24 +12,28 @@ import toast from 'react-hot-toast'
 // ─── ELEGANT PRODUCT CARD ───────────────────────────────────────────────────
 export const ElegantProductCard = ({ product, slug }: any) => {
   const { toggleItem, isInWishlist } = useWishlist()
-  const [showHint, setShowHint] = React.useState(false)
   const isWishlisted = isInWishlist(product.id)
   const productImage = product.image_url || (product.images && product.images.length > 0 ? product.images[0] : 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2670&auto=format&fit=crop')
 
   const { addItem } = useCart()
 
-  React.useEffect(() => {
-    let timer: any
-    if (showHint) {
-      timer = setTimeout(() => setShowHint(false), 5000)
-    }
-    return () => clearTimeout(timer)
-  }, [showHint])
-
   const handleWishlist = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
     toggleItem(product)
+    
+    // Direct sync fallback
+    try {
+      const saved = localStorage.getItem('wishlist')
+      let items = saved ? JSON.parse(saved) : []
+      if (isWishlisted) {
+        items = items.filter((i: any) => i.id !== product.id)
+      } else {
+        items.push(product)
+      }
+      localStorage.setItem('wishlist', JSON.stringify(items))
+    } catch (e) {}
+
     if (!isWishlisted) {
       toast.success('تم الإضافة للمفضلة')
     }
@@ -38,15 +42,30 @@ export const ElegantProductCard = ({ product, slug }: any) => {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    addItem({
+    const newItem = {
       id: product.id,
       name: product.name,
       price: product.price || 0,
       original_price: product.original_price,
       image_url: productImage,
       quantity: 1
-    })
-    setShowHint(true)
+    }
+    addItem(newItem)
+    
+    // Direct sync fallback
+    try {
+      const saved = localStorage.getItem('cart')
+      const items = saved ? JSON.parse(saved) : []
+      const existing = items.find((i: any) => i.id === newItem.id)
+      let next
+      if (existing) {
+        next = items.map((i: any) => i.id === newItem.id ? { ...i, quantity: i.quantity + 1 } : i)
+      } else {
+        next = [...items, newItem]
+      }
+      localStorage.setItem('cart', JSON.stringify(next))
+    } catch (e) {}
+
     toast.success('تمت الإضافة للسلة')
   }
 
@@ -74,11 +93,6 @@ export const ElegantProductCard = ({ product, slug }: any) => {
             >
               <ShoppingBag className="h-4 w-4 md:h-5 md:w-5" strokeWidth={1.5} />
             </button>
-            {showHint && (
-              <div className="absolute right-full mr-3 whitespace-nowrap bg-zinc-900 text-white text-[9px] font-black px-3 py-2 rounded-none animate-in fade-in slide-in-from-left-2 duration-300 uppercase tracking-widest shadow-xl">
-                تمت الإضافة للسلة بنجاح
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -112,7 +126,7 @@ export const ElegantHero = ({ branding, store, slug }: any) => {
 
   if (words.length === 1) {
     renderedTitle = (
-      <span className="text-7xl md:text-9xl font-black text-zinc-900 tracking-tighter leading-none">
+      <span className="text-7xl md:text-9xl font-black tracking-tighter leading-none" style={{ color: 'var(--primary)', filter: 'brightness(0.15) contrast(1.2)' }}>
         {words[0]}
       </span>
     )
@@ -127,8 +141,8 @@ export const ElegantHero = ({ branding, store, slug }: any) => {
     renderedTitle = (
       <div className="flex flex-col -space-y-4">
         <span className="text-4xl md:text-6xl font-light text-[var(--primary)]/20 tracking-wide uppercase leading-tight">{words[0]}</span>
-        <span className="text-7xl md:text-9xl font-black text-zinc-900 leading-[0.85]">
-          {words[1]} <span className="text-[var(--primary)]">{words[2]}</span>
+        <span className="text-7xl md:text-9xl font-black leading-[0.85]">
+          <span style={{ color: 'var(--primary)', filter: 'brightness(0.15) contrast(1.2)' }}>{words[1]}</span> <span className="text-[var(--primary)]">{words[2]}</span>
         </span>
       </div>
     )

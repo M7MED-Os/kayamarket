@@ -14,13 +14,18 @@ import {
   FloralHeader,
   FloralFooter
 } from '@/components/store/themes/FloralTheme'
+import { useWishlist } from '@/context/WishlistContext'
+import React, { useEffect, useState } from 'react'
 
 export default function CartView({ params, storeData }: { params: { slug: string }, storeData: any }) {
   const { slug } = params
-  const { items, updateQuantity, removeItem, totalPrice, totalItems } = useCart()
+  const { items, updateQuantity, removeItem, totalPrice, totalItems, isInitialized } = useCart()
   const router = useRouter()
+  const [mounted, setMounted] = React.useState(false)
+  React.useEffect(() => { setMounted(true) }, [])
 
   if (!storeData?.store) return <div className="min-h-screen flex items-center justify-center font-black text-2xl">المتجر غير موجود</div>
+  if (!mounted || !isInitialized) return null
 
   const { store, branding } = storeData
   const primaryColor = branding?.primary_color || '#e11d48'
@@ -43,7 +48,7 @@ export default function CartView({ params, storeData }: { params: { slug: string
           {items.length === 0 ? (
             <div className="text-center py-32 border border-zinc-100 bg-zinc-50/50 rounded-none">
               <div className="h-20 w-20 bg-white rounded-none flex items-center justify-center mx-auto mb-6 shadow-sm border border-zinc-50">
-                 <ShoppingBag className="h-8 w-8 text-zinc-200" />
+                <ShoppingBag className="h-8 w-8 text-zinc-200" />
               </div>
               <p className="text-lg font-light italic text-zinc-400 mb-8">سلتك فارغة حالياً</p>
               <Link href={`/store/${slug}`} className="text-[10px] font-black uppercase tracking-widest text-white bg-[var(--primary)] px-12 py-5 hover:brightness-125 transition-all duration-500 rounded-none disabled:brightness-75">
@@ -69,20 +74,20 @@ export default function CartView({ params, storeData }: { params: { slug: string
                             )}
                           </div>
                         </div>
-                        <button onClick={() => removeItem(item.id)} className="text-zinc-200 hover:text-[var(--primary)] transition-colors">
-                          <Trash2 className="h-4 w-4" strokeWidth={1} />
+                        <button onClick={() => removeItem(item.id)} className="text-[var(--primary)] hover:brightness-125 transition-colors">
+                          <Trash2 className="h-4 w-4" strokeWidth={1.5} />
                         </button>
                       </div>
 
-                      <div className="flex items-center justify-between pt-4">
-                        <div className="flex items-center border border-zinc-100 p-1 rounded-none">
+                      <div className="flex items-center justify-between gap-4 pt-4">
+                        <div className="flex items-center border border-zinc-100 p-1 rounded-none bg-white">
                           <button
                             onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
                             className="h-10 w-10 flex items-center justify-center text-zinc-400 hover:text-[var(--primary)] hover:bg-zinc-50 transition-all active:scale-90"
                           >
                             <Minus className="h-3 w-3" />
                           </button>
-                          <span className="text-sm font-black w-8 text-center tabular-nums">{item.quantity}</span>
+                          <span className="text-sm font-black w-8 text-center tabular-nums text-zinc-900">{item.quantity}</span>
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
                             className="h-10 w-10 flex items-center justify-center text-zinc-400 hover:text-[var(--primary)] hover:bg-zinc-50 transition-all active:scale-90"
@@ -90,9 +95,9 @@ export default function CartView({ params, storeData }: { params: { slug: string
                             <Plus className="h-3 w-3" />
                           </button>
                         </div>
-                        <span className="text-sm font-bold text-zinc-900 uppercase tracking-widest tabular-nums">
-                          {(item.price * item.quantity).toLocaleString()} ج.م
-                        </span>
+                        <div className="text-sm sm:text-base font-bold text-zinc-900 uppercase tracking-widest tabular-nums text-left">
+                           {(item.price * item.quantity).toLocaleString()} ج.م
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -170,7 +175,7 @@ export default function CartView({ params, storeData }: { params: { slug: string
                         </button>
                       </div>
 
-                      <div className="flex items-center justify-between pt-2">
+                      <div className="flex items-center justify-between gap-4 pt-2">
                         <div className="flex items-center bg-[#FAF3F0]/60 rounded-full p-1 border border-rose-50">
                           <button
                             onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
@@ -186,9 +191,9 @@ export default function CartView({ params, storeData }: { params: { slug: string
                             <Plus className="h-3 w-3" />
                           </button>
                         </div>
-                        <span className="text-sm font-black text-[#2B2B2B]">
-                          {(item.price * item.quantity).toLocaleString()} ج.م
-                        </span>
+                        <div className="text-sm sm:text-base font-black text-[#2B2B2B] text-left">
+                           {(item.price * item.quantity).toLocaleString()} ج.م
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -137,9 +137,29 @@ export function FloralHero({ branding, store, slug }: { branding: any; store: an
               <span className="text-xs font-black text-[var(--primary)] uppercase tracking-[0.2em]">تشكيلة الموسم</span>
             </div>
 
-            <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-black leading-[1.2] tracking-normal drop-shadow-sm max-w-[12em] mx-auto lg:mx-0" style={{ color: 'var(--primary)', filter: 'brightness(0.7)' }}>
-              {heroTitle}
-            </h1>
+            {(() => {
+              const words = heroTitle.split(' ')
+              if (words.length === 1) {
+                return (
+                  <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-black leading-[1.2] tracking-normal drop-shadow-sm max-w-[12em] mx-auto lg:mx-0" style={{ color: 'var(--primary)', filter: 'brightness(0.15) contrast(1.2)' }}>
+                    {words[0]}
+                  </h1>
+                )
+              }
+              if (words.length === 3) {
+                return (
+                  <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-black leading-[1.2] tracking-normal drop-shadow-sm max-w-[12em] mx-auto lg:mx-0" style={{ color: 'var(--primary)' }}>
+                    <span style={{ opacity: 0.6 }}>{words[0]}</span> <span style={{ filter: 'brightness(0.15) contrast(1.2)' }}>{words[1]}</span> <span style={{ filter: 'none' }}>{words[2]}</span>
+                  </h1>
+                )
+              }
+              // Default for 2 words or 4+ words
+              return (
+                <h1 className="text-5xl md:text-6xl lg:text-[4.5rem] font-black leading-[1.2] tracking-normal drop-shadow-sm max-w-[12em] mx-auto lg:mx-0" style={{ color: 'var(--primary)', filter: 'brightness(0.7)' }}>
+                  {heroTitle}
+                </h1>
+              )
+            })()}
 
             <p className="text-lg text-zinc-500 max-w-md mx-auto lg:mx-0 font-medium leading-relaxed">
               {heroDesc}

@@ -20,6 +20,7 @@ interface CartContextType {
   clearCart: () => void
   totalItems: number
   totalPrice: number
+  isInitialized: boolean
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -55,7 +56,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const syncCart = async () => {
       const { createClient } = await import('@/lib/supabase/client')
       const supabase = createClient()
-      
+
       const productIds = items.map(item => item.id)
       const { data: availableProducts } = await supabase
         .from('products')
@@ -72,7 +73,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
 
     syncCart()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isInitialized])
 
   const addItem = (newItem: CartItem) => {
@@ -109,7 +110,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart, totalItems, totalPrice }}>
+    <CartContext.Provider value={{ items, addItem, removeItem, updateQuantity, clearCart, totalItems, totalPrice, isInitialized }}>
       {children}
     </CartContext.Provider>
   )

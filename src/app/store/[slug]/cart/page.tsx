@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getStoreByIdentifier } from '@/lib/tenant/get-store'
 import CartView from './CartView'
 

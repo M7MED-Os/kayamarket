@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 import StoreHeader from '@/components/StoreHeader'
 import TestimonialsMarquee from '@/components/TestimonialsMarquee'
-import Providers from '@/components/Providers'
+
 
 // ─── Section Helpers ──────────────────────────────────────────────────────────
 function isSectionEnabled(branding: any, sectionId: string): boolean {
@@ -373,79 +373,73 @@ export default async function StorePage({ params, searchParams }: PageProps) {
   // ─── THEME: ELEGANT ────────────────────────────────────────────────────────
   if (selectedTheme === 'elegant') {
     return (
-      <Providers>
-        <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
-          {shown('announcement') && ((branding as any)?.announcement_enabled === true || (branding as any)?.announcement_enabled === 'true') && (
-            <AnnouncementBar text={(branding as any)?.announcement_text || ''} branding={branding} />
-          )}
-          <ElegantHeader store={store} branding={branding} slug={slug} />
-          <ElegantHero branding={branding} store={store} slug={slug} />
-          <ElegantCategories categories={dbCategories || []} slug={slug} />
-          <ElegantBestsellers products={productsWithRatings} slug={slug} branding={branding} />
-          {shown('features') && <ElegantFeatures branding={branding} />}
+      <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
+        {shown('announcement') && ((branding as any)?.announcement_enabled === true || (branding as any)?.announcement_enabled === 'true') && (
+          <AnnouncementBar text={(branding as any)?.announcement_text || ''} branding={branding} />
+        )}
+        <ElegantHeader store={store} branding={branding} slug={slug} />
+        <ElegantHero branding={branding} store={store} slug={slug} />
+        <ElegantCategories categories={dbCategories || []} slug={slug} />
+        <ElegantBestsellers products={productsWithRatings} slug={slug} branding={branding} />
+        {shown('features') && <ElegantFeatures branding={branding} />}
 
-          {shown('testimonials') && (
-            <ElegantTestimonials reviews={storeReviews || []} />
-          )}
+        {shown('testimonials') && (
+          <ElegantTestimonials reviews={storeReviews || []} />
+        )}
 
-          {shown('faq') && <ElegantFAQ branding={branding} />}
-          {shown('footer') && <ElegantFooter store={store} branding={branding} />}
-        </div>
-      </Providers>
+        {shown('faq') && <ElegantFAQ branding={branding} />}
+        {shown('footer') && <ElegantFooter store={store} branding={branding} />}
+      </div>
     )
   }
 
   // ─── THEME: FLORAL ─────────────────────────────────────────────────────────
   if (selectedTheme === 'floral') {
     return (
-      <Providers>
-        <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
-          {shown('announcement') && ((branding as any)?.announcement_enabled === true || (branding as any)?.announcement_enabled === 'true') && (
-            <AnnouncementBar text={(branding as any)?.announcement_text || ''} branding={branding} />
-          )}
-          <FloralHeader store={store} branding={branding} slug={slug} />
-          <FloralHero branding={branding} store={store} slug={slug} />
-          {shown('categories') && <FloralCategories categories={dbCategories || []} slug={slug} />}
+      <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
+        {shown('announcement') && ((branding as any)?.announcement_enabled === true || (branding as any)?.announcement_enabled === 'true') && (
+          <AnnouncementBar text={(branding as any)?.announcement_text || ''} branding={branding} />
+        )}
+        <FloralHeader store={store} branding={branding} slug={slug} />
+        <FloralHero branding={branding} store={store} slug={slug} />
+        {shown('categories') && <FloralCategories categories={dbCategories || []} slug={slug} />}
 
-          {shown('bestsellers') && <FloralBestsellers products={productsWithRatings} slug={slug} />}
+        {shown('bestsellers') && <FloralBestsellers products={productsWithRatings} slug={slug} />}
 
-          {shown('features') && <FloralFeatures branding={branding} />}
-          {shown('testimonials') && <FloralTestimonials reviews={storeReviews || []} />}
-          {shown('faq') && <FloralFAQ branding={branding} />}
-          {shown('footer') && <FloralFooter store={store} branding={branding} />}
-        </div>
-      </Providers>
+        {shown('features') && <FloralFeatures branding={branding} />}
+        {shown('testimonials') && <FloralTestimonials reviews={storeReviews || []} />}
+        {shown('faq') && <FloralFAQ branding={branding} />}
+        {shown('footer') && <FloralFooter store={store} branding={branding} />}
+      </div>
     )
   }
 
   // ─── THEME: DEFAULT (MESH) ─────────────────────────────────────────────────
   return (
-    <Providers>
-      <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
-        {/* 1. Announcement */}
-        {shown('announcement') && ((branding as any)?.announcement_enabled === true || (branding as any)?.announcement_enabled === 'true') && (
-          <AnnouncementBar text={(branding as any)?.announcement_text || ''} branding={branding} />
-        )}
-        {/* 2. Header */}
-        <StoreHeader store={store} branding={branding} slug={slug} />
-        <Hero branding={branding} store={store} slug={slug} />
-        <CategoryHighlights categories={dbCategories || []} slug={slug} branding={branding} />
-        <Bestsellers products={productsWithRatings} slug={slug} branding={branding} />
-        <Features branding={branding} />
+    <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
+      {/* 1. Announcement */}
+      {shown('announcement') && ((branding as any)?.announcement_enabled === true || (branding as any)?.announcement_enabled === 'true') && (
+        <AnnouncementBar text={(branding as any)?.announcement_text || ''} branding={branding} />
+      )}
+      {/* 2. Header */}
+      <StoreHeader store={store} branding={branding} slug={slug} />
+      <Hero branding={branding} store={store} slug={slug} />
+      <CategoryHighlights categories={dbCategories || []} slug={slug} branding={branding} />
+      <Bestsellers products={productsWithRatings} slug={slug} branding={branding} />
+      <Features branding={branding} />
 
-        {/* Testimonials / Reviews Section */}
-        {shown('testimonials') && (
-          <section className="bg-zinc-50/50 py-24 md:py-32 overflow-hidden border-y border-zinc-100">
-            <div className="mx-auto max-w-7xl px-6">
-              <SectionHeader title="آراء العملاء" subtitle="ثقة نعتز بها" />
-              <TestimonialsMarquee reviews={storeReviews || []} />
-            </div>
-          </section>
-        )}
+      {/* Testimonials / Reviews Section */}
+      {shown('testimonials') && (
+        <section className="bg-zinc-50/50 py-24 md:py-32 overflow-hidden border-y border-zinc-100">
+          <div className="mx-auto max-w-7xl px-6">
+            <SectionHeader title="آراء العملاء" subtitle="ثقة نعتز بها" />
+            <TestimonialsMarquee reviews={storeReviews || []} />
+          </div>
+        </section>
+      )}
 
-        {shown('faq') && <FAQ branding={branding} />}
-        {shown('footer') && <StoreFooter store={store} branding={branding} slug={slug} />}
-      </div>
-    </Providers>
+      {shown('faq') && <FAQ branding={branding} />}
+      {shown('footer') && <StoreFooter store={store} branding={branding} slug={slug} />}
+    </div>
   )
 }
