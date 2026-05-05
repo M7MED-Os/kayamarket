@@ -11,6 +11,7 @@ interface WishlistItem {
   description?: string | null
   sale_end_date?: string | null
   sales_count?: number
+  store_id?: string
 }
 
 interface WishlistContextType {
