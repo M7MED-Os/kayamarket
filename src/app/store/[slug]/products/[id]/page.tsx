@@ -85,7 +85,8 @@ export default async function StoreProductPage({ params }: PageProps) {
   // Fetch plan config for watermark
   const { getPlanConfig, getDynamicPlanConfigs } = await import('@/lib/subscription')
   const dynamicConfigs = await getDynamicPlanConfigs(supabase)
-  const planTier = (store.plan || 'starter') as any
+  const rawPlan = store.plan as string || 'starter'
+  const planTier = (rawPlan.toLowerCase() === 'free' ? 'starter' : rawPlan.toLowerCase()) as import('@/lib/subscription').PlanTier
   const planConfig = dynamicConfigs[planTier] || getPlanConfig(planTier)
   const showWatermark = !planConfig.canRemoveWatermark
 
