@@ -371,7 +371,7 @@ export default async function StorePage({ params, searchParams }: PageProps) {
   const rawPlan = store.plan as string || 'starter'
   const planTier = (rawPlan.toLowerCase() === 'free' ? 'starter' : rawPlan.toLowerCase()) as import('@/lib/subscription').PlanTier
   const planConfig = dynamicConfigs[planTier] || getPlanConfig(planTier)
-  const showWatermark = !planConfig.canRemoveWatermark
+  const showWatermark = planConfig ? !planConfig.canRemoveWatermark : true
 
   // Fixed order — only check enabled from DB sections
   const shown = (id: string) => isSectionEnabled(branding, id)

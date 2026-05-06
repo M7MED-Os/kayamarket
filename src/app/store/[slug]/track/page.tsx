@@ -19,10 +19,11 @@ export default async function TrackPage({ params }: PageProps) {
 
   const supabase = await createClient()
   const { getPlanConfig, getDynamicPlanConfigs } = await import('@/lib/subscription')
+  const rawPlan = store.plan as string || 'starter'
+  const planTier = (rawPlan.toLowerCase() === 'free' ? 'starter' : rawPlan.toLowerCase()) as import('@/lib/subscription').PlanTier
   const dynamicConfigs = await getDynamicPlanConfigs(supabase)
-  const planTier = (store.plan || 'starter') as any
   const planConfig = dynamicConfigs[planTier] || getPlanConfig(planTier)
-  const showWatermark = !planConfig.canRemoveWatermark
+  const showWatermark = planConfig ? !planConfig.canRemoveWatermark : true
 
   return <TrackOrderClient store={store} branding={branding} slug={slug} showWatermark={showWatermark} />
 }

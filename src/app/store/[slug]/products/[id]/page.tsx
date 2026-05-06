@@ -88,7 +88,7 @@ export default async function StoreProductPage({ params }: PageProps) {
   const rawPlan = store.plan as string || 'starter'
   const planTier = (rawPlan.toLowerCase() === 'free' ? 'starter' : rawPlan.toLowerCase()) as import('@/lib/subscription').PlanTier
   const planConfig = dynamicConfigs[planTier] || getPlanConfig(planTier)
-  const showWatermark = !planConfig.canRemoveWatermark
+  const showWatermark = planConfig ? !planConfig.canRemoveWatermark : true
 
   // ─── THEME: ELEGANT ────────────────────────────────────────────────────────
   if (selectedTheme === 'elegant') {

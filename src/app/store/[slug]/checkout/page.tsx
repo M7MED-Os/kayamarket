@@ -11,7 +11,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ slug:
   const rawPlan = storeData.store?.plan as string || 'starter'
   const planTier = (rawPlan.toLowerCase() === 'free' ? 'starter' : rawPlan.toLowerCase()) as import('@/lib/subscription').PlanTier
   const planConfig = dynamicConfigs[planTier] || getPlanConfig(planTier)
-  const showWatermark = !planConfig.canRemoveWatermark
+  const showWatermark = planConfig ? !planConfig.canRemoveWatermark : true
 
   return <CheckoutView params={{ slug }} storeData={storeData} showWatermark={showWatermark} />
 }
