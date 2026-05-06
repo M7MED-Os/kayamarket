@@ -1,50 +1,67 @@
-import { Loader2, PackageSearch } from 'lucide-react'
+'use client'
+
+import React from 'react'
+import { usePathname } from 'next/navigation'
+
+const KayaLogo = ({ className = "h-8 w-8" }: { className?: string }) => (
+  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${className} shrink-0`}>
+    <path d="M15 50 C15 30.67 30.67 15 50 15 C69.33 15 85 30.67 85 50" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+    <path d="M85 50 C85 69.33 69.33 85 50 85 C30.67 85 15 69.33 15 50" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+    <path d="M30 35 L30 65" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+    <path d="M50 50 L50 70" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+    <path d="M35 30 L50 50 L65 30" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M70 35 L70 65" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+  </svg>
+)
 
 export default function RootLoading() {
+  const pathname = usePathname()
+  
+  // If we are in a store route, don't show the KayaMarket loader at all
+  // Let the store-specific loading handle it to avoid double UI
+  if (pathname?.includes('/store/')) {
+    return <div className="fixed inset-0 z-[9999] bg-white" />
+  }
+
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6" dir="rtl">
-      
-      {/* Brand Icon Animation */}
-      <div className="relative mb-12">
-        <div className="absolute inset-0 bg-slate-900/5 rounded-3xl animate-ping" style={{ animationDuration: '3s' }} />
-        <div className="relative h-24 w-24 bg-white shadow-2xl shadow-slate-200/50 rounded-3xl flex items-center justify-center border border-slate-100 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-100/50 to-transparent" />
-          <div className="w-12 h-12 bg-slate-50 rounded-2xl animate-pulse flex items-center justify-center z-10 border border-slate-100 shadow-inner">
-            <PackageSearch className="w-6 h-6 text-slate-400" />
+    <div className="fixed inset-0 z-[9999] bg-white flex flex-col items-center justify-center p-6" dir="rtl">
+      <div className="relative flex flex-col items-center w-full max-w-sm space-y-12">
+        
+        {/* Brand Identity */}
+        <div className="flex flex-col items-center space-y-5 animate-in fade-in zoom-in duration-700">
+          <div className="flex items-center gap-4" dir="ltr">
+            <div className="text-[#00a6f4] bg-white p-2.5 rounded-2xl shadow-[0_10px_30px_rgba(0,166,244,0.15)] border border-blue-50 ring-4 ring-blue-50/30">
+              <KayaLogo className="h-10 w-10" />
+            </div>
+            <span className="text-3xl md:text-5xl font-black text-[#00a6f4] tracking-tighter whitespace-nowrap">
+              Kaya<span className="font-semibold text-slate-400">Market</span>
+            </span>
+          </div>
+          <div className="h-1 w-16 bg-[#00a6f4]/10 rounded-full overflow-hidden">
+            <div className="h-full bg-[#00a6f4] w-1/2 animate-[loading_1.5s_infinite_ease-in-out]" />
+          </div>
+        </div>
+
+        {/* Messaging */}
+        <div className="text-center animate-in fade-in slide-in-from-bottom-4 duration-1000">
+          <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.4em] mb-4">جاري تحميل المنصة</p>
+          <div className="flex items-center justify-center gap-2">
+            <div className="w-2 h-2 bg-[#00a6f4] rounded-full animate-bounce [animation-delay:-0.3s]" />
+            <div className="w-2 h-2 bg-[#00a6f4] rounded-full animate-bounce [animation-delay:-0.15s]" />
+            <div className="w-2 h-2 bg-[#00a6f4] rounded-full animate-bounce" />
           </div>
         </div>
       </div>
 
-      {/* Loading Text */}
-      <div className="text-center space-y-3 mb-16">
-        <h2 className="text-2xl font-black text-slate-900 tracking-tight">KayaMarket</h2>
-        <div className="flex items-center justify-center gap-2">
-           <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-           <p className="text-sm font-bold text-slate-500 tracking-widest uppercase">جاري التجهيز</p>
-        </div>
-      </div>
-
-      {/* Generic UI Skeleton */}
-      <div className="w-full max-w-4xl space-y-6 opacity-40 pointer-events-none">
-        
-        {/* Top bar */}
-        <div className="w-full h-16 bg-white border border-slate-100 rounded-2xl flex items-center justify-between px-6 shadow-sm">
-           <div className="h-4 w-32 bg-slate-100 rounded-md animate-pulse" />
-           <div className="flex gap-2">
-              <div className="h-8 w-8 bg-slate-50 rounded-full animate-pulse" />
-              <div className="h-8 w-8 bg-slate-50 rounded-full animate-pulse" />
-           </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-           <div className="h-[300px] bg-white border border-slate-100 rounded-[2rem] shadow-sm animate-pulse relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-white via-slate-50/30 to-slate-100/20 -translate-x-full animate-[shimmer_2s_infinite]" />
-           </div>
-           <div className="md:col-span-2 h-[300px] bg-white border border-slate-100 rounded-[2rem] shadow-sm animate-pulse relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-slate-50/50 to-transparent -translate-x-full animate-[shimmer_1.5s_infinite]" />
-           </div>
-        </div>
-        
+      <style jsx global>{`
+        @keyframes loading {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(200%); }
+        }
+      `}</style>
+      
+      <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-50/30 rounded-full blur-[120px]" />
       </div>
     </div>
   )

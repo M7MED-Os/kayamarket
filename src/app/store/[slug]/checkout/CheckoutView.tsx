@@ -19,8 +19,9 @@ import {
   FloralHeader,
   FloralFooter
 } from '@/components/store/themes/FloralTheme'
+import { KayaBadge } from '@/components/store/KayaBadge'
 
-export default function CheckoutView({ params, storeData }: { params: { slug: string }, storeData: any }) {
+export default function CheckoutView({ params, storeData, showWatermark }: { params: { slug: string }, storeData: any, showWatermark?: boolean }) {
   const { slug } = params
   const { items, totalPrice, clearCart } = useCart()
   const [submitting, setSubmitting] = useState(false)
@@ -141,7 +142,12 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
     return (
       <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
         <ElegantHeader store={store} branding={branding} slug={slug} />
-        <main className="mx-auto max-w-5xl px-6 py-20">
+        <main className="mx-auto max-w-5xl px-6 py-20 relative">
+          {showWatermark && (
+            <div className="fixed bottom-6 right-6 z-[9999]">
+              <KayaBadge />
+            </div>
+          )}
           <div className="flex flex-col items-center text-center mb-16 space-y-4">
             <div className="h-px w-12 bg-[var(--primary)]/30 mb-2" />
             <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--primary)]">الدفع</span>
@@ -274,7 +280,12 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
     return (
       <div className="min-h-screen bg-[#FAF3F0]/20" dir="rtl" style={commonStyles}>
         <FloralHeader store={store} branding={branding} slug={slug} />
-        <main className="mx-auto max-w-5xl px-6 py-24">
+        <main className="mx-auto max-w-5xl px-6 py-24 relative">
+          {showWatermark && (
+            <div className="fixed bottom-6 right-6 z-[9999]">
+              <KayaBadge />
+            </div>
+          )}
           {/* Cart → Checkout progress */}
           <div className="flex items-center justify-center gap-3 mb-10">
             <Link
@@ -427,7 +438,12 @@ export default function CheckoutView({ params, storeData }: { params: { slug: st
     <div className="min-h-screen bg-zinc-50 font-inter" dir="rtl" style={commonStyles}>
       <StoreHeader store={store} branding={branding} slug={slug} />
 
-      <main className="mx-auto max-w-5xl px-6 py-12">
+      <main className="mx-auto max-w-5xl px-6 py-12 relative">
+        {showWatermark && (
+          <div className="absolute top-4 right-4 z-20">
+            <KayaBadge />
+          </div>
+        )}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           
           {/* Customer Info Form */}

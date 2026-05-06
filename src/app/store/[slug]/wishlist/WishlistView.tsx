@@ -19,8 +19,9 @@ import {
   FloralSectionTitle,
   PetalDeco
 } from '@/components/store/themes/FloralTheme'
+import { KayaBadge } from '@/components/store/KayaBadge'
 
-export default function WishlistView({ params, storeData }: { params: { slug: string }, storeData: any }) {
+export default function WishlistView({ params, storeData, showWatermark }: { params: { slug: string }, storeData: any, showWatermark?: boolean }) {
   const { slug } = params
   const { items, isInitialized } = useWishlist()
   const [mounted, setMounted] = React.useState(false)
@@ -40,7 +41,12 @@ export default function WishlistView({ params, storeData }: { params: { slug: st
     return (
       <div className="min-h-screen bg-white" dir="rtl" style={commonStyles}>
         <ElegantHeader store={store} branding={branding} slug={slug} />
-        <main className="mx-auto max-w-7xl px-6 py-20">
+        <main className="mx-auto max-w-7xl px-6 py-20 relative">
+          {showWatermark && (
+            <div className="fixed bottom-6 right-6 z-[9999]">
+              <KayaBadge />
+            </div>
+          )}
           <div className="flex flex-col items-center text-center mb-16 space-y-4">
             <div className="h-px w-12 bg-[var(--primary)]/30 mb-2" />
             <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--primary)]">قائمتك</span>
@@ -65,7 +71,7 @@ export default function WishlistView({ params, storeData }: { params: { slug: st
             </div>
           )}
         </main>
-        <ElegantFooter store={store} branding={branding} />
+        <ElegantFooter store={store} branding={branding} showWatermark={showWatermark} />
       </div>
     )
   }
@@ -75,7 +81,12 @@ export default function WishlistView({ params, storeData }: { params: { slug: st
     return (
       <div className="min-h-screen bg-[#FAF3F0]/20" dir="rtl" style={commonStyles}>
         <FloralHeader store={store} branding={branding} slug={slug} />
-        <main className="mx-auto max-w-7xl px-6 py-24">
+        <main className="mx-auto max-w-7xl px-6 py-24 relative">
+          {showWatermark && (
+            <div className="fixed bottom-6 right-6 z-[9999]">
+              <KayaBadge />
+            </div>
+          )}
           <FloralSectionTitle title="المفضلات" subtitle="اخترتها بعناية" />
 
           {items.length === 0 ? (
@@ -102,7 +113,7 @@ export default function WishlistView({ params, storeData }: { params: { slug: st
             </div>
           )}
         </main>
-        <FloralFooter store={store} branding={branding} />
+        <FloralFooter store={store} branding={branding} showWatermark={showWatermark} />
       </div>
     )
   }
@@ -112,7 +123,12 @@ export default function WishlistView({ params, storeData }: { params: { slug: st
     <div className="min-h-screen bg-zinc-50 font-inter" dir="rtl" style={commonStyles}>
       <StoreHeader store={store} branding={branding} slug={slug} />
 
-      <main className="mx-auto max-w-7xl px-6 py-12">
+      <main className="mx-auto max-w-7xl px-6 py-12 relative">
+        {showWatermark && (
+          <div className="absolute top-4 right-4 z-20">
+            <KayaBadge />
+          </div>
+        )}
         <h1 className="text-3xl md:text-4xl font-black text-zinc-900 mb-8 flex items-center gap-4">
           <Heart className="h-8 w-8 text-rose-500 fill-rose-500" />
           المفضلات
@@ -141,7 +157,7 @@ export default function WishlistView({ params, storeData }: { params: { slug: st
           </div>
         )}
       </main>
-      <StoreFooter store={store} branding={branding} slug={slug} />
+      <StoreFooter store={store} branding={branding} slug={slug} showWatermark={showWatermark} />
     </div>
   )
 }

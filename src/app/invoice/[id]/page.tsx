@@ -4,6 +4,7 @@ import { getStoreById } from '@/lib/tenant/get-store'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { CheckCircle2, Wallet, ArrowRight, Building2, User, MapPin, Phone, MessageSquare, AlertTriangle, Smartphone, CreditCard } from 'lucide-react'
+import { KayaBadge } from '@/components/store/KayaBadge'
 import InvoiceActions from '@/components/InvoiceActions'
 import CopyableText from '@/components/CopyableText'
 
@@ -113,9 +114,11 @@ export default async function InvoicePage({
    }
 
    const { getPlanConfig, getDynamicPlanConfigs } = await import('@/lib/subscription')
-   const plan = (storeInfo?.plan as any || 'starter') as import('@/lib/subscription').PlanTier
+   const rawPlan = storeInfo?.plan as string || 'starter'
+   const plan = (rawPlan.toLowerCase() === 'free' ? 'starter' : rawPlan.toLowerCase()) as import('@/lib/subscription').PlanTier
    const dynamicConfigs = await getDynamicPlanConfigs(supabase)
    const config = dynamicConfigs[plan] || getPlanConfig(plan)
+   const showWatermark = config ? !config.canRemoveWatermark : true
 
    const storeName = storeInfo?.name ?? 'متجرنا'
    const storeBackHref = storeInfo?.slug ? `/store/${storeInfo.slug}` : '/'
@@ -150,6 +153,7 @@ export default async function InvoicePage({
          `عنوان التوصيل: ${order.customer_address}`,
          '',
          `تفاصيل الطلب:`,
+         `رقم الطلب: #${shortId}`,
          `وقت الطلب: ${new Date(order.created_at).toLocaleString('ar-EG', { timeZone: 'Africa/Cairo', dateStyle: 'medium', timeStyle: 'short' })}`,
          `طريقة الدفع: ${order.payment_method}`,
          order.coupon_code ? `🎟️ الكوبون: ${order.coupon_code}\n💰 السعر قبل الخصم: ${productPrice.toLocaleString()} ج.م\n🎁 قيمة الخصم: ${((productPrice * discountPct) / 100).toLocaleString()} ج.م` : '',
@@ -369,13 +373,13 @@ export default async function InvoicePage({
                   )}
 
                   {storeSettings?.policies && (
-                     <div className="pt-16 border-t border-zinc-100">
+                     <div className="pt-10 border-t border-zinc-100">
                         <div className="bg-zinc-50/50 p-8 space-y-4 border border-zinc-100">
                            <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-900 flex items-center gap-2">
-                              <div className="h-1 w-1 bg-[var(--primary)]" />
+                              <div className="h-1.5 w-1.5 bg-[var(--primary)]" />
                               سياسات المتجر
                            </h4>
-                           <p className="text-xs text-zinc-500 leading-relaxed font-medium whitespace-pre-wrap">
+                           <p className="text-xs text-zinc-500 leading-relaxed font-bold whitespace-pre-wrap">
                               {storeSettings.policies}
                            </p>
                         </div>
@@ -580,10 +584,16 @@ export default async function InvoicePage({
                   )}
 
                   {storeSettings?.policies && (
-                     <div className="pt-16 border-t border-rose-50">
-                        <div className="max-w-2xl mx-auto text-center space-y-4 opacity-40">
-                           <p className="text-[10px] font-black uppercase tracking-widest">سياساتنا</p>
-                           <p className="text-[10px] font-bold leading-relaxed whitespace-pre-line">{storeSettings.policies}</p>
+                     <div className="pt-8 border-t border-rose-50">
+                        <div className="max-w-2xl mx-auto text-center space-y-6">
+                           <div className="flex items-center justify-center gap-4">
+                              <div className="h-px flex-1 bg-gradient-to-l from-[var(--primary)]/20 to-transparent" />
+                              <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--primary)]">سياساتنا</p>
+                              <div className="h-px flex-1 bg-gradient-to-r from-[var(--primary)]/20 to-transparent" />
+                           </div>
+                           <div className="bg-white/50 backdrop-blur-sm p-8 rounded-[2rem] border border-rose-50/50">
+                              <p className="text-[11px] font-bold text-zinc-500 leading-relaxed whitespace-pre-line">{storeSettings.policies}</p>
+                           </div>
                         </div>
                      </div>
                   )}
@@ -591,8 +601,15 @@ export default async function InvoicePage({
             </main>
 
             <footer className="py-12 text-center no-print relative z-10">
-               <p className="text-[9px] font-black text-zinc-300 uppercase tracking-[0.5em]">Kaya Market Platform</p>
+               {!showWatermark && (
+                  <p className="text-[9px] font-black text-zinc-300 uppercase tracking-[0.5em]">Kaya Market Platform</p>
+               )}
             </footer>
+            {showWatermark && (
+              <div className="fixed bottom-6 right-6 z-[9999] no-print">
+                <KayaBadge href="https://kayamarket.vercel.app" />
+              </div>
+            )}
          </div>
       )
    }
@@ -743,9 +760,16 @@ export default async function InvoicePage({
             </div>
          </main>
 
-         <footer className="py-12 text-center no-print opacity-40">
-            <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em]">Kaya Market Platform</p>
+         <footer className="py-12 text-center no-print">
+            {!showWatermark && (
+               <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em]">Kaya Market Platform</p>
+            )}
          </footer>
+            {showWatermark && (
+              <div className="fixed bottom-6 right-6 z-[9999] no-print">
+                <KayaBadge href="https://kayamarket.vercel.app" />
+              </div>
+            )}
       </div>
    )
 }

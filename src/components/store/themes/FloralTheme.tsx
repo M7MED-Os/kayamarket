@@ -6,6 +6,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { ShoppingBag, Heart, Menu, X, Flower2, Truck, Gift, Star, ChevronDown, Quote, MessageCircle, ChevronRight } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
+import { KayaBadge } from '@/components/store/KayaBadge'
 
 // ─── Decorative SVGs ────────────────────────────────────────────────────────
 export function PetalDeco({ className }: { className?: string }) {
@@ -113,7 +114,7 @@ export function FloralHeader({ store, branding, slug }: { store: any; branding: 
 }
 
 // ─── Hero ────────────────────────────────────────────────────────────────────
-export function FloralHero({ branding, store, slug }: { branding: any; store: any; slug: string }) {
+export function FloralHero({ branding, store, slug, showWatermark }: { branding: any; store: any; slug: string; showWatermark?: boolean }) {
   const heroTitle = branding?.hero_title || store.name
   const heroDesc = branding?.hero_description || 'نُنسّق مشاعرك في باقات من الجمال، نهتم بكل تفصيلة لتصل هديتك بأبهى صورة.'
   const heroImage = branding?.hero_image_url || 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?q=80&w=2000&auto=format&fit=crop'
@@ -288,15 +289,15 @@ export function FloralProductCard({ product, slug }: { product: any; slug: strin
       </div>
 
       {/* Info */}
-      <div className="px-4 pt-3 pb-6 text-center space-y-1.5">
+      <div className="px-3 md:px-4 pt-2 md:pt-3 pb-4 md:pb-6 text-center space-y-1 md:space-y-1.5">
         <Link href={`/store/${slug}/products/${product.id}`}>
-          <h3 className="font-sans text-[#2B2B2B] text-base font-bold line-clamp-1 hover:text-[var(--primary)] transition-colors">{product.name}</h3>
+          <h3 className="font-sans text-[#2B2B2B] text-xs md:text-base font-bold line-clamp-1 hover:text-[var(--primary)] transition-colors">{product.name}</h3>
         </Link>
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-1.5 md:gap-2">
           {product.original_price && product.original_price > product.price && (
-            <span className="text-xs text-zinc-400 line-through">{Number(product.original_price).toLocaleString()} ج.م</span>
+            <span className="text-[10px] md:text-xs text-zinc-400 line-through">{Number(product.original_price).toLocaleString()} ج.م</span>
           )}
-          <span className="text-lg font-black text-[var(--primary)]">{Number(product.price).toLocaleString()} ج.م</span>
+          <span className="text-sm md:text-lg font-black text-[var(--primary)]">{Number(product.price).toLocaleString()} ج.م</span>
         </div>
       </div>
     </div>
@@ -309,13 +310,14 @@ export function FloralBestsellers({ products, slug }: { products: any[]; slug: s
   const featured = products.slice(0, 4)
 
   return (
-    <section id="bestsellers" className="py-28 bg-[#FAF3F0]/30 relative overflow-hidden">
+    <section id="bestsellers" className="py-20 md:py-28 bg-[#FAF3F0]/30 relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-rose-100 to-transparent" />
       <div className="mx-auto max-w-7xl px-6">
         {/* Header */}
         <FloralSectionTitle title="باقاتنا المميزة" subtitle="الأكثر طلباً" />
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* Grid - 2 items on mobile, 4 on desktop */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
           {featured.map((product) => (
             <FloralProductCard key={product.id} product={product} slug={slug} />
           ))}
@@ -335,17 +337,17 @@ export function FloralCategories({ categories, slug }: { categories: any[]; slug
     'https://images.unsplash.com/photo-1547517023-7ca0b3954cbc?q=80&w=800&fit=crop',
   ]
   return (
-    <section className="py-28 bg-white">
+    <section className="py-20 md:py-28 bg-white">
       <div className="mx-auto max-w-7xl px-6">
         {/* Header */}
         <FloralSectionTitle title="أقسام المتجر" subtitle="تصفح حسب المناسبة" />
 
         {/* Grid — elegant arch cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 md:gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
           {categories.slice(0, 4).map((cat, i) => (
             <Link key={cat.id || i} href={`/store/${slug}/products?category=${cat.name}`}
-              className="group flex flex-col items-center gap-5">
-              <div className="relative w-full aspect-[3/4] rounded-t-full rounded-b-3xl overflow-hidden border-4 border-white shadow-md ring-1 ring-zinc-100 group-hover:ring-[var(--primary)]/30 group-hover:shadow-2xl group-hover:-translate-y-3 transition-all duration-700">
+              className="group flex flex-col items-center gap-4 md:gap-5">
+              <div className="relative w-full aspect-[3/4] rounded-t-full rounded-b-3xl overflow-hidden border-[3px] md:border-4 border-white shadow-md ring-1 ring-zinc-100 group-hover:ring-[var(--primary)]/30 group-hover:shadow-2xl group-hover:-translate-y-2 transition-all duration-700">
                 <Image
                   src={cat.image_url || placeholders[i % 4]}
                   alt={cat.name}
@@ -356,7 +358,7 @@ export function FloralCategories({ categories, slug }: { categories: any[]; slug
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-60 group-hover:opacity-30 transition-opacity duration-500" />
               </div>
               <div className="text-center">
-                <h3 className="text-xl font-sans font-bold text-[#2B2B2B] group-hover:text-[var(--primary)] transition-colors duration-300">{cat.name}</h3>
+                <h3 className="text-sm md:text-xl font-sans font-bold text-[#2B2B2B] group-hover:text-[var(--primary)] transition-colors duration-300">{cat.name}</h3>
               </div>
             </Link>
           ))}
@@ -543,7 +545,7 @@ const FacebookIcon = ({ className }: { className?: string }) => <svg xmlns="http
 const InstagramIcon = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
 const TwitterIcon = ({ className }: { className?: string }) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
 
-export function FloralFooter({ store, branding }: { store: any; branding: any }) {
+export function FloralFooter({ store, branding, showWatermark = true }: { store: any; branding: any; showWatermark?: boolean }) {
   const socials = [
     { key: 'instagram_url', Icon: InstagramIcon, label: 'Instagram' },
     { key: 'facebook_url', Icon: FacebookIcon, label: 'Facebook' },
@@ -568,7 +570,7 @@ export function FloralFooter({ store, branding }: { store: any; branding: any })
               <span className="text-3xl font-sans font-bold text-white">{store.name}</span>
             )}
             <p className="text-zinc-400 text-sm leading-relaxed max-w-xs font-medium">
-              {branding?.footer_description || branding?.tagline || 'نسعى دائماً لنكون جزءاً من لحظاتكم الجميلة.'}
+              {branding?.footer_description || store.description || branding?.tagline || 'نسعى دائماً لنكون جزءاً من لحظاتكم الجميلة.'}
             </p>
           </div>
 
@@ -610,7 +612,11 @@ export function FloralFooter({ store, branding }: { store: any; branding: any })
 
         <div className="pt-6 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-medium text-zinc-500">
           <p>© {new Date().getFullYear()} {store.name}. جميع الحقوق محفوظة.</p>
-          <p className="flex items-center gap-1">صُنع بواسطة <span className="text-white font-sans font-bold">KayaMarket</span></p>
+          {showWatermark ? (
+            <KayaBadge />
+          ) : (
+            <p className="flex items-center gap-1">صُنع بواسطة <span className="text-white font-sans font-bold">KayaMarket</span></p>
+          )}
         </div>
       </div>
     </footer>

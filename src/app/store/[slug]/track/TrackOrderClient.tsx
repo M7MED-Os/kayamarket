@@ -15,6 +15,7 @@ import {
 } from '@/components/store/themes/FloralTheme'
 import StoreHeader from '@/components/StoreHeader'
 import StoreFooter from '@/components/StoreFooter'
+import { KayaBadge } from '@/components/store/KayaBadge'
 
 const STATUS_STEPS = [
   { id: 'pending', label: 'قيد المراجعة', icon: Clock },
@@ -23,7 +24,7 @@ const STATUS_STEPS = [
   { id: 'delivered', label: 'تم التوصيل', icon: PackageCheck },
 ]
 
-export default function TrackOrderClient({ store, branding, slug }: any) {
+export default function TrackOrderClient({ store, branding, slug, showWatermark }: any) {
   const [orderId, setOrderId] = useState('')
   const [phone, setPhone] = useState('')
   const [isSearching, setIsSearching] = useState(false)
@@ -94,7 +95,12 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
     return (
       <div className="min-h-screen bg-white" dir="rtl" style={{ '--primary': primaryColor } as any}>
         <ElegantHeader store={store} branding={branding} slug={slug} />
-        <main className="mx-auto max-w-4xl px-6 py-20">
+        <main className="mx-auto max-w-4xl px-6 py-20 relative">
+          {showWatermark && (
+            <div className="fixed bottom-6 right-6 z-[9999]">
+              <KayaBadge />
+            </div>
+          )}
           {!order ? (
             <div className="max-w-md mx-auto space-y-12">
               <div className="text-center space-y-4">
@@ -256,7 +262,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
             </div>
           )}
         </main>
-        <ElegantFooter store={store} branding={branding} slug={slug} />
+        <ElegantFooter store={store} branding={branding} slug={slug} showWatermark={showWatermark} />
       </div>
     )
   }
@@ -266,7 +272,12 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
     return (
       <div className="min-h-screen bg-[#FAF3F0]/20" dir="rtl" style={{ '--primary': primaryColor } as any}>
         <FloralHeader store={store} branding={branding} slug={slug} />
-        <main className="mx-auto max-w-4xl px-6 py-24">
+        <main className="mx-auto max-w-4xl px-6 py-24 relative">
+          {showWatermark && (
+            <div className="fixed bottom-6 right-6 z-[9999]">
+              <KayaBadge />
+            </div>
+          )}
           {!order ? (
             <div className="max-w-md mx-auto space-y-10 p-10 bg-white rounded-[2.5rem] border border-rose-50 shadow-sm">
               <div className="text-center space-y-4">
@@ -416,7 +427,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
             </div>
           )}
         </main>
-        <FloralFooter store={store} branding={branding} />
+        <FloralFooter store={store} branding={branding} showWatermark={showWatermark} />
       </div>
     )
   }
@@ -426,7 +437,12 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
     <div className="min-h-screen bg-slate-50 font-inter" dir="rtl" style={{ '--primary': primaryColor } as any}>
       <StoreHeader store={store} branding={branding} slug={slug} />
 
-      <main className="max-w-4xl mx-auto px-6 py-12">
+      <main className="max-w-4xl mx-auto px-6 py-12 relative">
+        {showWatermark && (
+          <div className="absolute top-4 right-4 z-20">
+            <KayaBadge />
+          </div>
+        )}
         {!order ? (
           <div className="max-w-md mx-auto">
             <div className="text-center mb-8">
@@ -698,7 +714,7 @@ export default function TrackOrderClient({ store, branding, slug }: any) {
           </div>
         )}
       </main>
-      <StoreFooter store={store} branding={branding} slug={slug} />
+      <StoreFooter store={store} branding={branding} slug={slug} showWatermark={showWatermark} />
     </div>
   )
 }

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import StoreHeader from '@/components/StoreHeader'
 import TestimonialsMarquee from '@/components/TestimonialsMarquee'
+import { KayaBadge } from '@/components/store/KayaBadge'
 
 
 // ─── Section Helpers ──────────────────────────────────────────────────────────
@@ -61,7 +62,7 @@ function AnnouncementBar({ text, branding }: { text: string; branding: any }) {
 }
 
 // ─── Hero ──────────────────────────────────────────────────────────────────────
-function Hero({ branding, store, slug }: { branding: any; store: any; slug: string }) {
+function Hero({ branding, store, slug, showWatermark }: { branding: any; store: any; slug: string; showWatermark?: boolean }) {
   const bannerUrl = branding?.banner_url || null
   const heroTitle = branding?.hero_title || store.name
   const heroDescription = branding?.hero_description || branding?.tagline || `تسوق من ${store.name} بكل سهولة`
@@ -145,6 +146,11 @@ function Hero({ branding, store, slug }: { branding: any; store: any; slug: stri
 
   return (
     <section className="relative overflow-hidden flex flex-col justify-center min-h-[calc(100vh-116px)]" dir="rtl">
+      {showWatermark && (
+        <div className="fixed bottom-6 right-6 z-[9999]">
+          <KayaBadge />
+        </div>
+      )}
       {/* Backgrounds */}
       <div className="absolute inset-0 bg-white" />
       <div className="absolute inset-0 opacity-[0.45] blur-[120px] mix-blend-multiply" style={{ backgroundImage: `radial-gradient(at 20% 20%, var(--primary) 0, transparent 45%), radial-gradient(at 80% 80%, var(--primary) 0, transparent 45%)` }} />
@@ -359,6 +365,13 @@ export default async function StorePage({ params, searchParams }: PageProps) {
   const fontFamily = branding?.font_family || 'Cairo'
   const selectedTheme = (branding as any)?.selected_theme || 'default'
 
+  // Fetch plan config for watermark
+  const { getPlanConfig, getDynamicPlanConfigs } = await import('@/lib/subscription')
+  const dynamicConfigs = await getDynamicPlanConfigs(supabase)
+  const planTier = (store.plan || 'starter') as any
+  const planConfig = dynamicConfigs[planTier] || getPlanConfig(planTier)
+  const showWatermark = !planConfig.canRemoveWatermark
+
   // Fixed order — only check enabled from DB sections
   const shown = (id: string) => isSectionEnabled(branding, id)
 
@@ -378,7 +391,7 @@ export default async function StorePage({ params, searchParams }: PageProps) {
           <AnnouncementBar text={(branding as any)?.announcement_text || ''} branding={branding} />
         )}
         <ElegantHeader store={store} branding={branding} slug={slug} />
-        <ElegantHero branding={branding} store={store} slug={slug} />
+        <ElegantHero branding={branding} store={store} slug={slug} showWatermark={showWatermark} />
         <ElegantCategories categories={dbCategories || []} slug={slug} />
         <ElegantBestsellers products={productsWithRatings} slug={slug} branding={branding} />
         {shown('features') && <ElegantFeatures branding={branding} />}
@@ -388,7 +401,12 @@ export default async function StorePage({ params, searchParams }: PageProps) {
         )}
 
         {shown('faq') && <ElegantFAQ branding={branding} />}
-        {shown('footer') && <ElegantFooter store={store} branding={branding} />}
+        {shown('footer') && <ElegantFooter store={store} branding={branding} showWatermark={showWatermark} />}
+        {showWatermark && (
+          <div className="fixed bottom-6 right-6 z-[9999]">
+            <KayaBadge />
+          </div>
+        )}
       </div>
     )
   }
@@ -401,7 +419,7 @@ export default async function StorePage({ params, searchParams }: PageProps) {
           <AnnouncementBar text={(branding as any)?.announcement_text || ''} branding={branding} />
         )}
         <FloralHeader store={store} branding={branding} slug={slug} />
-        <FloralHero branding={branding} store={store} slug={slug} />
+        <FloralHero branding={branding} store={store} slug={slug} showWatermark={showWatermark} />
         {shown('categories') && <FloralCategories categories={dbCategories || []} slug={slug} />}
 
         {shown('bestsellers') && <FloralBestsellers products={productsWithRatings} slug={slug} />}
@@ -409,7 +427,12 @@ export default async function StorePage({ params, searchParams }: PageProps) {
         {shown('features') && <FloralFeatures branding={branding} />}
         {shown('testimonials') && <FloralTestimonials reviews={storeReviews || []} />}
         {shown('faq') && <FloralFAQ branding={branding} />}
-        {shown('footer') && <FloralFooter store={store} branding={branding} />}
+        {shown('footer') && <FloralFooter store={store} branding={branding} showWatermark={showWatermark} />}
+        {showWatermark && (
+          <div className="fixed bottom-6 right-6 z-[9999]">
+            <KayaBadge />
+          </div>
+        )}
       </div>
     )
   }
@@ -423,7 +446,7 @@ export default async function StorePage({ params, searchParams }: PageProps) {
       )}
       {/* 2. Header */}
       <StoreHeader store={store} branding={branding} slug={slug} />
-      <Hero branding={branding} store={store} slug={slug} />
+      <Hero branding={branding} store={store} slug={slug} showWatermark={showWatermark} />
       <CategoryHighlights categories={dbCategories || []} slug={slug} branding={branding} />
       <Bestsellers products={productsWithRatings} slug={slug} branding={branding} />
       <Features branding={branding} />
@@ -439,7 +462,12 @@ export default async function StorePage({ params, searchParams }: PageProps) {
       )}
 
       {shown('faq') && <FAQ branding={branding} />}
-      {shown('footer') && <StoreFooter store={store} branding={branding} slug={slug} />}
+      {shown('footer') && <StoreFooter store={store} branding={branding} slug={slug} showWatermark={showWatermark} />}
+      {showWatermark && (
+        <div className="fixed bottom-6 right-6 z-[9999]">
+          <KayaBadge />
+        </div>
+      )}
     </div>
   )
 }

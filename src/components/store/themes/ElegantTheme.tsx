@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ArrowLeft, MessageSquare, ShoppingBag, Heart, Star, Share2, MapPin, Truck } from 'lucide-react'
+import { KayaBadge } from '@/components/store/KayaBadge'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import toast from 'react-hot-toast'
@@ -114,7 +115,7 @@ export const ElegantProductCard = ({ product, slug }: any) => {
 }
 
 // ─── ELEGANT HERO ───────────────────────────────────────────────────────────
-export const ElegantHero = ({ branding, store, slug }: any) => {
+export const ElegantHero = ({ branding, store, slug, showWatermark }: any) => {
   const hasImage = !!branding?.hero_image_url
   const sideImage = branding?.hero_image_url
   const heroTitle = branding?.hero_title || `مرحباً بك في ${store.name}`
@@ -472,7 +473,7 @@ export const ElegantTestimonials = ({ reviews }: { reviews: any[] }) => {
 }
 
 // ─── ELEGANT FOOTER ─────────────────────────────────────────────────────────
-export const ElegantFooter = ({ store, branding }: any) => {
+export const ElegantFooter = ({ store, branding, showWatermark = true }: any) => {
   return (
     <footer className="bg-white py-20 border-t border-zinc-100" dir="rtl">
       <div className="mx-auto max-w-7xl px-6">
@@ -482,7 +483,7 @@ export const ElegantFooter = ({ store, branding }: any) => {
               {store.name}
             </h2>
             <p className="text-xs font-bold text-zinc-400 max-w-xs leading-relaxed">
-              {branding?.footer_description || 'نقدم لكم أجود المنتجات بأعلى معايير الجودة والفخامة.'}
+              {branding?.footer_description || store.description || 'نقدم لكم أجود المنتجات بأعلى معايير الجودة والفخامة.'}
             </p>
           </div>
 
@@ -549,15 +550,18 @@ export const ElegantFooter = ({ store, branding }: any) => {
           <p className="text-[9px] font-bold text-zinc-300 uppercase tracking-widest">
             © {new Date().getFullYear()} {store.name}. جميع الحقوق محفوظة.
           </p>
-          <div className="flex items-center gap-2">
-            <div className="h-px w-8 bg-zinc-100" />
+          {showWatermark ? (
+            <KayaBadge />
+          ) : (
             <span className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em]">Kaya Market Platform</span>
-          </div>
+          )}
         </div>
       </div>
     </footer>
   )
 }
+
+
 
 // ─── ELEGANT FAQ ────────────────────────────────────────────────────────────
 export const ElegantFAQ = ({ branding }: any) => {

@@ -10,14 +10,12 @@ import {
   ElegantHeader,
   ElegantFooter
 } from '@/components/store/themes/ElegantTheme'
-import {
-  FloralHeader,
-  FloralFooter
-} from '@/components/store/themes/FloralTheme'
+import { FloralHeader, FloralFooter } from '@/components/store/themes/FloralTheme'
+import { KayaBadge } from '@/components/store/KayaBadge'
 import { useWishlist } from '@/context/WishlistContext'
 import React, { useEffect, useState } from 'react'
 
-export default function CartView({ params, storeData }: { params: { slug: string }, storeData: any }) {
+export default function CartView({ params, storeData, showWatermark }: { params: { slug: string }, storeData: any, showWatermark: boolean }) {
   const { slug } = params
   const { items, updateQuantity, removeItem, totalPrice, totalItems, isInitialized } = useCart()
   const router = useRouter()
@@ -96,7 +94,7 @@ export default function CartView({ params, storeData }: { params: { slug: string
                           </button>
                         </div>
                         <div className="text-sm sm:text-base font-bold text-zinc-900 uppercase tracking-widest tabular-nums text-left">
-                           {(item.price * item.quantity).toLocaleString()} ج.م
+                          {(item.price * item.quantity).toLocaleString()} ج.م
                         </div>
                       </div>
                     </div>
@@ -119,7 +117,12 @@ export default function CartView({ params, storeData }: { params: { slug: string
             </div>
           )}
         </main>
-        <ElegantFooter store={store} branding={branding} />
+        <ElegantFooter store={store} branding={branding} showWatermark={showWatermark} />
+        {showWatermark && (
+          <div className="fixed bottom-6 right-6 z-[9999]">
+            <KayaBadge />
+          </div>
+        )}
       </div>
     )
   }
@@ -139,9 +142,23 @@ export default function CartView({ params, storeData }: { params: { slug: string
             )}
           </div>
 
-          <div className="text-center mb-16 space-y-4">
-            <h1 className="text-4xl md:text-5xl font-sans font-black text-[#2B2B2B]">سلة المشتريات</h1>
-            <p className="text-zinc-500 font-medium">نجهز طلبك بكل حب وعناية</p>
+          {/* Branded Section Header */}
+          <div className="mb-16 flex flex-col items-center text-center space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700">
+             
+             {/* Subtitle with decorative lines */}
+             <div className="flex items-center gap-4 w-full max-w-xs justify-center">
+                <div className="h-px flex-1 bg-gradient-to-l from-[var(--primary)]/30 to-transparent" />
+                <span className="text-[11px] font-black uppercase tracking-[0.2em] text-[var(--primary)] whitespace-nowrap">
+                   نجهز طلبك بكل حب وعناية
+                </span>
+                <div className="h-px flex-1 bg-gradient-to-r from-[var(--primary)]/30 to-transparent" />
+             </div>
+
+             <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-tight text-zinc-900">
+                سلة المشتريات
+             </h2>
+             
+             <div className="h-1.5 w-16 rounded-full bg-gradient-to-r from-[var(--primary)] to-transparent mx-auto" />
           </div>
 
           {items.length === 0 ? (
@@ -156,43 +173,52 @@ export default function CartView({ params, storeData }: { params: { slug: string
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-              <div className="lg:col-span-2 space-y-8">
+              <div className="lg:col-span-2 space-y-6">
                 {items.map((item) => (
-                  <div key={item.id} className="flex gap-6 items-start p-6 bg-white rounded-[2rem] border border-rose-50 shadow-sm hover:shadow-md transition-shadow group">
-                    <div className="relative h-32 w-28 rounded-2xl bg-[#FAF3F0]/40 overflow-hidden shrink-0 border border-rose-50">
-                      {item.image_url && <img src={item.image_url} alt={item.name} className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700" />}
+                  <div key={item.id} className="flex gap-4 md:gap-6 items-center p-4 md:p-5 bg-white rounded-[2rem] border border-rose-50 shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden">
+                    
+                    {/* Product Image - Back to Start (Right in RTL) */}
+                    <div className="relative h-20 w-20 md:h-28 md:w-28 rounded-[1.2rem] bg-[#FAF3F0]/40 overflow-hidden shrink-0 border border-rose-50 shadow-inner">
+                      {item.image_url && <img src={item.image_url} alt={item.name} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />}
                     </div>
-                    <div className="flex-1 space-y-4">
-                      <div className="flex justify-between items-start">
-                        <div className="space-y-1">
-                          <h3 className="text-lg font-sans font-bold text-[#2B2B2B]">{item.name}</h3>
-                          <div className="flex items-center gap-3">
-                            <div className="text-lg font-bold text-[var(--primary)]">{item.price.toLocaleString()} ج.م</div>
-                          </div>
+
+                    <div className="flex-1 space-y-3 min-w-0 py-1">
+                      <div className="flex justify-between items-start gap-4">
+                        <div className="text-right space-y-0.5">
+                          <h3 className="text-sm md:text-lg font-sans font-black text-[#2B2B2B] truncate leading-tight">{item.name}</h3>
+                          <div className="text-xs md:text-sm font-bold text-rose-300">{item.price.toLocaleString()} ج.م</div>
                         </div>
-                        <button onClick={() => removeItem(item.id)} className="h-10 w-10 flex items-center justify-center rounded-full bg-rose-50 text-rose-400 hover:text-white hover:bg-rose-500 transition-colors">
-                          <Trash2 className="h-4 w-4" strokeWidth={2} />
+
+                         <button 
+                          onClick={() => removeItem(item.id)} 
+                          className="h-8 w-8 flex items-center justify-center rounded-full bg-rose-50 text-rose-300 hover:text-white hover:bg-rose-500 transition-all duration-300 shrink-0"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" strokeWidth={2.5} />
                         </button>
                       </div>
 
-                      <div className="flex items-center justify-between gap-4 pt-2">
-                        <div className="flex items-center bg-[#FAF3F0]/60 rounded-full p-1 border border-rose-50">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center bg-[#FAF3F0]/60 rounded-xl p-0.5 md:p-1 border border-rose-100/50">
                           <button
                             onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
-                            className="h-8 w-8 flex items-center justify-center rounded-full bg-white text-zinc-400 hover:text-[var(--primary)] shadow-sm transition-colors"
+                            className="h-6 w-6 md:h-7 md:w-7 flex items-center justify-center rounded-lg bg-white text-zinc-400 hover:text-[var(--primary)] shadow-sm transition-all"
                           >
-                            <Minus className="h-3 w-3" />
+                            <Minus className="h-2.5 w-2.5" />
                           </button>
-                          <span className="text-sm font-bold w-10 text-center text-[#2B2B2B]">{item.quantity}</span>
+                          <span className="text-xs md:text-sm font-bold w-6 md:w-8 text-center text-[#2B2B2B]">{item.quantity}</span>
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            className="h-8 w-8 flex items-center justify-center rounded-full bg-[var(--primary)] text-white shadow-sm transition-colors hover:bg-[var(--primary)]/90"
+                            className="h-6 w-6 md:h-7 md:w-7 flex items-center justify-center rounded-lg bg-[var(--primary)] text-white shadow-sm transition-all hover:scale-105"
                           >
-                            <Plus className="h-3 w-3" />
+                            <Plus className="h-2.5 w-2.5" />
                           </button>
                         </div>
-                        <div className="text-sm sm:text-base font-black text-[#2B2B2B] text-left">
-                           {(item.price * item.quantity).toLocaleString()} ج.م
+
+                        <div className="text-left shrink-0">
+                          <div className="text-[9px] font-bold text-rose-200 uppercase tracking-wider">المجموع</div>
+                          <div className="text-base md:text-xl font-black text-[var(--primary)] leading-none">
+                             {(item.price * item.quantity).toLocaleString()} <span className="text-[9px] md:text-[10px] opacity-60">ج.م</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -201,11 +227,26 @@ export default function CartView({ params, storeData }: { params: { slug: string
               </div>
 
               <div className="lg:col-span-1">
-                <div className="bg-white p-8 rounded-[2rem] border border-rose-50 shadow-sm sticky top-32 space-y-8">
+                <div className="bg-white p-6 md:p-8 rounded-[2.5rem] border border-rose-50 shadow-sm sticky top-32 space-y-6 md:space-y-8">
                   <h3 className="text-lg font-sans font-bold text-[#2B2B2B] pb-4 border-b border-rose-50">ملخص الطلب</h3>
-                  <div className="flex justify-between items-end">
-                    <span className="text-sm font-bold text-zinc-500">الإجمالي</span>
-                    <span className="text-3xl font-black text-[var(--primary)]">{totalPrice.toLocaleString()} ج.م</span>
+                  
+                  <div className="space-y-4">
+                    <div className="flex justify-between text-zinc-500">
+                      <span>عدد المنتجات</span>
+                      <span className="font-bold text-[#2B2B2B]">{items.reduce((acc, item) => acc + item.quantity, 0)}</span>
+                    </div>
+                    <div className="flex justify-between text-zinc-500">
+                      <span>قيمة المنتجات</span>
+                      <span className="font-bold text-[#2B2B2B]">{totalPrice.toLocaleString()} ج.م</span>
+                    </div>
+                    <div className="flex justify-between text-zinc-500">
+                      <span>الشحن</span>
+                      <span className="text-green-500 font-bold">مجاني</span>
+                    </div>
+                    <div className="pt-4 border-t border-rose-50 flex justify-between items-center">
+                      <span className="text-lg font-bold text-[#2B2B2B]">الإجمالي</span>
+                      <span className="text-2xl font-black text-[var(--primary)]">{totalPrice.toLocaleString()} ج.م</span>
+                    </div>
                   </div>
                   <Link href={`/store/${slug}/checkout`} className="w-full h-14 bg-[var(--primary)] text-white rounded-full flex items-center justify-center text-sm font-bold hover:bg-[var(--primary)]/90 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
                     إتمام الطلب
@@ -215,7 +256,12 @@ export default function CartView({ params, storeData }: { params: { slug: string
             </div>
           )}
         </main>
-        <FloralFooter store={store} branding={branding} />
+        <FloralFooter store={store} branding={branding} showWatermark={showWatermark} />
+        {showWatermark && (
+          <div className="fixed bottom-6 right-6 z-[9999]">
+            <KayaBadge />
+          </div>
+        )}
       </div>
     )
   }
@@ -337,7 +383,12 @@ export default function CartView({ params, storeData }: { params: { slug: string
           </div>
         )}
       </main>
-      <StoreFooter store={store} branding={branding} slug={slug} />
+      <StoreFooter store={store} branding={branding} slug={slug} showWatermark={showWatermark} />
+      {showWatermark && (
+        <div className="fixed bottom-6 right-6 z-[9999]">
+          <KayaBadge />
+        </div>
+      )}
     </div>
   )
 }

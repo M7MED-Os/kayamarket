@@ -12,6 +12,7 @@ import ProductReviews from '@/components/product/ProductReviews'
 import { getApprovedReviews, getProductRatingSummary } from '@/app/actions/reviews'
 import { Star } from 'lucide-react'
 import StoreFooter from '@/components/StoreFooter'
+import { KayaBadge } from '@/components/store/KayaBadge'
 
 interface PageProps {
   params: Promise<{ slug: string; id: string }>
@@ -80,6 +81,13 @@ export default async function StoreProductPage({ params }: PageProps) {
   const selectedTheme = (branding as any)?.selected_theme || 'default'
 
   const commonStyles = { '--store-primary': primaryColor, '--primary': primaryColor } as any
+
+  // Fetch plan config for watermark
+  const { getPlanConfig, getDynamicPlanConfigs } = await import('@/lib/subscription')
+  const dynamicConfigs = await getDynamicPlanConfigs(supabase)
+  const planTier = (store.plan || 'starter') as any
+  const planConfig = dynamicConfigs[planTier] || getPlanConfig(planTier)
+  const showWatermark = !planConfig.canRemoveWatermark
 
   // ─── THEME: ELEGANT ────────────────────────────────────────────────────────
   if (selectedTheme === 'elegant') {
@@ -169,6 +177,11 @@ export default async function StoreProductPage({ params }: PageProps) {
           </div>
         </main >
         <ElegantFooter store={store} branding={branding} />
+        {showWatermark && (
+          <div className="fixed bottom-6 right-6 z-[9999]">
+            <KayaBadge />
+          </div>
+        )}
       </div >
     )
   }
@@ -259,6 +272,11 @@ export default async function StoreProductPage({ params }: PageProps) {
           </div>
         </main>
         <FloralFooter store={store} branding={branding} />
+        {showWatermark && (
+          <div className="fixed bottom-6 right-6 z-[9999]">
+            <KayaBadge />
+          </div>
+        )}
       </div>
     )
   }
@@ -374,6 +392,11 @@ export default async function StoreProductPage({ params }: PageProps) {
         </div>
       </main>
       <StoreFooter store={store} branding={branding} slug={slug} />
+      {showWatermark && (
+        <div className="fixed bottom-6 right-6 z-[9999]">
+          <KayaBadge />
+        </div>
+      )}
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { getStoreByIdentifier } from '@/lib/tenant/get-store'
+import { KayaBadge } from '@/components/store/KayaBadge'
 import ProductCard from '@/components/product/ProductCard'
 import ProductFilters from '@/components/product/ProductFilters'
 import { notFound } from 'next/navigation'
@@ -18,6 +19,12 @@ import {
   FloralProductCard,
   FloralSectionTitle
 } from '@/components/store/themes/FloralTheme'
+
+function isSectionEnabled(branding: any, sectionId: string): boolean {
+  if (!branding?.sections || !Array.isArray(branding.sections)) return true
+  const found = branding.sections.find((s: any) => s.id === sectionId)
+  return found ? found.enabled !== false : true
+}
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -76,6 +83,15 @@ export default async function AllProductsPage({ params, searchParams }: PageProp
   const fontFamily = branding?.font_family || 'Cairo'
   const selectedTheme = (branding as any)?.selected_theme || 'default'
 
+  // Fetch plan config for watermark
+  const { getPlanConfig, getDynamicPlanConfigs } = await import('@/lib/subscription')
+  const dynamicConfigs = await getDynamicPlanConfigs(supabase)
+  const planTier = (store.plan || 'starter') as any
+  const planConfig = dynamicConfigs[planTier] || getPlanConfig(planTier)
+  const showWatermark = !planConfig.canRemoveWatermark
+
+  const shown = (id: string) => isSectionEnabled(branding, id)
+
   const commonStyles = { '--primary': primaryColor, '--secondary': secondaryColor, fontFamily } as any
 
   // ─── THEME: ELEGANT ────────────────────────────────────────────────────────
@@ -107,7 +123,12 @@ export default async function AllProductsPage({ params, searchParams }: PageProp
             </div>
           )}
         </main>
-        <ElegantFooter store={store} branding={branding} />
+        {shown('footer') && <ElegantFooter store={store} branding={branding} showWatermark={showWatermark} />}
+        {showWatermark && (
+          <div className="fixed bottom-6 right-6 z-[9999]">
+            <KayaBadge />
+          </div>
+        )}
       </div>
     )
   }
@@ -136,7 +157,12 @@ export default async function AllProductsPage({ params, searchParams }: PageProp
           )}
         </main>
 
-        <FloralFooter store={store} branding={branding} />
+        {shown('footer') && <FloralFooter store={store} branding={branding} showWatermark={showWatermark} />}
+        {showWatermark && (
+          <div className="fixed bottom-6 right-6 z-[9999]">
+            <KayaBadge />
+          </div>
+        )}
       </div>
     )
   }
@@ -180,7 +206,12 @@ export default async function AllProductsPage({ params, searchParams }: PageProp
           </div>
         )}
       </main>
-      <StoreFooter store={store} branding={branding} slug={slug} />
+      {shown('footer') && <StoreFooter store={store} branding={branding} slug={slug} showWatermark={showWatermark} />}
+      {showWatermark && (
+        <div className="fixed bottom-6 right-6 z-[9999]">
+          <KayaBadge />
+        </div>
+      )}
     </div>
   )
 }

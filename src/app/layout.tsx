@@ -27,8 +27,12 @@ export const metadata: Metadata = {
   title: "KayaMarket | المنصة المتكاملة لتجارة التجزئة",
   description: "أنشئ متجرك الإلكتروني الاحترافي في دقائق مع KayaMarket. المنصة العصرية لإدارة التجارة الإلكترونية.",
   icons: {
-    icon: '/favicon.svg',
-    apple: '/favicon.svg',
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
   },
 };
 
