@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
 
 interface WishlistItem {
   id: string
@@ -27,24 +28,29 @@ const WishlistContext = createContext<WishlistContextType | undefined>(undefined
 export function WishlistProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<WishlistItem[]>([])
   const [isInitialized, setIsInitialized] = useState(false)
+  const params = useParams()
+  const slug = params?.slug as string | undefined
+  const wishlistKey = slug ? `wishlist_${slug}` : 'wishlist'
 
   useEffect(() => {
-    const savedWishlist = localStorage.getItem('wishlist')
+    const savedWishlist = localStorage.getItem(wishlistKey)
     if (savedWishlist) {
       try {
         setItems(JSON.parse(savedWishlist))
       } catch (e) {
         console.error('Failed to parse wishlist from localStorage', e)
       }
+    } else {
+      setItems([]) // Clear items if switching to a store with no saved wishlist
     }
     setIsInitialized(true)
-  }, [])
+  }, [wishlistKey])
 
   useEffect(() => {
     if (isInitialized) {
-      localStorage.setItem('wishlist', JSON.stringify(items))
+      localStorage.setItem(wishlistKey, JSON.stringify(items))
     }
-  }, [items, isInitialized])
+  }, [items, isInitialized, wishlistKey])
 
   const toggleItem = (item: WishlistItem) => {
     setItems((prev) => {

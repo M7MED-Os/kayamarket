@@ -25,14 +25,15 @@ export const ElegantProductCard = ({ product, slug }: any) => {
     
     // Direct sync fallback
     try {
-      const saved = localStorage.getItem('wishlist')
+      const wishlistKey = slug ? `wishlist_${slug}` : 'wishlist'
+      const saved = localStorage.getItem(wishlistKey)
       let items = saved ? JSON.parse(saved) : []
       if (isWishlisted) {
         items = items.filter((i: any) => i.id !== product.id)
       } else {
         items.push(product)
       }
-      localStorage.setItem('wishlist', JSON.stringify(items))
+      localStorage.setItem(wishlistKey, JSON.stringify(items))
     } catch (e) {}
 
     if (!isWishlisted) {
@@ -55,7 +56,8 @@ export const ElegantProductCard = ({ product, slug }: any) => {
     
     // Direct sync fallback
     try {
-      const saved = localStorage.getItem('cart')
+      const cartKey = slug ? `cart_${slug}` : 'cart'
+      const saved = localStorage.getItem(cartKey)
       const items = saved ? JSON.parse(saved) : []
       const existing = items.find((i: any) => i.id === newItem.id)
       let next
@@ -64,7 +66,7 @@ export const ElegantProductCard = ({ product, slug }: any) => {
       } else {
         next = [...items, newItem]
       }
-      localStorage.setItem('cart', JSON.stringify(next))
+      localStorage.setItem(cartKey, JSON.stringify(next))
     } catch (e) {}
 
     toast.success('تمت الإضافة للسلة')

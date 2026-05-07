@@ -1,6 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
 
 interface CartItem {
   id: string
@@ -28,26 +29,31 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([])
   const [isInitialized, setIsInitialized] = useState(false)
+  const params = useParams()
+  const slug = params?.slug as string | undefined
+  const cartKey = slug ? `cart_${slug}` : 'cart'
 
   // 1. Initial Load from LocalStorage
   useEffect(() => {
-    const savedCart = localStorage.getItem('cart')
+    const savedCart = localStorage.getItem(cartKey)
     if (savedCart) {
       try {
         setItems(JSON.parse(savedCart))
       } catch (e) {
         console.error('Failed to parse cart from localStorage', e)
       }
+    } else {
+      setItems([]) // Clear items if switching to a store with no saved cart
     }
     setIsInitialized(true)
-  }, [])
+  }, [cartKey])
 
   // 2. Persist to LocalStorage (only after initialization)
   useEffect(() => {
     if (isInitialized) {
-      localStorage.setItem('cart', JSON.stringify(items))
+      localStorage.setItem(cartKey, JSON.stringify(items))
     }
-  }, [items, isInitialized])
+  }, [items, isInitialized, cartKey])
 
   // 3. Sync with DB: Remove deleted/hidden products
   useEffect(() => {

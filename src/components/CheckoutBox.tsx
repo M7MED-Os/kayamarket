@@ -110,7 +110,8 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
     
     // Immediate fallback persistence
     try {
-      const saved = localStorage.getItem('cart')
+      const cartKey = storeSlug ? `cart_${storeSlug}` : 'cart'
+      const saved = localStorage.getItem(cartKey)
       const items = saved ? JSON.parse(saved) : []
       const existing = items.find((i: any) => i.id === newItem.id)
       let next
@@ -119,7 +120,7 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
       } else {
         next = [...items, newItem]
       }
-      localStorage.setItem('cart', JSON.stringify(next))
+      localStorage.setItem(cartKey, JSON.stringify(next))
     } catch (e) {}
 
     toast.success('تمت الإضافة للسلة')
