@@ -616,9 +616,9 @@ export default async function InvoicePage({
                )}
             </footer>
             {showWatermark && (
-              <div className="fixed bottom-6 right-6 z-[9999] no-print">
-                <KayaBadge href="https://kayamarket.vercel.app" />
-              </div>
+               <div className="fixed bottom-6 right-6 z-[9999] no-print">
+                  <KayaBadge href="https://kayamarket.vercel.app" />
+               </div>
             )}
          </div>
       )
@@ -825,11 +825,11 @@ export default async function InvoicePage({
                <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em]">Kaya Market Platform</p>
             )}
          </footer>
-            {showWatermark && (
-               <div className="fixed bottom-6 right-6 z-[9999] no-print">
-                 <KayaBadge href="https://kayamarket.vercel.app" />
-               </div>
-            )}
+         {showWatermark && (
+            <div className="fixed bottom-6 right-6 z-[9999] no-print">
+               <KayaBadge href="https://kayamarket.vercel.app" />
+            </div>
+         )}
       </div>
    )
 }

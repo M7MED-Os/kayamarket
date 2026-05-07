@@ -46,7 +46,15 @@ export default async function AdminSettingsPage() {
   // 4. Fetch all plans for comparison
   const allPlans = await getDynamicPlanConfigs(supabase)
 
-  // 5. Get User Email for Auto-fill
+  // 5. Fetch available themes
+  const { data: themes } = await supabase
+    .from('platform_themes')
+    .select('*')
+    .eq('is_visible', true)
+    .eq('is_active', true)
+    .order('created_at', { ascending: true })
+
+  // 6. Get User Email for Auto-fill
   const { data: { user } } = await supabase.auth.getUser()
 
   if (brandingError && brandingError.code !== 'PGRST116') {
@@ -64,6 +72,7 @@ export default async function AdminSettingsPage() {
         plan={storePlan}
         allPlans={allPlans}
         userEmail={user?.email}
+        themes={themes || []}
       />
     </div>
   )

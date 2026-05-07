@@ -1,14 +1,28 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
-import { assertMerchant } from '@/lib/auth'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
+import { assertMerchant, assertSuperAdmin } from '@/lib/auth'
 import { randomUUID } from 'crypto'
 
 export async function uploadImage(formData: FormData) {
   const supabase = await createClient()
 
   try {
-    const { storeId } = await assertMerchant(supabase)
+    let uploaderId = ''
+    
+    // Check if it's a merchant first
+    try {
+      const { storeId } = await assertMerchant(supabase)
+      uploaderId = storeId
+    } catch (err) {
+      // If not a merchant, check if it's a super admin
+      const { role } = await assertSuperAdmin(supabase)
+      if (role === 'super_admin') {
+        uploaderId = 'platform'
+      } else {
+        throw new Error('NO_ACCESS')
+      }
+    }
 
     const file = formData.get('file') as File
     const category = formData.get('category') as string // 'products', 'logos', 'banners', or 'categories'
@@ -17,7 +31,8 @@ export async function uploadImage(formData: FormData) {
       return { success: false, error: 'لم يتم اختيار ملف' }
     }
 
-    if (!['products', 'logos', 'banners', 'categories'].includes(category)) {
+    const validCategories = ['products', 'logos', 'banners', 'categories', 'themes']
+    if (!validCategories.includes(category)) {
       return { success: false, error: 'الفئة غير صالحة' }
     }
 
@@ -33,10 +48,13 @@ export async function uploadImage(formData: FormData) {
 
     const fileExtension = file.name.split('.').pop()
     const fileName = `${randomUUID()}.${fileExtension}`
-    const path = `${storeId}/${category}/${fileName}`
+    const path = `${uploaderId}/${category}/${fileName}`
 
     // Upload to 'store-assets' bucket
-    const { data, error } = await supabase.storage
+    // If uploaderId is 'platform', we use the Admin Client to bypass merchant-only RLS policies
+    const storageClient = uploaderId === 'platform' ? createAdminClient().storage : supabase.storage
+
+    const { data, error } = await storageClient
       .from('store-assets')
       .upload(path, file, {
         cacheControl: '3600',

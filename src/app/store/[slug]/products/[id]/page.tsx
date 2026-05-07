@@ -102,10 +102,25 @@ export default async function StoreProductPage({ params }: PageProps) {
               <div className="relative group">
                 <ImageGallery images={galleryImages} productName={product.name} />
                 <div className="absolute top-6 left-6 z-10">
-                  <div className="bg-[var(--primary)] text-white text-[10px] font-black px-4 py-2 rounded-full uppercase tracking-widest shadow-xl shadow-[var(--primary)]/20">
-                    {product.stock !== null && product.stock > 0 ? 'متوفر حالياً' : 'نفذت الكمية'}
+                  <div className={`text-white text-[10px] font-black px-4 py-2 rounded-full uppercase tracking-widest shadow-xl flex items-center gap-2`}
+                       style={{ 
+                         backgroundColor: product.stock === 0 ? 'rgba(0,0,0,0.8)' : 
+                                          product.stock !== null && product.stock <= 5 ? 'var(--primary)' : 'var(--primary)',
+                         opacity: product.stock !== null && product.stock <= 5 ? 0.7 : 1,
+                         filter: product.stock === 0 ? 'brightness(0.5)' : 'none'
+                       }}>
+                    <div className={`h-1.5 w-1.5 rounded-full bg-white ${product.stock !== null && product.stock <= 5 && product.stock > 0 ? 'animate-pulse' : ''}`} />
+                    {product.stock === null ? 'متوفر' : 
+                     product.stock === 0 ? 'غير متوفر' : 
+                     product.stock <= 5 ? `محدود: ${product.stock}` : 'متوفر'}
                   </div>
                 </div>
+
+                {product.original_price && product.price && product.original_price > product.price && (
+                  <div className="absolute top-6 right-6 z-10 bg-red-600 text-white text-[10px] font-black px-4 py-2 rounded-full shadow-xl">
+                    خصم {Math.round(((product.original_price - product.price) / product.original_price) * 100)}%
+                  </div>
+                )}
               </div>
             </div>
 
@@ -117,8 +132,12 @@ export default async function StoreProductPage({ params }: PageProps) {
                   <div className="space-y-4">
                     <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.5em] text-zinc-400">
                       <span className="text-[var(--primary)]">{product.category || 'تصنيف'}</span>
-                      <span>|</span>
-                      <span>تم الشراء {product.views_count ? Math.max(1, Math.floor(product.views_count / 3)) : 12} مرة</span>
+                      {product.sales_count > 0 && (
+                        <>
+                          <span>|</span>
+                          <span>تم الشراء {product.sales_count} مرة</span>
+                        </>
+                      )}
                     </div>
                     {ratingSummary.total_reviews > 0 && (
                       <div className="flex items-center gap-3">
@@ -136,7 +155,7 @@ export default async function StoreProductPage({ params }: PageProps) {
                     )}
                   </div>
                 </div>
-                <h1 className="text-5xl md:text-6xl font-light text-zinc-900 leading-tight tracking-tighter uppercase">
+                <h1 className="text-4xl font-light text-zinc-900 leading-tight tracking-tighter uppercase">
                   {product.name}
                 </h1>
                 <div className="flex items-center gap-6">
@@ -148,6 +167,16 @@ export default async function StoreProductPage({ params }: PageProps) {
                       {Number(product.original_price).toLocaleString()} ج.م
                     </div>
                   )}
+                </div>
+                
+                {/* Badge under price (Elegant) */}
+                <div className="flex items-center gap-2 pt-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-[var(--primary)]" style={{ opacity: product.stock === 0 ? 0.3 : 1 }} />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+                    {product.stock === null ? 'متوفر في المخزون' : 
+                     product.stock === 0 ? 'غير متوفر حالياً' : 
+                     product.stock <= 5 ? `كمية محدودة جداً (${product.stock} قطع)` : `متوفر: ${product.stock} قطعة`}
+                  </span>
                 </div>
               </div>
 
@@ -210,19 +239,56 @@ export default async function StoreProductPage({ params }: PageProps) {
 
           <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 items-start">
             {/* Gallery */}
-            <div className="lg:sticky lg:top-32 rounded-[2.5rem] overflow-hidden border border-rose-50 shadow-sm">
+            <div className="lg:sticky lg:top-32 rounded-[2.5rem] overflow-hidden border border-rose-50 shadow-sm relative">
               <ImageGallery images={galleryImages} productName={product.name} />
+              {/* Badge on Gallery (Bloom) */}
+              <div className="absolute top-6 left-6 z-10">
+                <div className="px-4 py-2 rounded-full text-[10px] font-black text-white shadow-lg backdrop-blur-md flex items-center gap-2"
+                     style={{ 
+                       backgroundColor: product.stock === 0 ? 'rgba(0,0,0,0.8)' : 
+                                        product.stock !== null && product.stock <= 5 ? 'var(--primary)' : 'var(--primary)',
+                       opacity: product.stock !== null && product.stock <= 5 ? 0.8 : 1,
+                       filter: product.stock === 0 ? 'brightness(0.3)' : 'none'
+                     }}>
+                  <div className={`h-1.5 w-1.5 rounded-full bg-white ${product.stock !== null && product.stock <= 5 && product.stock > 0 ? 'animate-pulse' : ''}`} />
+                  {product.stock === null ? 'متوفر' : 
+                   product.stock === 0 ? 'غير متوفر' : 
+                   product.stock <= 5 ? `محدود: ${product.stock}` : 'متوفر'}
+                </div>
+              </div>
+
+              {product.original_price && product.price && product.original_price > product.price && (
+                <div className="absolute top-6 right-6 z-10 bg-[var(--primary)] text-white text-[10px] font-black px-4 py-2 rounded-full shadow-lg">
+                  خصم {Math.round(((product.original_price - product.price) / product.original_price) * 100)}%
+                </div>
+              )}
             </div>
 
             {/* Details */}
             <div className="space-y-10">
               <div className="space-y-4">
-                <span className="inline-block px-4 py-1.5 rounded-full bg-rose-50 text-[var(--primary)] text-sm font-bold border border-rose-100">
-                  {product.category || 'منتج'}
-                </span>
-                <h1 className="text-4xl md:text-5xl font-sans font-black text-[#2B2B2B] leading-tight">
-                  {product.name}
-                </h1>
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-3">
+                    <span className={`inline-block px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border`}
+                          style={{
+                            backgroundColor: product.stock === 0 ? 'rgba(0,0,0,0.05)' : product.stock !== null && product.stock <= 5 ? 'rgba(var(--primary-rgb, 225, 29, 72), 0.1)' : 'var(--primary)',
+                            color: product.stock === null || (product.stock > 5) ? 'white' : 'var(--primary)',
+                            borderColor: 'transparent'
+                          }}>
+                      {product.stock === null ? 'متوفر حالياً' : 
+                       product.stock === 0 ? 'غير متوفر حالياً' : 
+                       product.stock <= 5 ? `عدد محدود: ${product.stock} قطع` : 'متوفر حالياً'}
+                    </span>
+                    {product.sales_count > 0 && (
+                      <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest bg-zinc-50 px-4 py-1.5 rounded-full border border-zinc-100">
+                        تم شراءه {product.sales_count} مرة
+                      </span>
+                    )}
+                  </div>
+                  <h1 className="text-4xl font-sans font-black text-[#2B2B2B] leading-tight">
+                    {product.name}
+                  </h1>
+                </div>
 
                 <div className="flex items-center gap-2">
                   <div className="flex gap-1">
@@ -308,15 +374,24 @@ export default async function StoreProductPage({ params }: PageProps) {
               <ImageGallery images={galleryImages} productName={product.name} />
             </div>
 
-            {product.original_price && product.price && product.original_price > product.price && (
-              <div className="absolute top-6 left-6 z-10 bg-red-600 text-white text-xs font-black px-5 py-2 rounded-full shadow-2xl">
-                خصم {Math.round(((product.original_price - product.price) / product.original_price) * 100)}%
+            {/* Badges on Gallery (Default) */}
+            <div className="absolute top-6 left-6 z-10">
+              <div className="px-5 py-2 rounded-full text-xs font-black text-white shadow-2xl flex items-center gap-2"
+                   style={{ 
+                     backgroundColor: product.stock === 0 ? 'rgba(0,0,0,0.9)' : 'var(--primary)',
+                     opacity: product.stock !== null && product.stock <= 5 ? 0.75 : 1,
+                     filter: product.stock === 0 ? 'brightness(0.2)' : 'none'
+                   }}>
+                <div className={`h-1.5 w-1.5 rounded-full bg-white ${product.stock !== null && product.stock <= 5 && product.stock > 0 ? 'animate-pulse' : ''}`} />
+                {product.stock === null ? 'متوفر' : 
+                 product.stock === 0 ? 'غير متوفر' : 
+                 product.stock <= 5 ? `محدود: ${product.stock}` : 'متوفر'}
               </div>
-            )}
+            </div>
 
-            {product.stock !== null && product.stock <= 5 && product.stock > 0 && (
-              <div className="absolute bottom-6 right-6 bg-amber-500 text-white text-xs font-black px-5 py-2 rounded-full shadow-2xl animate-bounce z-10">
-                باقي {product.stock} فقط في المخزون!
+            {product.original_price && product.price && product.original_price > product.price && (
+              <div className="absolute top-6 right-6 z-10 bg-red-600 text-white text-[10px] font-black px-4 py-1.5 rounded-full shadow-2xl">
+                خصم {Math.round(((product.original_price - product.price) / product.original_price) * 100)}%
               </div>
             )}
           </div>
@@ -324,11 +399,25 @@ export default async function StoreProductPage({ params }: PageProps) {
           {/* ── Info & Checkout (Right) ── */}
           <div className="flex flex-col">
             <div className="flex flex-col gap-3 mb-6">
-              <h1 className="text-4xl md:text-5xl font-black text-zinc-900 leading-tight">
+              <h1 className="text-4xl font-black text-zinc-900 leading-tight">
                 {product.name}
               </h1>
 
               <div className="flex items-center gap-4 flex-wrap">
+                {/* Badge under price (Default) */}
+                <div className={`flex items-center gap-2 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest transition-all`}
+                     style={{
+                       backgroundColor: product.stock === 0 ? 'rgba(0,0,0,0.03)' : product.stock !== null && product.stock <= 5 ? 'rgba(var(--primary-rgb, 0,0,0), 0.05)' : 'var(--primary)',
+                       color: product.stock === null || product.stock > 5 ? 'white' : 'var(--primary)',
+                       borderColor: product.stock === 0 ? '#eee' : 'transparent',
+                       opacity: product.stock !== null && product.stock <= 5 ? 0.8 : 1
+                     }}>
+                  <div className={`h-1 w-1 rounded-full ${product.stock === null || product.stock > 5 ? 'bg-white' : 'bg-[var(--primary)]'}`} />
+                  {product.stock === null ? 'متوفر حالياً' : 
+                   product.stock === 0 ? 'غير متوفر' : 
+                   product.stock <= 5 ? `كمية محدودة: ${product.stock}` : 'متوفر حالياً'}
+                </div>
+
                 {ratingSummary.total_reviews > 0 && (
                   <div className="flex items-center gap-2">
                     <div className="flex text-amber-400">
@@ -341,7 +430,7 @@ export default async function StoreProductPage({ params }: PageProps) {
 
                 {product.sales_count > 0 && (
                   <>
-                    {ratingSummary.total_reviews > 0 && <div className="h-4 w-px bg-zinc-200" />}
+                    <div className="h-4 w-px bg-zinc-200" />
                     <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-500">
                       <Package className="h-4 w-4 text-zinc-400" />
                       تم شراءه <span className="text-[var(--store-primary)] text-sm">{product.sales_count}</span> مرة
@@ -357,24 +446,9 @@ export default async function StoreProductPage({ params }: PageProps) {
               </div>
             )}
 
-            {/* Feature List */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
-              {[
-                { icon: CheckCircle2, label: 'أعلى جودة' },
-                { icon: Truck, label: 'شحن فائق السرعة' },
-                { icon: ShieldCheck, label: 'دفع آمن' }
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-2xl bg-primary-50 flex items-center justify-center text-primary-600 shadow-sm">
-                    <item.icon className="h-5 w-5" />
-                  </div>
-                  <span className="text-[13px] font-black text-zinc-900">{item.label}</span>
-                </div>
-              ))}
-            </div>
 
             {/* Checkout Section */}
-            <div className="bg-white rounded-[3rem] border border-zinc-100 shadow-2xl shadow-zinc-200/50 p-8 md:p-10 mb-12">
+            <div className={`bg-white rounded-[3rem] border border-zinc-100 shadow-2xl shadow-zinc-200/50 p-8 md:p-10 mb-12 ${product.stock === 0 ? 'opacity-70 grayscale' : ''}`}>
               <CheckoutBox product={product} storeId={store.id} storeSlug={slug} />
             </div>
 

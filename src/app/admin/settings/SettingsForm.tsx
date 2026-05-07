@@ -31,7 +31,23 @@ import UpgradeModal from '@/components/UpgradeModal'
 
 import { submitUpgradeRequest } from '@/app/actions/subscription'
 
-export default function SettingsForm({ initialStore, initialBranding, initialSettings, plan = 'starter', allPlans, userEmail }: { initialStore: any, initialBranding: any, initialSettings: any, plan?: PlanTier, allPlans?: any, userEmail?: string }) {
+export default function SettingsForm({ 
+   initialStore, 
+   initialBranding, 
+   initialSettings, 
+   plan = 'starter', 
+   allPlans, 
+   userEmail,
+   themes = []
+}: { 
+   initialStore: any, 
+   initialBranding: any, 
+   initialSettings: any, 
+   plan?: PlanTier, 
+   allPlans?: any, 
+   userEmail?: string,
+   themes?: any[]
+}) {
    // Defensive check: if plan is invalid or not found in PLAN_CONFIG, fallback to starter
    const currentPlan = ((plan as string) === 'free' ? 'starter' : plan) as PlanTier
    const config = allPlans?.[currentPlan] || PLAN_CONFIG[currentPlan] || PLAN_CONFIG.starter
@@ -239,34 +255,19 @@ export default function SettingsForm({ initialStore, initialBranding, initialSet
       { id: 'plan', label: 'خطة الاشتراك', icon: Zap, color: 'text-orange-600', bg: 'bg-orange-50' },
    ]
 
-   const AVAILABLE_THEMES = [
+   const AVAILABLE_THEMES = themes.length > 0 ? themes.map(t => ({
+      id: t.id,
+      name: t.name,
+      desc: t.description,
+      requiredPlan: t.required_plan,
+      preview: t.preview_url
+   })) : [
       {
          id: 'default',
          name: 'الافتراضي (Premium Mesh)',
          desc: 'تصميم عصري بخلفيات متدرجة وتأثيرات زجاجية، مثالي للمتاجر التي تبحث عن مظهر فخم.',
          requiredPlan: 'starter',
          preview: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop'
-      },
-      {
-         id: 'elegant',
-         name: 'الأنيق (Minimal Elegant)',
-         desc: 'تصميم بسيط ونظيف يركز على المنتجات والصور الاحترافية، مناسب لمتاجر الأزياء والمجوهرات.',
-         requiredPlan: 'growth',
-         preview: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2670&auto=format&fit=crop'
-      },
-      {
-         id: 'floral',
-         name: 'بلوم — Bloom 🌸',
-         desc: 'ثيم رومانسي فاخر للورود والهدايا. تصميم عاطفي بألوان وردية ناعمة وأشكال قوسية أنيقة.',
-         requiredPlan: 'growth',
-         preview: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2670&auto=format&fit=crop'
-      },
-      {
-         id: 'dark-vogue',
-         name: 'دارك فوغ (Dark Vogue)',
-         desc: 'ثيم غامق بلمسات ذهبية للمنتجات الفاخرة.',
-         requiredPlan: 'pro',
-         preview: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2670&auto=format&fit=crop'
       }
    ]
 
@@ -685,7 +686,7 @@ export default function SettingsForm({ initialStore, initialBranding, initialSet
                                              value={color.value.replace('#', '')}
                                              onChange={e => {
                                                 const val = e.target.value;
-                                                if (val.length <= 8) color.setter('#' + val)
+                                                if (val.length <= 6) color.setter('#' + val.replace(/[^0-9A-Fa-f]/g, ''))
                                              }}
                                              className="w-full bg-transparent text-sm font-black outline-none font-inter uppercase tracking-widest text-slate-600"
                                           />

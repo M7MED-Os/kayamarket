@@ -134,30 +134,23 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
             <CountdownTimer endDate={product.sale_end_date} selectedTheme={selectedTheme} />
           )}
 
-          {product.stock !== null && (
-            <div className="flex items-center gap-2">
-              <div className={`h-1 w-1 rounded-none ${product.stock > 0 ? 'bg-[var(--primary)]' : 'bg-zinc-200'}`} />
-              <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
-                {product.stock > 0 ? `متوفر: ${product.stock} قطعة` : 'نفذت الكمية'}
-              </span>
-            </div>
-          )}
+          {/* Stock info removed from here to avoid duplication with the main page badges */}
         </div>
 
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">الاسم</label>
-              <input value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all rounded-none" placeholder="الاسم بالكامل..." />
+              <input value={customerName} onChange={e => setCustomerName(e.target.value)} disabled={product.stock === 0} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all rounded-none disabled:bg-zinc-900/10 disabled:text-zinc-400 disabled:cursor-not-allowed" placeholder="الاسم بالكامل..." />
             </div>
             <div className="space-y-1">
               <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">رقم الهاتف</label>
-              <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all text-right rounded-none" dir="ltr" placeholder="01234567890" />
+              <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} disabled={product.stock === 0} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all text-right rounded-none disabled:bg-zinc-900/10 disabled:text-zinc-400 disabled:cursor-not-allowed" dir="ltr" placeholder="01234567890" />
             </div>
           </div>
           <div className="space-y-1">
             <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">العنوان</label>
-            <input value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all rounded-none" placeholder="المدينة، الشارع، رقم المنزل..." />
+            <input value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} disabled={product.stock === 0} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all rounded-none disabled:bg-zinc-900/10 disabled:text-zinc-400 disabled:cursor-not-allowed" placeholder="المدينة، الشارع، رقم المنزل..." />
           </div>
 
           <div className="space-y-4">
@@ -241,8 +234,8 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
               )}
             </div>
 
-            <button onClick={handleOrder} disabled={loading} className="w-full bg-[var(--primary)] text-white h-16 flex items-center justify-center text-[10px] font-black uppercase tracking-[0.2em] hover:brightness-125 transition-all shadow-lg disabled:brightness-75 rounded-none">
-              {loading ? 'جاري التنفيذ...' : 'تأكيد الطلب الآن'}
+            <button onClick={handleOrder} disabled={loading || product.stock === 0} className={`w-full h-16 flex items-center justify-center text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-lg rounded-none ${product.stock === 0 ? 'bg-zinc-900 text-zinc-400 cursor-not-allowed opacity-100' : 'bg-[var(--primary)] text-white hover:brightness-125 disabled:brightness-75'}`}>
+              {loading ? 'جاري التنفيذ...' : product.stock === 0 ? 'غير متوفر حالياً' : 'تأكيد الطلب الآن'}
             </button>
           </div>
         </div>
@@ -285,28 +278,7 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
         )}
 
         {/* Stock Status */}
-        {product.stock !== null ? (
-          <div className="mt-4 flex items-center gap-2">
-            {product.stock > 0 && product.stock < 5 ? (
-              <div className="flex items-center gap-1.5 bg-rose-50 text-rose-600 px-2.5 py-1 rounded-md border border-rose-100">
-                <div className="h-1.5 w-1.5 rounded-full bg-rose-500 animate-pulse" />
-                <span className="text-xs font-black">كمية محدودة: {product.stock} فقط!</span>
-              </div>
-            ) : (
-              <>
-                <div className={`h-2 w-2 rounded-full ${product.stock > 0 ? 'bg-green-500' : 'bg-primary-500'}`} />
-                <span className={`text-xs font-bold ${product.stock > 0 ? 'text-zinc-500' : 'text-primary-600'}`}>
-                  {product.stock > 0 ? `متوفر في المخزون: ${product.stock}` : 'غير متوفر حالياً'}
-                </span>
-              </>
-            )}
-          </div>
-        ) : (
-          <div className="mt-1 flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-green-500" />
-            <span className="text-xs font-bold text-zinc-500">متوفر في المخزون</span>
-          </div>
-        )}
+        {/* Stock status removed from here to avoid duplication */}
       </div>
 
       <div className="h-px bg-primary-100" />
@@ -318,14 +290,16 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
           <div className="flex items-center bg-zinc-50 border border-zinc-100 rounded-2xl p-1 shadow-sm w-full sm:w-auto justify-between sm:justify-start">
             <button
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="h-10 w-12 sm:w-10 flex items-center justify-center rounded-xl bg-white text-zinc-600 hover:text-primary-600 shadow-sm transition-all active:scale-90"
+              disabled={product.stock === 0}
+              className="h-10 w-12 sm:w-10 flex items-center justify-center rounded-xl bg-white text-zinc-600 hover:text-primary-600 shadow-sm transition-all active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Minus className="h-4 w-4" />
             </button>
-            <span className="w-16 text-center text-xl font-black text-primary-600">{quantity}</span>
+            <span className={`w-16 text-center text-xl font-black ${product.stock === 0 ? 'text-zinc-400' : 'text-primary-600'}`}>{quantity}</span>
             <button
               onClick={() => setQuantity(quantity + 1)}
-              className="h-10 w-12 sm:w-10 flex items-center justify-center rounded-xl bg-white text-zinc-600 hover:text-primary-600 shadow-sm transition-all active:scale-90"
+              disabled={product.stock === 0}
+              className="h-10 w-12 sm:w-10 flex items-center justify-center rounded-xl bg-white text-zinc-600 hover:text-primary-600 shadow-sm transition-all active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Plus className="h-4 w-4" />
             </button>
@@ -350,8 +324,9 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
               required
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
+              disabled={product.stock === 0}
               placeholder="الاسم بالكامل"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-all"
+              className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-all disabled:bg-zinc-900/10 disabled:text-zinc-400 disabled:cursor-not-allowed"
             />
           </div>
           <div>
@@ -361,8 +336,9 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
               required
               value={customerPhone}
               onChange={(e) => setCustomerPhone(e.target.value)}
+              disabled={product.stock === 0}
               placeholder="رقم الموبايل للتواصل"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-all text-right"
+              className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-all text-right disabled:bg-zinc-900/10 disabled:text-zinc-400 disabled:cursor-not-allowed"
               dir="ltr"
             />
           </div>
@@ -373,15 +349,16 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
               required
               value={customerAddress}
               onChange={(e) => setCustomerAddress(e.target.value)}
+              disabled={product.stock === 0}
               placeholder="المدينة، المنطقة، الشارع، رقم العمارة"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-all"
+              className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100 transition-all disabled:bg-zinc-900/10 disabled:text-zinc-400 disabled:cursor-not-allowed"
             />
           </div>
           <div>
             <label className="block text-sm font-bold text-zinc-700 mb-2">طريقة الدفع <span className="text-primary-500">*</span></label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <label className={`relative flex rounded-xl border p-4 transition-all ${!settings.cod_enabled ? 'cursor-not-allowed opacity-60 bg-zinc-50 border-zinc-200' : paymentMethod === 'الدفع عند الاستلام' ? 'cursor-pointer border-[var(--primary)] bg-[var(--primary)]/5 shadow-sm' : 'cursor-pointer border-zinc-200 hover:border-[var(--primary)]/20 bg-white'}`}>
-                <input type="radio" name="paymentMethod" value="الدفع عند الاستلام" checked={paymentMethod === 'الدفع عند الاستلام'} onChange={(e) => setPaymentMethod(e.target.value)} disabled={!settings.cod_enabled} className="sr-only" />
+              <label className={`relative flex rounded-xl border p-4 transition-all ${product.stock === 0 || !settings.cod_enabled ? 'cursor-not-allowed opacity-60 bg-zinc-50 border-zinc-200' : paymentMethod === 'الدفع عند الاستلام' ? 'cursor-pointer border-[var(--primary)] bg-[var(--primary)]/5 shadow-sm' : 'cursor-pointer border-zinc-200 hover:border-[var(--primary)]/20 bg-white'}`}>
+                <input type="radio" name="paymentMethod" value="الدفع عند الاستلام" checked={paymentMethod === 'الدفع عند الاستلام'} onChange={(e) => setPaymentMethod(e.target.value)} disabled={product.stock === 0 || !settings.cod_enabled} className="sr-only" />
                 <div className="flex w-full items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${!settings.cod_enabled ? 'bg-zinc-200 text-zinc-400' : paymentMethod === 'الدفع عند الاستلام' ? 'bg-primary-100 text-primary-600' : 'bg-zinc-100 text-zinc-500'}`}>
@@ -401,8 +378,8 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
                 </div>
               </label>
 
-              <label className={`relative flex cursor-pointer rounded-xl border p-4 transition-all ${paymentMethod === 'تحويل بنكي / محافظ إلكترونية' ? 'border-[var(--primary)] bg-[var(--primary)]/5 shadow-sm' : 'border-zinc-200 hover:border-[var(--primary)]/20 bg-white'}`}>
-                <input type="radio" name="paymentMethod" value="تحويل بنكي / محافظ إلكترونية" checked={paymentMethod === 'تحويل بنكي / محافظ إلكترونية'} onChange={(e) => setPaymentMethod(e.target.value)} className="sr-only" />
+              <label className={`relative flex rounded-xl border p-4 transition-all ${product.stock === 0 ? 'cursor-not-allowed opacity-60 bg-zinc-50 border-zinc-200' : paymentMethod === 'تحويل بنكي / محافظ إلكترونية' ? 'cursor-pointer border-[var(--primary)] bg-[var(--primary)]/5 shadow-sm' : 'cursor-pointer border-zinc-200 hover:border-[var(--primary)]/20 bg-white'}`}>
+                <input type="radio" name="paymentMethod" value="تحويل بنكي / محافظ إلكترونية" checked={paymentMethod === 'تحويل بنكي / محافظ إلكترونية'} onChange={(e) => setPaymentMethod(e.target.value)} disabled={product.stock === 0} className="sr-only" />
                 <div className="flex w-full items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${paymentMethod === 'تحويل بنكي / محافظ إلكترونية' ? 'bg-primary-100 text-primary-600' : 'bg-zinc-100 text-zinc-500'}`}>
