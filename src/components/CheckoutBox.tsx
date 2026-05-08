@@ -173,14 +173,14 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
         {hasVariants && (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Colors - Only show if color name is not "مقاسات المنتج" */}
-            {selectedVariant.color !== 'مقاسات المنتج' && (
+            {(selectedVariant && selectedVariant.color !== 'مقاسات المنتج') && (
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">اختر اللون</label>
                   <span className="text-[10px] font-black text-[var(--primary)]">{selectedVariant.color}</span>
                 </div>
                 <div className="flex flex-wrap gap-4">
-                  {product.variants.map((v: any, i: number) => (
+                  {product.variants?.map((v: any, i: number) => (
                     <button
                       key={i}
                       type="button"
@@ -200,7 +200,7 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
             <div className="space-y-4">
               <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">المقاس المتاح</label>
               <div className="flex flex-wrap gap-3">
-                {selectedVariant.sizes.map((s: any, i: number) => (
+                {selectedVariant?.sizes.map((s: any, i: number) => (
                   <button
                     key={i}
                     type="button"
@@ -332,13 +332,13 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
       {hasVariants && (
         <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-500">
           {/* Colors - Only show if not "مقاسات المنتج" */}
-          {selectedVariant.color !== 'مقاسات المنتج' && (
+          {(selectedVariant && selectedVariant.color !== 'مقاسات المنتج') && (
             <div className="space-y-3">
               <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
                 <div className="h-1 w-1 bg-primary-500 rounded-full" /> اختر اللون:
               </label>
               <div className="flex flex-wrap gap-3">
-                {product.variants.map((v: any, i: number) => (
+                {product.variants?.map((v: any, i: number) => (
                   <button
                     key={i}
                     type="button"
@@ -367,7 +367,7 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
               <div className="h-1 w-1 bg-primary-500 rounded-full" /> المقاس المتاح:
             </label>
             <div className="flex flex-wrap gap-2">
-              {selectedVariant.sizes.map((s: any, i: number) => (
+              {selectedVariant?.sizes.map((s: any, i: number) => (
                 <button
                   key={i}
                   type="button"
