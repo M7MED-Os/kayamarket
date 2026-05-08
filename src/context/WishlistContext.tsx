@@ -13,6 +13,7 @@ interface WishlistItem {
   sale_end_date?: string | null
   sales_count?: number
   store_id?: string
+  variants?: any[]
 }
 
 interface WishlistContextType {
