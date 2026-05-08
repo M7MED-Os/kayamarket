@@ -40,7 +40,7 @@ export default async function AdminOrdersPage({
 
   const { data: orders, error, count } = await supabase
     .from('orders')
-    .select('*', { count: 'exact' })
+    .select('*, order_items(*)', { count: 'exact' })
     .eq('store_id', storeId!)
     .order('created_at', { ascending: false })
     .range(from, to)

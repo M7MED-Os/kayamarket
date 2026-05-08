@@ -4,20 +4,25 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 
 interface CartItem {
-  id: string
+  id: string          // Original Product ID (from DB)
+  cartItemId: string  // Unique ID for cart entry (e.g., prodId-variantHash)
   name: string
   price: number
   image_url?: string
   original_price?: number | null
   description?: string | null
   quantity: number
+  variant_info?: {
+    color?: string
+    size?: string
+  }
 }
 
 interface CartContextType {
   items: CartItem[]
   addItem: (item: CartItem) => void
-  removeItem: (id: string) => void
-  updateQuantity: (id: string, quantity: number) => void
+  removeItem: (cartItemId: string) => void
+  updateQuantity: (cartItemId: string, quantity: number) => void
   clearCart: () => void
   totalItems: number
   totalPrice: number
@@ -38,7 +43,28 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     const savedCart = localStorage.getItem(cartKey)
     if (savedCart) {
       try {
-        setItems(JSON.parse(savedCart))
+        const parsed = JSON.parse(savedCart)
+        // Migration: Ensure all old items have a cartItemId
+        const migrated = parsed.reduce((acc: CartItem[], item: any) => {
+          const color = item.variant_info?.color || 'none';
+          const size = item.variant_info?.size || 'none';
+          const reconstructedId = item.cartItemId || `${item.id}-${color}-${size}`;
+          
+          const existing = acc.find(i => i.cartItemId === reconstructedId);
+          if (existing) {
+            existing.quantity += (item.quantity || 1);
+            return acc;
+          }
+
+          acc.push({
+            ...item,
+            cartItemId: reconstructedId,
+            quantity: item.quantity || 1
+          });
+          return acc;
+        }, []);
+
+        setItems(migrated);
       } catch (e) {
         console.error('Failed to parse cart from localStorage', e)
       }
@@ -63,7 +89,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       const { createClient } = await import('@/lib/supabase/client')
       const supabase = createClient()
 
-      const productIds = items.map(item => item.id)
+      const productIds = Array.from(new Set(items.map(item => item.id)))
       const { data: availableProducts } = await supabase
         .from('products')
         .select('id, is_visible, stock')
@@ -84,10 +110,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addItem = (newItem: CartItem) => {
     setItems((prev) => {
-      const existing = prev.find((item) => item.id === newItem.id)
+      const existing = prev.find((item) => item.cartItemId === newItem.cartItemId)
       if (existing) {
         return prev.map((item) =>
-          item.id === newItem.id
+          item.cartItemId === newItem.cartItemId
             ? { ...item, quantity: item.quantity + newItem.quantity }
             : item
         )
@@ -96,17 +122,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     })
   }
 
-  const removeItem = (id: string) => {
-    setItems((prev) => prev.filter((item) => item.id !== id))
+  const removeItem = (cartItemId: string) => {
+    setItems((prev) => prev.filter((item) => item.cartItemId !== cartItemId))
   }
 
-  const updateQuantity = (id: string, quantity: number) => {
+  const updateQuantity = (cartItemId: string, quantity: number) => {
     if (quantity <= 0) {
-      removeItem(id)
+      removeItem(cartItemId)
       return
     }
     setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, quantity } : item))
+      prev.map((item) => (item.cartItemId === cartItemId ? { ...item, quantity } : item))
     )
   }
 

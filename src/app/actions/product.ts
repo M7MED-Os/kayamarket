@@ -17,6 +17,7 @@ const productSchema = z.object({
   images: z.array(z.string()).optional().default([]),
   is_visible: z.boolean().default(true),
   sale_end_date: z.string().optional().nullable(),
+  variants: z.any().optional().nullable(),
 })
 
 // ─── Helper: fetch store plan + dynamic config ───────────────────────────────
@@ -51,6 +52,7 @@ export async function createProduct(formData: FormData) {
       images: formData.get('images') ? JSON.parse(formData.get('images') as string) : [],
       is_visible: formData.get('is_visible') === 'true',
       sale_end_date: formData.get('sale_end_date') || null,
+      variants: formData.get('variants') ? JSON.parse(formData.get('variants') as string) : [],
     }
 
     // 1. Check Total Products Limit
@@ -106,6 +108,7 @@ export async function createProduct(formData: FormData) {
         images: rawData.images as string[],
         is_visible: parsed.data.is_visible,
         sale_end_date: parsed.data.sale_end_date,
+        variants: parsed.data.variants,
       })
 
     if (error) {
@@ -142,6 +145,7 @@ export async function updateProduct(id: string, formData: FormData) {
       images: formData.get('images') ? JSON.parse(formData.get('images') as string) : [],
       is_visible: formData.get('is_visible') === 'true',
       sale_end_date: formData.get('sale_end_date') || null,
+      variants: formData.get('variants') ? JSON.parse(formData.get('variants') as string) : [],
     }
 
     // ✅ Check Images Per Product Limit (now also on update)
@@ -181,6 +185,7 @@ export async function updateProduct(id: string, formData: FormData) {
         images: rawData.images as string[],
         is_visible: parsed.data.is_visible,
         sale_end_date: parsed.data.sale_end_date,
+        variants: parsed.data.variants,
       })
       .eq('id', id)
       .eq('store_id', storeId)

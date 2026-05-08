@@ -4,7 +4,7 @@ import { useState, useEffect, useTransition } from 'react'
 import {
   Palette, Plus, Shield, Check, Info,
   ExternalLink, Lock, Eye, Settings2, Trash2, 
-  EyeOff, Loader2, Save, ArrowRightLeft, AlertTriangle, X
+  EyeOff, Loader2, Save, ArrowRightLeft, AlertTriangle, X, Star
 } from 'lucide-react'
 import Image from 'next/image'
 import toast from 'react-hot-toast'
@@ -135,21 +135,40 @@ export default function ThemesPage() {
               )}
               
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-6 gap-2">
-                <button className="flex-1 bg-white text-slate-900 py-3 rounded-xl font-black text-sm flex items-center justify-center gap-2 shadow-xl translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                  <Eye className="h-4 w-4" />
-                  معاينة
-                </button>
-                <button 
-                  onClick={() => setMigrationTheme(theme)}
-                  className="bg-rose-500 text-white p-3 rounded-xl shadow-xl translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-75" 
-                  title="تعطيل ونقل المشتركين"
-                >
-                  <ArrowRightLeft className="h-5 w-5" />
-                </button>
+                {!theme.is_active && (
+                  <button 
+                    onClick={() => handleUpdate(theme.id, { is_active: true, is_visible: true })}
+                    className="flex-1 bg-emerald-500 text-white py-3 rounded-xl font-black text-sm flex items-center justify-center gap-2 shadow-xl translate-y-4 group-hover:translate-y-0 transition-transform duration-500"
+                  >
+                    <Check className="h-4 w-4" />
+                    إعادة تفعيل
+                  </button>
+                )}
+                {theme.is_active && (
+                  <>
+                    <button className="flex-1 bg-white text-slate-900 py-3 rounded-xl font-black text-sm flex items-center justify-center gap-2 shadow-xl translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                      <Eye className="h-4 w-4" />
+                      معاينة
+                    </button>
+                    <button 
+                      onClick={() => setMigrationTheme(theme)}
+                      className="bg-rose-500 text-white p-3 rounded-xl shadow-xl translate-y-4 group-hover:translate-y-0 transition-transform duration-500 delay-75" 
+                      title="تعطيل ونقل المشتركين"
+                    >
+                      <ArrowRightLeft className="h-5 w-5" />
+                    </button>
+                  </>
+                )}
               </div>
 
-              {/* Badge */}
-              <div className="absolute top-4 left-4">
+              {/* Badge Area */}
+              <div className="absolute top-4 left-4 flex flex-col gap-2 items-start">
+                {theme.is_default && (
+                  <span className="bg-amber-400 text-slate-900 text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider shadow-lg flex items-center gap-1.5 border border-amber-200">
+                    <Star className="h-3 w-3 fill-current" />
+                    الافتراضي للنظام
+                  </span>
+                )}
                 {theme.is_free ? (
                   <span className="bg-emerald-500 text-white text-[10px] font-black px-3 py-1.5 rounded-full uppercase tracking-wider shadow-lg">مجاني</span>
                 ) : (
@@ -177,6 +196,13 @@ export default function ThemesPage() {
                   <span className="text-lg font-black text-slate-900">{theme.active_stores} متجر</span>
                 </div>
                 <div className="flex gap-2">
+                  <button 
+                    onClick={() => handleUpdate(theme.id, { is_default: !theme.is_default })}
+                    className={`h-11 w-11 rounded-xl flex items-center justify-center transition-all ${theme.is_default ? 'bg-amber-50 text-amber-600 border border-amber-200' : 'bg-slate-50 text-slate-400 hover:text-amber-500'}`}
+                    title={theme.is_default ? 'إزالة الافتراضي' : 'تعيين كافتراضي'}
+                  >
+                    <Star className={`h-5 w-5 ${theme.is_default ? 'fill-current' : ''}`} />
+                  </button>
                   <button 
                     onClick={() => setEditingTheme(theme)}
                     className="h-11 w-11 rounded-xl bg-slate-50 text-slate-600 flex items-center justify-center hover:bg-slate-100 transition-colors"

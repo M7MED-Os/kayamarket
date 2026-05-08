@@ -1,0 +1,5 @@
+1. 01_schema/01_tables.sql       # إنشاء الجداول الأساسية والقيود
+2. 01_schema/02_functions.sql    # دوال العمليات (RPCs)
+3. 01_schema/03_triggers.sql     # تفعيل التريجرز
+4. 02_security/01_rls_policies.sql # تطبيق سياسات الحماية
+5. 03_data/01_seeds.sql          # إعدادات المخازن والصلاحيات الافتراضية

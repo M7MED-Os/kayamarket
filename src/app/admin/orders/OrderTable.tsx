@@ -183,9 +183,9 @@ export default function OrderTable({ orders, currentPage, totalPages, totalCount
               className={`bg-white rounded-[2.5rem] border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col h-full hover:shadow-xl hover:border-sky-100 transition-all duration-300 group relative ${isSelectorOpen ? 'z-50' : 'z-0'} ${isProcessing ? 'opacity-50 pointer-events-none scale-95' : ''}`}
             >
               <div className="px-6 py-5 bg-slate-50/50 flex items-center justify-between border-b border-slate-100 rounded-t-[2.5rem]">
-                <div className="flex items-center gap-2">
-                   <Hash className="h-3 w-3 text-slate-300" />
-                   <span className="text-[10px] font-black text-slate-400 font-poppins uppercase" dir="ltr">#{order.id.split('-')[0].toUpperCase()}</span>
+                <div className="flex items-center gap-3">
+                  <div className="h-2 w-2 rounded-full bg-sky-500 animate-pulse" />
+                  <span className="text-lg font-black text-slate-900 font-poppins uppercase tracking-wider" dir="ltr">#{order.id.split('-')[0].toUpperCase()}</span>
                 </div>
                 <div className="relative">
                   <button
@@ -222,32 +222,65 @@ export default function OrderTable({ orders, currentPage, totalPages, totalCount
               </div>
 
               <div className="p-7 flex-grow space-y-6">
-                <div className="flex justify-between items-start gap-4">
-                  <h4 className="text-xl font-black text-slate-900 leading-tight font-inter min-h-[3.5rem] line-clamp-2">{order.product_name}</h4>
-                  <div className="text-left shrink-0">
-                    <p className="text-2xl font-black text-sky-600 font-poppins">{order.final_price.toLocaleString()}</p>
-                    <p className="text-[9px] font-bold text-slate-400 uppercase text-left">ج.م</p>
-                  </div>
-                </div>
+                 {/* Order Total Header */}
+                 <div className="flex justify-between items-center pb-4 border-b border-slate-50">
+                    <div className="space-y-1">
+                       <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">إجمالي الطلب</p>
+                       <div className="flex items-baseline gap-1">
+                          <span className="text-3xl font-black text-sky-600 font-poppins">{order.final_price.toLocaleString()}</span>
+                          <span className="text-[10px] font-bold text-slate-400 uppercase">ج.م</span>
+                       </div>
+                    </div>
+                    {order.order_items && order.order_items.length > 1 && (
+                       <div className="bg-sky-50 text-sky-600 px-3 py-1 rounded-full text-[10px] font-black border border-sky-100">
+                          {order.order_items.length} منتجات
+                       </div>
+                    )}
+                 </div>
 
-                <div className="grid grid-cols-2 gap-y-5 gap-x-10 py-6 border-y border-slate-50/80">
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2 text-[10px] font-black text-slate-300 uppercase tracking-widest"><User className="h-3 w-3" /> العميل</div>
-                    <p className="text-sm font-black text-slate-700 truncate">{order.customer_name}</p>
-                  </div>
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2 text-[10px] font-black text-slate-300 uppercase tracking-widest"><Phone className="h-3 w-3" /> التواصل</div>
-                    <p className="text-sm font-black text-slate-700 text-right" dir="ltr">{order.customer_phone}</p>
-                  </div>
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2 text-[10px] font-black text-slate-300 uppercase tracking-widest"><Calendar className="h-3 w-3" /> التاريخ</div>
-                    <p className="text-sm font-black text-slate-700">{new Date(order.created_at).toLocaleDateString('ar-EG')}</p>
-                  </div>
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-2 text-[10px] font-black text-slate-300 uppercase tracking-widest"><CreditCard className="h-3 w-3" /> الدفع</div>
-                    <p className="text-sm font-black text-slate-700">{paymentLabel}</p>
-                  </div>
-                </div>
+                 <div className="flex flex-col gap-4">
+                   {(order.order_items && order.order_items.length > 0 ? order.order_items : [{ product_name: order.product_name, quantity: 1, product_price: order.product_price, variant_info: order.variant_info }]).map((item: any, idx: number) => (
+                     <div key={idx} className="space-y-1">
+                       <div className="flex items-start gap-3">
+                         <span className="text-xs font-black text-sky-500 bg-sky-50 h-6 w-6 flex items-center justify-center rounded-lg shrink-0">{item.quantity}</span>
+                         <h4 className="text-lg font-black text-slate-900 leading-tight font-inter line-clamp-2">{item.product_name}</h4>
+                       </div>
+                       {item.variant_info && (item.variant_info.color || item.variant_info.size) && (
+                         <div className="flex flex-wrap gap-2 pr-9">
+                           {item.variant_info.color && (
+                             <span className="px-2 py-0.5 bg-slate-100 text-[9px] font-black text-slate-600 rounded-lg border border-slate-200">
+                               اللون: {item.variant_info.color}
+                             </span>
+                           )}
+                           {item.variant_info.size && (
+                             <span className="px-2 py-0.5 bg-sky-50 text-[9px] font-black text-sky-600 rounded-lg border border-sky-100">
+                               المقاس: {item.variant_info.size}
+                             </span>
+                           )}
+                         </div>
+                       )}
+                     </div>
+                   ))}
+                 </div>
+
+                 <div className="grid grid-cols-2 gap-y-5 gap-x-10 py-6 border-y border-slate-50/80">
+                   <div className="space-y-1.5">
+                     <div className="flex items-center gap-2 text-[10px] font-black text-slate-300 uppercase tracking-widest"><User className="h-3 w-3" /> العميل</div>
+                     <p className="text-sm font-black text-slate-700 truncate">{order.customer_name}</p>
+                   </div>
+                   <div className="space-y-1.5">
+                     <div className="flex items-center gap-2 text-[10px] font-black text-slate-300 uppercase tracking-widest"><Phone className="h-3 w-3" /> التواصل</div>
+                     <p className="text-sm font-black text-slate-700 text-right" dir="ltr">{order.customer_phone}</p>
+                   </div>
+                   <div className="space-y-1.5">
+                     <div className="flex items-center gap-2 text-[10px] font-black text-slate-300 uppercase tracking-widest"><Calendar className="h-3 w-3" /> التاريخ</div>
+                     <p className="text-sm font-black text-slate-700">{new Date(order.created_at).toLocaleDateString('ar-EG')}</p>
+                   </div>
+                   <div className="space-y-1.5">
+                     <div className="flex items-center gap-2 text-[10px] font-black text-slate-300 uppercase tracking-widest"><CreditCard className="h-3 w-3" /> الدفع</div>
+                     <p className="text-sm font-black text-slate-700">{paymentLabel}</p>
+                   </div>
+                 </div>
               </div>
 
               <div className="px-7 pb-7 flex items-center gap-4">

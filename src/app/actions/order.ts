@@ -17,17 +17,20 @@ export async function createOrder(
   paymentMethod: string,
   storeId?: string,
   idempotencyKey?: string,
-  quantity: number = 1
+  quantity: number = 1,
+  variantInfo?: any,
+  price?: number
 ) {
   // Map single product to items array for the new multi-product function
   const items = [{
     id: product.id,
     quantity: quantity,
     name: product.name,
-    price: product.price,
-    image_url: product.image_url
+    price: price || product.price,
+    image_url: product.image_url,
+    variant_info: variantInfo
   }]
-  
+
   return createOrderMulti(
     items,
     couponCode?.trim() || '',
@@ -52,16 +55,17 @@ export async function createOrderMulti(
 ) {
   try {
     const supabase = await createClient()
-    
+
     // Format items for PostgreSQL JSONB
     const formattedItems = items.map(item => ({
       product_id: item.id || item.product_id,
       quantity: item.quantity,
       name: item.name,
-      price: item.price
+      price: item.price,
+      variant_info: item.variant_info || {}
     }))
 
-    const { data, error } = await supabase.rpc('create_order_multi_v1', {
+    const { data, error } = await supabase.rpc('create_order_multi_v2', {
       p_items: formattedItems,
       p_coupon_code: couponCode?.trim() || null,
       p_customer_name: customerName,
@@ -82,10 +86,10 @@ export async function createOrderMulti(
       return { success: false, error: result.o_error_message }
     }
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       orderId: result.o_order_id,
-      publicToken: result.o_public_token 
+      publicToken: result.o_public_token
     }
   } catch (error: any) {
     console.error('Order action exception:', error)

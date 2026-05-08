@@ -4,6 +4,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect, useMemo } from 'react'
 import { ShoppingBag, Heart, Menu, X, Flower2, Truck, Gift, Star, ChevronDown, Quote, MessageCircle, ChevronRight } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import { KayaBadge } from '@/components/store/KayaBadge'
@@ -236,6 +238,7 @@ import { CheckCircle2 } from 'lucide-react'
 
 // ─── Product Card ────────────────────────────────────────────────────────────
 export function FloralProductCard({ product, slug }: { product: any; slug: string }) {
+  const router = useRouter()
   const { addItem } = useCart()
   const { toggleItem, isInWishlist } = useWishlist()
   const [adding, setAdding] = useState(false)
@@ -245,8 +248,33 @@ export function FloralProductCard({ product, slug }: { product: any; slug: strin
 
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault(); e.stopPropagation()
+    
+    // If product has variants, redirect to product page
+    const hasVariants = product.variants && product.variants.length > 0
+    
+    if (hasVariants) {
+      toast('يرجى اختيار المقاس واللون أولاً ثم الضغط على زر "أضف للسلة"', { icon: '📝' })
+      router.push(`/store/${slug}/products/${product.id}`)
+      return
+    }
+
     setAdding(true)
-    addItem({ id: product.id, name: product.name, price: product.price, image_url: product.image_url, quantity: 1 })
+    
+    const cartItemId = `${product.id}-none-none`
+    
+    addItem({ 
+      id: product.id, 
+      cartItemId: cartItemId,
+      name: product.name, 
+      price: product.price, 
+      image_url: product.image_url, 
+      quantity: 1,
+      variant_info: {
+        color: undefined,
+        size: undefined
+      }
+    })
+    toast.success('تمت الإضافة للسلة')
     setTimeout(() => setAdding(false), 1200)
   }
 

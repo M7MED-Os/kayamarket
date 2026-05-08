@@ -37,7 +37,14 @@ export function generateInvoiceHTML(order: any, store: any, branding: any, setti
     const itemsRows = items && items.length > 0
         ? items.map(item => `
             <tr>
-                <td class="product-name">${item.product_name || item.name}</td>
+                <td class="product-name">
+                    <div>${item.product_name || item.name}</div>
+                    ${item.variant_info && (item.variant_info.color || item.variant_info.size) ? `
+                        <div style="font-size: 10px; color: #64748b; margin-top: 4px; font-weight: 700;">
+                            ${[item.variant_info.color, item.variant_info.size].filter(Boolean).join(' / ')}
+                        </div>
+                    ` : ''}
+                </td>
                 <td style="text-align: center;">${item.quantity}</td>
                 <td class="price-col" style="text-align: left;">
                     <span>${(Number(item.product_price || item.price) * item.quantity).toFixed(2)} ج.م</span>
@@ -46,7 +53,14 @@ export function generateInvoiceHTML(order: any, store: any, branding: any, setti
         `).join('')
         : `
             <tr>
-                <td class="product-name">${order.product_name}</td>
+                <td class="product-name">
+                    <div>${order.product_name}</div>
+                    ${order.variant_info && (order.variant_info.color || order.variant_info.size) ? `
+                        <div style="font-size: 10px; color: #64748b; margin-top: 4px; font-weight: 700;">
+                            ${[order.variant_info.color, order.variant_info.size].filter(Boolean).join(' / ')}
+                        </div>
+                    ` : ''}
+                </td>
                 <td style="text-align: center;">1</td>
                 <td class="price-col" style="text-align: left;">
                     <span>${originalPrice.toFixed(2)} ج.م</span>
@@ -74,6 +88,7 @@ export function generateInvoiceHTML(order: any, store: any, branding: any, setti
             min-height: 297mm; 
             margin: 0 auto; 
             position: relative;
+            background: white;
         }
         
         /* Premium Header with Row Layout */
@@ -140,6 +155,8 @@ export function generateInvoiceHTML(order: any, store: any, branding: any, setti
             border: 1.5px solid #f1f5f9;
             border-radius: 24px;
             padding: 24px;
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
 
         .box-title {
@@ -163,6 +180,8 @@ export function generateInvoiceHTML(order: any, store: any, branding: any, setti
             border-radius: 12px;
             margin-bottom: 30px;
             text-align: center;
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
         .alert-text { font-size: 13px; font-weight: 700; color: ${primaryColor}; line-height: 1.5; }
         
@@ -170,6 +189,8 @@ export function generateInvoiceHTML(order: any, store: any, branding: any, setti
         .policies-container {
             width: 45%;
             text-align: right;
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
         .policies-text {
             font-size: 10px;
@@ -180,7 +201,7 @@ export function generateInvoiceHTML(order: any, store: any, branding: any, setti
         }
 
         /* Table */
-        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; table-layout: fixed; }
         th { 
             background: #f8fafc; 
             padding: 15px; 
@@ -190,13 +211,15 @@ export function generateInvoiceHTML(order: any, store: any, branding: any, setti
             border-bottom: 2px solid #e2e8f0;
             text-align: right;
         }
-        td { padding: 20px 15px; border-bottom: 1px solid #f1f5f9; font-weight: 700; text-align: right; }
+        td { padding: 20px 15px; border-bottom: 1px solid #f1f5f9; font-weight: 700; text-align: right; word-wrap: break-word; }
         .product-name { font-size: 16px; color: #1e293b; }
 
         /* Totals */
         .totals-section {
             width: 350px;
             margin-top: 0px;
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
         .total-row {
             display: flex;
@@ -223,6 +246,8 @@ export function generateInvoiceHTML(order: any, store: any, branding: any, setti
             border-radius: 16px;
             padding: 22px;
             margin-top: 25px;
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
         .deposit-row {
             display: flex;
@@ -239,6 +264,8 @@ export function generateInvoiceHTML(order: any, store: any, branding: any, setti
             border-top: 1px solid #f1f5f9;
             padding-top: 20px;
             color: #94a3b8;
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
         .footer-thanks { font-size: 13px; font-weight: 700; color: #64748b; margin-bottom: 5px; }
         .footer-note { font-size: 10px; opacity: 0.8; }
@@ -381,11 +408,9 @@ export function generateInvoiceHTML(order: any, store: any, branding: any, setti
                         </div>
                     ` : ''}
 
-                    <div class="total-row grand">
-                        <span>الإجمالي النهائي:</span>
-                        <div style="text-align: left;">
-                            <span class="grand-price">${finalPrice.toFixed(2)} ج.م</span>
-                        </div>
+                    <div class="total-row grand" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <span style="font-size: 16px; opacity: 0.7;">الإجمالي النهائي:</span>
+                        <span class="grand-price">${finalPrice.toFixed(2)} ج.م</span>
                     </div>
 
                     ${isDepositRequired ? `

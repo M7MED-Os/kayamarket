@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Package, Star } from 'lucide-react'
+import { Package, Star, Heart, ShoppingCart } from 'lucide-react'
 import CountdownTimer from '../CountdownTimer'
+import { useRouter } from 'next/navigation'
 
 interface ProductCardProps {
   product: any
@@ -44,12 +45,12 @@ function StarRating({ rating }: { rating: number | null }) {
   )
 }
 
-import { Heart, ShoppingCart } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
 import toast from 'react-hot-toast'
 
 export default function ProductCard({ product, slug }: ProductCardProps) {
+  const router = useRouter()
   const hasDiscount = product.original_price && product.original_price > product.price
   const discountPercent = hasDiscount
     ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
@@ -83,14 +84,32 @@ export default function ProductCard({ product, slug }: ProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+
+    // If product has variants, redirect to product page instead of adding directly
+    const hasVariants = product.variants && product.variants.length > 0
+    
+    if (hasVariants) {
+      toast('يرجى اختيار المقاس واللون أولاً ثم الضغط على زر "أضف للسلة"', { icon: '📝' })
+      router.push(`/store/${slug}/products/${product.id}`)
+      return
+    }
+
+    // Generate cartItemId for simple products
+    const cartItemId = `${product.id}-none-none`
+
     addItem({
       id: product.id,
+      cartItemId: cartItemId,
       name: product.name,
       price: product.price,
       original_price: product.original_price,
       image_url: product.image_url,
       description: product.description,
-      quantity: 1
+      quantity: 1,
+      variant_info: {
+        color: undefined,
+        size: undefined
+      }
     })
     toast.success('تمت الإضافة للسلة')
   }

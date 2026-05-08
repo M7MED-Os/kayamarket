@@ -57,7 +57,7 @@ export default function CartView({ params, storeData, showWatermark }: { params:
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-16">
               <div className="lg:col-span-2 space-y-12">
                 {items.map((item) => (
-                  <div key={item.id} className="flex gap-10 items-start pb-10 border-b border-zinc-100 group">
+                  <div key={item.cartItemId} className="flex gap-10 items-start pb-10 border-b border-zinc-100 group">
                     <div className="relative h-40 w-32 bg-zinc-50 border border-zinc-50 rounded-none overflow-hidden transition-all duration-700">
                       {item.image_url && <img src={item.image_url} alt={item.name} className="h-full w-full object-cover scale-110 group-hover:scale-100 transition-transform duration-700" />}
                     </div>
@@ -65,14 +65,20 @@ export default function CartView({ params, storeData, showWatermark }: { params:
                       <div className="flex justify-between items-start">
                         <div className="space-y-1">
                           <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-widest group-hover:text-[var(--primary)] transition-colors">{item.name}</h3>
-                          <div className="flex items-center gap-3">
+                          <div className="flex flex-col gap-1">
                             <div className="text-lg font-bold text-[var(--primary)]">{item.price.toLocaleString()} ج.م</div>
+                            {item.variant_info && (item.variant_info.color || item.variant_info.size) && (
+                              <div className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex gap-2">
+                                {item.variant_info.color && <span>اللون: {item.variant_info.color}</span>}
+                                {item.variant_info.size && <span>المقاس: {item.variant_info.size}</span>}
+                              </div>
+                            )}
                             {(item as any).original_price && (item as any).original_price > item.price && (
                               <div className="text-xs font-light text-zinc-300 line-through italic">{(item as any).original_price.toLocaleString()} ج.م</div>
                             )}
                           </div>
                         </div>
-                        <button onClick={() => removeItem(item.id)} className="text-[var(--primary)] hover:brightness-125 transition-colors">
+                        <button onClick={() => removeItem(item.cartItemId)} className="text-[var(--primary)] hover:brightness-125 transition-colors">
                           <Trash2 className="h-4 w-4" strokeWidth={1.5} />
                         </button>
                       </div>
@@ -80,14 +86,14 @@ export default function CartView({ params, storeData, showWatermark }: { params:
                       <div className="flex items-center justify-between gap-4 pt-4">
                         <div className="flex items-center border border-zinc-100 p-1 rounded-none bg-white">
                           <button
-                            onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                            onClick={() => updateQuantity(item.cartItemId, Math.max(1, item.quantity - 1))}
                             className="h-10 w-10 flex items-center justify-center text-zinc-400 hover:text-[var(--primary)] hover:bg-zinc-50 transition-all active:scale-90"
                           >
                             <Minus className="h-3 w-3" />
                           </button>
                           <span className="text-sm font-black w-8 text-center tabular-nums text-zinc-900">{item.quantity}</span>
                           <button
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
                             className="h-10 w-10 flex items-center justify-center text-zinc-400 hover:text-[var(--primary)] hover:bg-zinc-50 transition-all active:scale-90"
                           >
                             <Plus className="h-3 w-3" />
@@ -175,7 +181,7 @@ export default function CartView({ params, storeData, showWatermark }: { params:
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
               <div className="lg:col-span-2 space-y-6">
                 {items.map((item) => (
-                  <div key={item.id} className="flex gap-4 md:gap-6 items-center p-4 md:p-5 bg-white rounded-[2rem] border border-rose-50 shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden">
+                  <div key={item.cartItemId} className="flex gap-4 md:gap-6 items-center p-4 md:p-5 bg-white rounded-[2rem] border border-rose-50 shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden">
                     
                     {/* Product Image - Back to Start (Right in RTL) */}
                     <div className="relative h-20 w-20 md:h-28 md:w-28 rounded-[1.2rem] bg-[#FAF3F0]/40 overflow-hidden shrink-0 border border-rose-50 shadow-inner">
@@ -187,10 +193,16 @@ export default function CartView({ params, storeData, showWatermark }: { params:
                         <div className="text-right space-y-0.5">
                           <h3 className="text-sm md:text-lg font-sans font-black text-[#2B2B2B] truncate leading-tight">{item.name}</h3>
                           <div className="text-xs md:text-sm font-bold text-rose-300">{item.price.toLocaleString()} ج.م</div>
+                          {item.variant_info && (item.variant_info.color || item.variant_info.size) && (
+                            <div className="text-[9px] font-bold text-[var(--primary)] opacity-60 uppercase tracking-wider flex gap-2">
+                              {item.variant_info.color && <span>{item.variant_info.color}</span>}
+                              {item.variant_info.size && <span>{item.variant_info.size}</span>}
+                            </div>
+                          )}
                         </div>
 
                          <button 
-                          onClick={() => removeItem(item.id)} 
+                          onClick={() => removeItem(item.cartItemId)} 
                           className="h-8 w-8 flex items-center justify-center rounded-full bg-rose-50 text-rose-300 hover:text-white hover:bg-rose-500 transition-all duration-300 shrink-0"
                         >
                           <Trash2 className="h-3.5 w-3.5" strokeWidth={2.5} />
@@ -200,14 +212,14 @@ export default function CartView({ params, storeData, showWatermark }: { params:
                       <div className="flex items-center justify-between gap-4">
                         <div className="flex items-center bg-[#FAF3F0]/60 rounded-xl p-0.5 md:p-1 border border-rose-100/50">
                           <button
-                            onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                            onClick={() => updateQuantity(item.cartItemId, Math.max(1, item.quantity - 1))}
                             className="h-6 w-6 md:h-7 md:w-7 flex items-center justify-center rounded-lg bg-white text-zinc-400 hover:text-[var(--primary)] shadow-sm transition-all"
                           >
                             <Minus className="h-2.5 w-2.5" />
                           </button>
                           <span className="text-xs md:text-sm font-bold w-6 md:w-8 text-center text-[#2B2B2B]">{item.quantity}</span>
                           <button
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
                             className="h-6 w-6 md:h-7 md:w-7 flex items-center justify-center rounded-lg bg-[var(--primary)] text-white shadow-sm transition-all hover:scale-105"
                           >
                             <Plus className="h-2.5 w-2.5" />
@@ -297,7 +309,7 @@ export default function CartView({ params, storeData, showWatermark }: { params:
             {/* Items List */}
             <div className="lg:col-span-2 space-y-4">
               {items.map((item) => (
-                <div key={item.id} className="bg-white rounded-3xl border border-zinc-100 p-6 flex gap-6 items-center shadow-sm hover:shadow-md transition-all">
+                <div key={item.cartItemId} className="bg-white rounded-3xl border border-zinc-100 p-6 flex gap-6 items-center shadow-sm hover:shadow-md transition-all">
                   <div className="relative h-24 w-24 rounded-2xl overflow-hidden border border-zinc-50 bg-zinc-50 shrink-0">
                     {item.image_url ? (
                       <img src={item.image_url} alt={item.name} className="h-full w-full object-cover" />
@@ -314,24 +326,32 @@ export default function CartView({ params, storeData, showWatermark }: { params:
                       <p className="text-xs text-zinc-400 font-bold mb-3 line-clamp-1">{(item as any).description}</p>
                     )}
 
-                    <div className="flex items-center gap-2 mb-4">
-                      <p className="text-sm font-black text-[var(--primary)]">{item.price.toLocaleString()} ج.م</p>
-                      {(item as any).original_price && (item as any).original_price > item.price && (
-                        <p className="text-[10px] text-zinc-300 line-through font-bold">{((item as any).original_price).toLocaleString()} ج.م</p>
+                    <div className="flex flex-col gap-1 mb-4">
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-black text-[var(--primary)]">{item.price.toLocaleString()} ج.م</p>
+                        {(item as any).original_price && (item as any).original_price > item.price && (
+                          <p className="text-[10px] text-zinc-300 line-through font-bold">{((item as any).original_price).toLocaleString()} ج.م</p>
+                        )}
+                      </div>
+                      {item.variant_info && (item.variant_info.color || item.variant_info.size) && (
+                        <div className="flex gap-2 text-[10px] font-bold text-zinc-400">
+                          {item.variant_info.color && <span className="bg-zinc-50 px-2 py-0.5 rounded">اللون: {item.variant_info.color}</span>}
+                          {item.variant_info.size && <span className="bg-zinc-50 px-2 py-0.5 rounded">المقاس: {item.variant_info.size}</span>}
+                        </div>
                       )}
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div className="flex items-center bg-zinc-50 border border-zinc-100 rounded-2xl p-1">
                         <button
-                          onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                          onClick={() => updateQuantity(item.cartItemId, Math.max(1, item.quantity - 1))}
                           className="h-9 w-9 flex items-center justify-center rounded-xl bg-white text-zinc-600 hover:text-zinc-900 shadow-sm transition-all active:scale-90"
                         >
                           <Minus className="h-3.5 w-3.5" />
                         </button>
                         <span className="w-10 text-center text-sm font-black text-zinc-900 tabular-nums">{item.quantity}</span>
                         <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
                           className="h-9 w-9 flex items-center justify-center rounded-xl bg-white text-zinc-600 hover:text-zinc-900 shadow-sm transition-all active:scale-90"
                         >
                           <Plus className="h-3.5 w-3.5" />
@@ -339,7 +359,7 @@ export default function CartView({ params, storeData, showWatermark }: { params:
                       </div>
 
                       <button
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeItem(item.cartItemId)}
                         className="text-zinc-400 hover:text-rose-500 transition-all p-2 hover:scale-110 active:scale-95"
                       >
                         <Trash2 className="h-5 w-5" />

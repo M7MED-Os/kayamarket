@@ -33,6 +33,15 @@ export async function getPlatformThemes() {
 
 export async function updateThemeSettings(id: string, updates: any) {
   const supabase = createAdminClient()
+
+  // If setting as default, first unset other defaults
+  if (updates.is_default === true) {
+    await supabase
+      .from('platform_themes')
+      .update({ is_default: false })
+      .neq('id', id)
+  }
+
   const { error } = await supabase
     .from('platform_themes')
     .update(updates)

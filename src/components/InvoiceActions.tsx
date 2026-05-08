@@ -21,16 +21,16 @@ interface InvoiceActionsProps {
   primaryColor?: string
 }
 
-export default function InvoiceActions({ 
-  order, 
+export default function InvoiceActions({
+  order,
   items = [],
   storeInfo = {},
   branding = {},
   settings = {},
-  hasPdfInvoice = false, 
-  storeName = 'المتجر', 
-  whatsappUrl = null, 
-  primaryColor = '#0ea5e9' 
+  hasPdfInvoice = false,
+  storeName = 'المتجر',
+  whatsappUrl = null,
+  primaryColor = '#0ea5e9'
 }: InvoiceActionsProps) {
   const [currentUrl, setCurrentUrl] = useState('')
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
@@ -44,7 +44,7 @@ export default function InvoiceActions({
     return new Promise((resolve, reject) => {
       try {
         const htmlString = generateInvoiceHTML(order, storeInfo, branding, settings, items);
-        
+
         const iframe = document.createElement('iframe');
         iframe.style.position = 'fixed';
         iframe.style.top = '-10000px';
@@ -63,25 +63,25 @@ export default function InvoiceActions({
 
             const canvas = await html2canvas(element, { scale: 2, useCORS: true });
             const imgData = canvas.toDataURL('image/png');
-            
+
             const pdf = new jsPDF({
               orientation: 'portrait',
               unit: 'mm',
               format: 'a4'
             });
-            
+
             const imgProps = pdf.getImageProperties(imgData);
             const pdfWidth = pdf.internal.pageSize.getWidth();
             const pageHeight = pdf.internal.pageSize.getHeight();
             const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
-            
+
             let heightLeft = imgHeight;
             let position = 0;
-            
+
             // Add first page
             pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
             heightLeft -= pageHeight;
-            
+
             // Add subsequent pages if the invoice is too long
             while (heightLeft > 0) {
               position = position - pageHeight;
@@ -89,14 +89,14 @@ export default function InvoiceActions({
               pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
               heightLeft -= pageHeight;
             }
-            
+
             resolve(pdf.output('blob'));
           } catch (err) {
             reject(err);
           } finally {
             document.body.removeChild(iframe);
           }
-        }, 1500);
+        }, 2000);
       } catch (err) {
         reject(err);
       }
@@ -209,7 +209,7 @@ export default function InvoiceActions({
       </div>
 
       {/* Subscription Lock Modal */}
-      <UpgradeModal 
+      <UpgradeModal
         isOpen={showUpgradeModal}
         onClose={() => setShowUpgradeModal(false)}
         title="تنزيل PDF غير متاح"

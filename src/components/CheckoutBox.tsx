@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Product } from '@/types/product'
 import { createClient } from '@/lib/supabase/client'
-import { CheckCircle2, Banknote, CreditCard, Truck, HeartHandshake, ShieldCheck, ShoppingCart, Minus, Plus } from 'lucide-react'
+import { CheckCircle2, Banknote, CreditCard, ShoppingCart, Minus, Plus } from 'lucide-react'
 import WishlistButton from './WishlistButton'
 import { createOrder } from '@/app/actions/order'
 import { useRouter } from 'next/navigation'
@@ -32,6 +32,15 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
   const { addItem } = useCart()
   const [settings, setSettings] = useState<{ cod_enabled: boolean; cod_deposit_required: boolean; deposit_percentage: number; policies?: string }>({ cod_enabled: true, cod_deposit_required: false, deposit_percentage: 50 })
   const [idempotencyKey, setIdempotencyKey] = useState<string>(() => crypto.randomUUID())
+  
+  // Variants Support
+  const hasVariants = product.variants && product.variants.length > 0
+  const [selectedVariantIdx, setSelectedVariantIdx] = useState(0)
+  const [selectedSizeIdx, setSelectedSizeIdx] = useState(0)
+  
+  const selectedVariant = hasVariants ? product.variants[selectedVariantIdx] : null
+  const selectedSize = (selectedVariant && selectedVariant.sizes[selectedSizeIdx]) ? selectedVariant.sizes[selectedSizeIdx] : null
+
   const router = useRouter()
   const supabase = createClient()
 
@@ -78,7 +87,8 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
     }
   }
 
-  const finalPrice = product.price ? (product.price - (product.price * discount / 100)) * quantity : null
+  const basePrice = (selectedSize && selectedSize.price_override) ? Number(selectedSize.price_override) : (product.price || 0)
+  const finalPrice = (basePrice - (basePrice * discount / 100)) * quantity
 
   const handleOrder = async () => {
     if (!customerName.trim() || !customerAddress.trim()) {
@@ -87,8 +97,13 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
     }
     setLoading(true)
     try {
+      const variantInfo = hasVariants ? {
+        color: selectedVariant.color,
+        size: selectedSize?.size
+      } : null
+
       const finalPaymentMethod = (paymentMethod === 'الدفع عند الاستلام' && settings.cod_deposit_required) ? 'الدفع عند الاستلام (عربون)' : paymentMethod
-      const result = await createOrder(product, couponCode, customerName.trim(), customerAddress.trim(), customerPhone.trim(), finalPaymentMethod, storeId, idempotencyKey, quantity)
+      const result = await createOrder(product, couponCode, customerName.trim(), customerAddress.trim(), customerPhone.trim(), finalPaymentMethod, storeId, idempotencyKey, quantity, variantInfo, basePrice)
       if (result.success && result.orderId) {
         toast.success('تم تسجيل الطلب بنجاح!')
         setIdempotencyKey(crypto.randomUUID())
@@ -105,137 +120,170 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
   }
 
   const handleAddToCart = () => {
-    const newItem = { id: product.id, name: product.name, price: product.price ?? 0, original_price: product.original_price ?? undefined, image_url: product.image_url ?? undefined, description: product.description ?? undefined, quantity }
-    addItem(newItem)
-    
-    // Immediate fallback persistence
-    try {
-      const cartKey = storeSlug ? `cart_${storeSlug}` : 'cart'
-      const saved = localStorage.getItem(cartKey)
-      const items = saved ? JSON.parse(saved) : []
-      const existing = items.find((i: any) => i.id === newItem.id)
-      let next
-      if (existing) {
-        next = items.map((i: any) => i.id === newItem.id ? { ...i, quantity: i.quantity + newItem.quantity } : i)
-      } else {
-        next = [...items, newItem]
-      }
-      localStorage.setItem(cartKey, JSON.stringify(next))
-    } catch (e) {}
+    const variantInfo = hasVariants ? {
+      color: selectedVariant.color,
+      size: selectedSize?.size
+    } : null
 
+    // Generate a unique ID for this specific variant combination
+    const variantKey = variantInfo ? `-${variantInfo.color}-${variantInfo.size}` : ''
+    const cartItemId = `${product.id}${variantKey}`
+
+    const newItem = { 
+      id: product.id, 
+      cartItemId,
+      name: product.name, 
+      price: basePrice, 
+      original_price: product.original_price ?? undefined, 
+      image_url: product.image_url ?? undefined, 
+      description: product.description ?? undefined, 
+      quantity,
+      variant_info: variantInfo
+    }
+    addItem(newItem)
     toast.success('تمت الإضافة للسلة')
   }
 
   if (isElegant) {
     return (
-      <div className="space-y-10">
-        <div className="space-y-2">
-          {/* Countdown Timer (Themed) */}
-          {product.sale_end_date && new Date(product.sale_end_date) > new Date() && (
-            <CountdownTimer endDate={product.sale_end_date} selectedTheme={selectedTheme} />
-          )}
-
-          {/* Stock info removed from here to avoid duplication with the main page badges */}
+      <div className="space-y-8">
+        {/* Dynamic Price Display - Styled to match Elegant theme header */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-6">
+            <div className="text-4xl font-bold text-[var(--primary)] tracking-tighter">
+              {finalPrice?.toLocaleString()} <span className="text-sm font-black opacity-60">ج.م</span>
+            </div>
+            {product.original_price && Number(product.original_price) > basePrice && (
+              <div className="text-lg font-bold text-zinc-300 line-through decoration-zinc-100">
+                {Number(product.original_price).toLocaleString()} ج.م
+              </div>
+            )}
+          </div>
+          
+          {/* Stock Badge */}
+          <div className="flex items-center gap-2">
+            <div className={`h-1.5 w-1.5 rounded-full ${product.stock === 0 ? 'bg-zinc-200' : 'bg-[var(--primary)] animate-pulse'}`} />
+            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+              {product.stock === 0 ? 'غير متوفر حالياً' : 'متوفر في المخزون'}
+            </span>
+          </div>
         </div>
+
+        {/* Variants Selection (Elegant) */}
+        {hasVariants && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {/* Colors - Only show if color name is not "مقاسات المنتج" */}
+            {selectedVariant.color !== 'مقاسات المنتج' && (
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">اختر اللون</label>
+                  <span className="text-[10px] font-black text-[var(--primary)]">{selectedVariant.color}</span>
+                </div>
+                <div className="flex flex-wrap gap-4">
+                  {product.variants.map((v: any, i: number) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => {
+                        setSelectedVariantIdx(i)
+                        setSelectedSizeIdx(0)
+                      }}
+                      className={`group relative h-9 w-9 rounded-full transition-all duration-500 ${selectedVariantIdx === i ? 'ring-1 ring-offset-4 ring-[var(--primary)] scale-110' : 'opacity-40 hover:opacity-100 hover:scale-105'}`}
+                      style={{ backgroundColor: v.hex }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Sizes */}
+            <div className="space-y-4">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">المقاس المتاح</label>
+              <div className="flex flex-wrap gap-3">
+                {selectedVariant.sizes.map((s: any, i: number) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setSelectedSizeIdx(i)}
+                    className={`px-6 py-3 text-[10px] font-black uppercase tracking-widest border transition-all duration-500 rounded-none ${selectedSizeIdx === i ? 'border-[var(--primary)] bg-[var(--primary)] text-white shadow-lg' : 'border-zinc-100 text-zinc-400 hover:border-zinc-300'}`}
+                  >
+                    {s.size}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
-              <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">الاسم</label>
-              <input value={customerName} onChange={e => setCustomerName(e.target.value)} disabled={product.stock === 0} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all rounded-none disabled:bg-zinc-900/10 disabled:text-zinc-400 disabled:cursor-not-allowed" placeholder="الاسم بالكامل..." />
+              <label className="text-[9px] font-black uppercase tracking-widest text-zinc-300 px-1">الاسم</label>
+              <input value={customerName} onChange={e => setCustomerName(e.target.value)} disabled={product.stock === 0} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all rounded-none" placeholder="الاسم بالكامل..." />
             </div>
             <div className="space-y-1">
-              <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">رقم الهاتف</label>
-              <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} disabled={product.stock === 0} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all text-right rounded-none disabled:bg-zinc-900/10 disabled:text-zinc-400 disabled:cursor-not-allowed" dir="ltr" placeholder="01234567890" />
+              <label className="text-[9px] font-black uppercase tracking-widest text-zinc-300 px-1">رقم الهاتف</label>
+              <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} disabled={product.stock === 0} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all text-right rounded-none" dir="ltr" placeholder="01xxxxxxxxx" />
             </div>
           </div>
           <div className="space-y-1">
-            <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">العنوان</label>
-            <input value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} disabled={product.stock === 0} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all rounded-none disabled:bg-zinc-900/10 disabled:text-zinc-400 disabled:cursor-not-allowed" placeholder="المدينة، الشارع، رقم المنزل..." />
+            <label className="text-[9px] font-black uppercase tracking-widest text-zinc-300 px-1">العنوان</label>
+            <input value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} disabled={product.stock === 0} className="w-full bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all rounded-none" placeholder="المدينة، الشارع، رقم المنزل..." />
           </div>
 
           <div className="space-y-4">
-            <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">طريقة الدفع</label>
+            <label className="text-[9px] font-black uppercase tracking-widest text-zinc-300 px-1">طريقة الدفع</label>
             <div className="flex flex-col sm:flex-row gap-4">
               {['الدفع عند الاستلام', 'تحويل بنكي / محافظ إلكترونية'].map(m => (
-                <button key={m} onClick={() => setPaymentMethod(m)} className={`flex-1 p-4 text-[10px] font-black uppercase tracking-widest border transition-all duration-500 rounded-none ${paymentMethod === m ? 'border-[var(--primary)] bg-[var(--primary)] text-white' : 'border-zinc-100 text-zinc-400 hover:border-[var(--primary)]/30'}`}>
-                  {m}
-                </button>
+                <div key={m} className="flex-1 flex flex-col gap-2">
+                  <button onClick={() => setPaymentMethod(m)} className={`w-full p-4 text-[10px] font-black uppercase tracking-widest border transition-all duration-500 rounded-none ${paymentMethod === m ? 'border-[var(--primary)] bg-[var(--primary)] text-white shadow-lg' : 'border-zinc-100 text-zinc-400 hover:border-zinc-300'}`}>
+                    {m}
+                  </button>
+                  {m === 'الدفع عند الاستلام' && settings.cod_deposit_required && (
+                    <p className="text-[10px] text-[var(--primary)] font-black text-center animate-pulse">
+                      مقدم {settings.deposit_percentage}% ({Number((finalPrice * settings.deposit_percentage) / 100).toFixed(2)} ج.م)
+                    </p>
+                  )}
+                </div>
               ))}
             </div>
-            {paymentMethod === 'الدفع عند الاستلام' && settings.cod_deposit_required && (
-              <div className="p-4 bg-zinc-50 border border-zinc-100 text-[10px] font-black uppercase tracking-widest text-zinc-900 flex justify-between items-center rounded-none">
-                <span>مقدم مطلوب ({settings.deposit_percentage}%)</span>
-                <span>{finalPrice ? ((finalPrice * settings.deposit_percentage) / 100).toLocaleString() : '0'} ج.م</span>
-              </div>
-            )}
           </div>
 
-          {/* Coupon Section */}
-          <div className="space-y-4 pt-4 border-t border-zinc-100">
-            <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">كوبون الخصم</label>
-            <div className="flex gap-4">
-              <input
-                value={couponCode}
-                onChange={e => setCouponCode(e.target.value)}
-                className="flex-1 bg-zinc-50 border-none p-4 text-xs focus:ring-1 focus:ring-[var(--primary)] transition-all uppercase tracking-widest rounded-none"
-                placeholder="أدخل الكود..."
-              />
-              <button
-                onClick={applyCoupon}
-                disabled={loading || !couponCode}
-                className="px-8 bg-[var(--primary)] text-white text-[10px] font-black uppercase tracking-widest hover:brightness-125 transition-all disabled:brightness-75 rounded-none"
-              >
-                تطبيق
-              </button>
-            </div>
-            {discount > 0 && <p className="text-[10px] font-black text-emerald-600">تم تطبيق خصم {discount}%</p>}
+          {/* Coupon */}
+          <div className="flex gap-4 p-1 bg-zinc-50 rounded-none mt-4">
+            <input
+              value={couponCode}
+              onChange={e => setCouponCode(e.target.value)}
+              className="flex-1 bg-transparent border-none p-3 text-xs focus:ring-0 uppercase tracking-widest"
+              placeholder="كوبون خصم؟"
+            />
+            <button
+              onClick={applyCoupon}
+              disabled={loading || !couponCode}
+              className="px-6 bg-[var(--primary)] text-white text-[10px] font-black uppercase tracking-widest hover:brightness-110 transition-all disabled:opacity-50"
+            >
+              تطبيق
+            </button>
           </div>
+          {discount > 0 && <p className="text-[10px] font-black text-emerald-600 px-1">✓ تم تفعيل خصم {discount}%</p>}
 
           <div className="pt-6 space-y-4">
             <div className="flex gap-4">
-              <div className="flex items-center bg-zinc-50 px-2 py-2 gap-2 rounded-none">
-                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-12 h-12 flex items-center justify-center text-zinc-400 hover:text-[var(--primary)] transition-colors"><Minus className="h-4 w-4" /></button>
-                <span className="text-base font-black w-8 text-center">{quantity}</span>
-                <button onClick={() => setQuantity(quantity + 1)} className="w-12 h-12 flex items-center justify-center text-zinc-400 hover:text-[var(--primary)] transition-colors"><Plus className="h-4 w-4" /></button>
+              <div className="flex items-center bg-zinc-50 px-2 gap-2">
+                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-10 h-10 flex items-center justify-center text-zinc-300 hover:text-zinc-900 transition-colors"><Minus className="h-3 w-3" /></button>
+                <span className="text-xs font-black w-6 text-center">{quantity}</span>
+                <button onClick={() => setQuantity(quantity + 1)} className="w-10 h-10 flex items-center justify-center text-zinc-300 hover:text-zinc-900 transition-colors"><Plus className="h-3 w-3" /></button>
               </div>
               <div className="flex-1 relative flex gap-4">
-                <button onClick={handleAddToCart} className="flex-1 bg-white border border-[var(--primary)] text-[var(--primary)] h-14 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[var(--primary)] hover:text-white transition-all duration-500 rounded-none">
+                <button onClick={handleAddToCart} className="flex-1 bg-white border border-[var(--primary)] text-[var(--primary)] h-14 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[var(--primary)] hover:text-white transition-all duration-500">
                   <ShoppingCart className="h-4 w-4" />
                   <span className="hidden sm:inline">إضافة للسلة</span>
                 </button>
-                <WishlistButton product={{...product, store_id: storeId}} />
+                <WishlistButton product={{ ...product, store_id: storeId }} />
               </div>
             </div>
-            {/* Store Policies (Elegant) */}
-            <div className="py-6 border-y border-zinc-50 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {[
-                  { icon: Truck, label: 'توصيل سريع لكل المحافظات' },
-                  { icon: HeartHandshake, label: 'الدفع عند الاستلام متاح' },
-                  { icon: ShieldCheck, label: 'تسوق آمن وضمان 100%' }
-                ].map((policy, idx) => (
-                  <div key={idx} className="flex items-center gap-3">
-                    <div className="h-7 w-7 rounded-full bg-zinc-50 flex items-center justify-center text-zinc-400">
-                      <policy.icon className="h-3.5 w-3.5" />
-                    </div>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 leading-tight">
-                      {policy.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              
-              {settings.policies && (
-                <div className="p-4 bg-zinc-50/50 border border-zinc-100 rounded-none">
-                  <p className="text-[10px] text-zinc-500 leading-relaxed font-medium">
-                    {settings.policies}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <button onClick={handleOrder} disabled={loading || product.stock === 0} className={`w-full h-16 flex items-center justify-center text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-lg rounded-none ${product.stock === 0 ? 'bg-zinc-900 text-zinc-400 cursor-not-allowed opacity-100' : 'bg-[var(--primary)] text-white hover:brightness-125 disabled:brightness-75'}`}>
+            
+            <button onClick={handleOrder} disabled={loading || product.stock === 0} className={`w-full h-16 flex items-center justify-center text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-xl rounded-none ${product.stock === 0 ? 'bg-zinc-200 text-zinc-400 cursor-not-allowed' : 'bg-[var(--primary)] text-white hover:brightness-110'}`}>
               {loading ? 'جاري التنفيذ...' : product.stock === 0 ? 'غير متوفر حالياً' : 'تأكيد الطلب الآن'}
             </button>
           </div>
@@ -254,9 +302,9 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
               <div className="flex flex-col">
                 <div className="flex items-center gap-3">
                   <span className="text-5xl font-black text-primary-600">
-                    {Number(finalPrice).toFixed(2)}
+                    {Number(finalPrice / quantity).toFixed(2)}
                   </span>
-                  {(product.price && ((product.original_price && product.original_price > product.price) || discount > 0)) && (
+                  {(product.price && ((product.original_price && product.original_price > basePrice) || discount > 0)) && (
                     <span className="text-2xl line-through text-zinc-400 font-bold">
                       {Number(product.original_price || product.price).toFixed(2)}
                     </span>
@@ -270,17 +318,72 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
           )}
         </div>
 
-
         {/* Countdown Timer */}
         {product.sale_end_date && new Date(product.sale_end_date) > new Date() && (
           <div className="mt-4 animate-in slide-in-from-bottom-2 duration-500">
             <CountdownTimer endDate={product.sale_end_date} />
           </div>
         )}
-
-        {/* Stock Status */}
-        {/* Stock status removed from here to avoid duplication */}
       </div>
+
+      <div className="h-px bg-primary-100" />
+
+      {/* Variants Selection (Default) */}
+      {hasVariants && (
+        <div className="space-y-6 animate-in fade-in slide-in-from-top-2 duration-500">
+          {/* Colors - Only show if not "مقاسات المنتج" */}
+          {selectedVariant.color !== 'مقاسات المنتج' && (
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+                <div className="h-1 w-1 bg-primary-500 rounded-full" /> اختر اللون:
+              </label>
+              <div className="flex flex-wrap gap-3">
+                {product.variants.map((v: any, i: number) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => {
+                      setSelectedVariantIdx(i)
+                      setSelectedSizeIdx(0)
+                    }}
+                    className={`group relative flex flex-col items-center gap-2 transition-all ${selectedVariantIdx === i ? 'scale-110' : 'opacity-60 hover:opacity-100'}`}
+                  >
+                    <div 
+                      className={`h-10 w-10 rounded-full border-4 transition-all shadow-md ${selectedVariantIdx === i ? 'border-primary-500 ring-4 ring-primary-100' : 'border-white'}`}
+                      style={{ backgroundColor: v.hex }}
+                    />
+                    <span className={`text-[10px] font-black tracking-tight ${selectedVariantIdx === i ? 'text-primary-600' : 'text-zinc-400'}`}>
+                      {v.color}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Sizes */}
+          <div className="space-y-3">
+            <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest flex items-center gap-2">
+              <div className="h-1 w-1 bg-primary-500 rounded-full" /> المقاس المتاح:
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {selectedVariant.sizes.map((s: any, i: number) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setSelectedSizeIdx(i)}
+                  className={`px-5 py-2 rounded-xl text-xs font-black transition-all border-2 ${selectedSizeIdx === i ? 'bg-primary-600 border-primary-600 text-white shadow-lg shadow-primary-200' : 'bg-white border-zinc-100 text-zinc-500 hover:border-primary-200'}`}
+                >
+                  {s.size}
+                  {s.price_override && Number(s.price_override) !== product.price && (
+                    <span className="block text-[8px] opacity-70 mt-0.5">{s.price_override} ج.م</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="h-px bg-primary-100" />
 
@@ -450,10 +553,11 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
 
           <button
             onClick={handleAddToCart}
-            className="w-full sm:flex-[1] flex items-center justify-center gap-2 h-14 bg-white border border-[var(--primary)] text-[var(--primary)] rounded-2xl font-black text-sm hover:bg-[var(--primary)]/5 transition-all shadow-sm"
+            className="w-full sm:flex-[1] flex items-center justify-center gap-2 h-14 bg-[var(--primary)]/10 border-2 border-[var(--primary)] text-[var(--primary)] rounded-2xl font-black text-sm hover:bg-[var(--primary)] transition-all hover:text-white shadow-sm active:scale-95 group"
+            title="إضافة للسلة"
           >
-            <ShoppingCart className="h-5 w-5" />
-            إضافة للسلة
+            <ShoppingCart className="h-5 w-5 group-hover:scale-110 transition-transform" />
+            <span className="hidden sm:inline">إضافة للسلة</span>
           </button>
         </div>
         <p className="text-center text-xs text-zinc-400">

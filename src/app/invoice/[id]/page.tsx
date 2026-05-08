@@ -320,11 +320,18 @@ export default async function InvoicePage({
                         المنتجات
                      </h4>
                      <div className="space-y-6">
-                        {(items.length > 0 ? items : [{ product_name: order.product_name, quantity: 1, product_price: order.product_price }]).map((item: any, idx: number) => (
+                        {(items.length > 0 ? items : [{ product_name: order.product_name, quantity: 1, product_price: order.product_price, variant_info: order.variant_info }]).map((item: any, idx: number) => (
                            <div key={idx} className="flex justify-between items-center group">
                               <div className="flex items-center gap-6">
                                  <span className="text-[10px] font-bold text-[var(--primary)] italic">{item.quantity}x</span>
-                                 <span className="text-sm font-bold text-zinc-900 uppercase tracking-wide group-hover:text-[var(--primary)] transition-colors">{item.product_name}</span>
+                                 <div className="flex flex-col">
+                                    <span className="text-sm font-bold text-zinc-900 uppercase tracking-wide group-hover:text-[var(--primary)] transition-colors">{item.product_name}</span>
+                                    {item.variant_info && (item.variant_info.color || item.variant_info.size) && (
+                                       <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest mt-1">
+                                          {[item.variant_info.color, item.variant_info.size].filter(Boolean).join(' / ')}
+                                       </span>
+                                    )}
+                                 </div>
                               </div>
                               <span className="text-sm font-light text-zinc-400">{(item.product_price * item.quantity).toLocaleString()} ج.م</span>
                            </div>
@@ -529,11 +536,18 @@ export default async function InvoicePage({
                         <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-800">محتويات الطلب</h4>
                      </div>
                      <div className="space-y-6 px-4">
-                        {(items.length > 0 ? items : [{ product_name: order.product_name, quantity: 1, product_price: order.product_price }]).map((item: any, idx: number) => (
+                        {(items.length > 0 ? items : [{ product_name: order.product_name, quantity: 1, product_price: order.product_price, variant_info: order.variant_info }]).map((item: any, idx: number) => (
                            <div key={idx} className="flex justify-between items-center group">
                               <div className="flex items-center gap-6">
                                  <span className="text-xs font-serif italic text-rose-300">{item.quantity}x</span>
-                                 <span className="text-sm font-bold text-zinc-800 uppercase tracking-wide">{item.product_name}</span>
+                                 <div className="flex flex-col">
+                                    <span className="text-sm font-bold text-zinc-800 uppercase tracking-wide">{item.product_name}</span>
+                                    {item.variant_info && (item.variant_info.color || item.variant_info.size) && (
+                                       <span className="text-[9px] font-black text-[var(--primary)] uppercase tracking-[0.2em] mt-1">
+                                          {[item.variant_info.color, item.variant_info.size].filter(Boolean).join(' • ')}
+                                       </span>
+                                    )}
+                                 </div>
                               </div>
                               <span className="text-sm font-medium text-zinc-400">{(item.product_price * item.quantity).toLocaleString()} ج.م</span>
                            </div>
@@ -746,13 +760,20 @@ export default async function InvoicePage({
                         <h4 className="text-[10px] font-black uppercase tracking-widest text-zinc-800">محتويات الطلب</h4>
                      </div>
                      <div className="space-y-4 px-4">
-                        {(items.length > 0 ? items : [{ product_name: order.product_name, quantity: 1, product_price: order.product_price }]).map((item: any, idx: number) => (
+                        {(items.length > 0 ? items : [{ product_name: order.product_name, quantity: 1, product_price: order.product_price, variant_info: order.variant_info }]).map((item: any, idx: number) => (
                            <div key={idx} className="flex justify-between items-center group py-4 border-b border-zinc-50 last:border-0">
                               <div className="flex items-center gap-4">
                                  <div className="h-8 w-8 rounded bg-zinc-50 flex items-center justify-center font-black text-zinc-400 text-[10px]">
                                     {item.quantity}x
                                  </div>
-                                 <span className="text-sm font-bold text-zinc-800">{item.product_name}</span>
+                                 <div className="flex flex-col">
+                                    <span className="text-sm font-bold text-zinc-800">{item.product_name}</span>
+                                    {item.variant_info && (item.variant_info.color || item.variant_info.size) && (
+                                       <span className="text-[10px] font-bold text-primary-600 mt-1">
+                                          {[item.variant_info.color, item.variant_info.size].filter(Boolean).join(' / ')}
+                                       </span>
+                                    )}
+                                 </div>
                               </div>
                               <span className="text-sm font-medium text-zinc-400">{(item.product_price * item.quantity).toLocaleString()} ج.م</span>
                            </div>

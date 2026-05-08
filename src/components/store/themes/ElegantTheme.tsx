@@ -3,7 +3,7 @@
 import React from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { ArrowLeft, MessageSquare, ShoppingBag, Heart, Star, Share2, MapPin, Truck } from 'lucide-react'
 import { KayaBadge } from '@/components/store/KayaBadge'
 import { useCart } from '@/context/CartContext'
@@ -12,6 +12,7 @@ import toast from 'react-hot-toast'
 
 // ─── ELEGANT PRODUCT CARD ───────────────────────────────────────────────────
 export const ElegantProductCard = ({ product, slug }: any) => {
+  const router = useRouter()
   const { toggleItem, isInWishlist } = useWishlist()
   const isWishlisted = isInWishlist(product.id)
   const productImage = product.image_url || (product.images && product.images.length > 0 ? product.images[0] : 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2670&auto=format&fit=crop')
@@ -44,31 +45,33 @@ export const ElegantProductCard = ({ product, slug }: any) => {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+
+    // If product has variants, redirect to product page instead of adding directly
+    const hasVariants = product.variants && product.variants.length > 0
+    
+    if (hasVariants) {
+      toast('يرجى اختيار المقاس واللون أولاً ثم الضغط على زر "أضف للسلة"', { icon: '📝' })
+      router.push(`/store/${slug}/products/${product.id}`)
+      return
+    }
+
+    // Generate cartItemId for simple products
+    const cartItemId = `${product.id}-none-none`
+
     const newItem = {
       id: product.id,
+      cartItemId: cartItemId,
       name: product.name,
       price: product.price || 0,
       original_price: product.original_price,
       image_url: productImage,
-      quantity: 1
+      quantity: 1,
+      variant_info: {
+        color: undefined,
+        size: undefined
+      }
     }
     addItem(newItem)
-    
-    // Direct sync fallback
-    try {
-      const cartKey = slug ? `cart_${slug}` : 'cart'
-      const saved = localStorage.getItem(cartKey)
-      const items = saved ? JSON.parse(saved) : []
-      const existing = items.find((i: any) => i.id === newItem.id)
-      let next
-      if (existing) {
-        next = items.map((i: any) => i.id === newItem.id ? { ...i, quantity: i.quantity + 1 } : i)
-      } else {
-        next = [...items, newItem]
-      }
-      localStorage.setItem(cartKey, JSON.stringify(next))
-    } catch (e) {}
-
     toast.success('تمت الإضافة للسلة')
   }
 

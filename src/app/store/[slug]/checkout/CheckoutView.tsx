@@ -216,10 +216,17 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
                    </h3>
                    <div className="space-y-6">
                       {items.map(item => (
-                        <div key={item.id} className="flex justify-between items-center group">
+                        <div key={item.cartItemId} className="flex justify-between items-center group">
                            <div className="flex items-center gap-4">
                               <span className="h-6 w-6 rounded-none bg-white flex items-center justify-center text-[10px] font-bold text-[var(--primary)] shadow-sm border border-zinc-100">{item.quantity}</span>
-                              <span className="text-sm font-bold text-zinc-900 uppercase tracking-wide truncate max-w-[120px] sm:max-w-[150px] group-hover:text-[var(--primary)] transition-colors">{item.name}</span>
+                              <div className="flex flex-col">
+                                <span className="text-sm font-bold text-zinc-900 uppercase tracking-wide truncate max-w-[120px] sm:max-w-[150px] group-hover:text-[var(--primary)] transition-colors">{item.name}</span>
+                                {item.variant_info && (item.variant_info.color || item.variant_info.size) && (
+                                  <span className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mt-1">
+                                    {[item.variant_info.color, item.variant_info.size].filter(Boolean).join(' / ')}
+                                  </span>
+                                )}
+                              </div>
                            </div>
                            <span className="text-sm font-bold text-[var(--primary)]">{(item.price * item.quantity).toLocaleString()} ج.م</span>
                         </div>
@@ -374,10 +381,17 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
                    <h3 className="text-lg font-sans font-bold text-[#2B2B2B] border-b border-rose-50 pb-4">ملخص الطلب</h3>
                    <div className="space-y-4">
                       {items.map(item => (
-                        <div key={item.id} className="flex justify-between items-center group bg-[#FAF3F0]/20 p-4 rounded-2xl border border-rose-50/50">
+                        <div key={item.cartItemId} className="flex justify-between items-center group bg-[#FAF3F0]/20 p-4 rounded-2xl border border-rose-50/50">
                            <div className="flex items-center gap-3">
                               <span className="h-6 w-6 rounded-full bg-white border border-rose-100 flex items-center justify-center text-xs font-bold text-[var(--primary)]">{item.quantity}</span>
-                              <span className="text-sm font-bold text-[#2B2B2B] truncate max-w-[120px] sm:max-w-[150px]">{item.name}</span>
+                              <div className="flex flex-col">
+                                <span className="text-sm font-bold text-[#2B2B2B] truncate max-w-[120px] sm:max-w-[150px]">{item.name}</span>
+                                {item.variant_info && (item.variant_info.color || item.variant_info.size) && (
+                                  <span className="text-[10px] font-bold text-rose-300">
+                                    {[item.variant_info.color, item.variant_info.size].filter(Boolean).join(' • ')}
+                                  </span>
+                                )}
+                              </div>
                            </div>
                            <span className="text-sm font-black text-[var(--primary)]">{(item.price * item.quantity).toLocaleString()} ج.م</span>
                         </div>
@@ -572,10 +586,17 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
             <div className="bg-white rounded-[2rem] md:rounded-[2.5rem] border border-zinc-100 p-6 md:p-8 shadow-xl shadow-zinc-200/50 space-y-6">
               <div className="space-y-4">
                 {items.map(item => (
-                  <div key={item.id} className="flex justify-between items-center text-sm">
+                  <div key={item.cartItemId} className="flex justify-between items-center text-sm">
                     <div className="flex gap-3 items-center overflow-hidden">
                       <span className="h-6 w-6 shrink-0 flex items-center justify-center bg-zinc-100 rounded-md font-black text-[10px]">{item.quantity}x</span>
-                      <span className="font-bold text-zinc-700 truncate">{item.name}</span>
+                      <div className="flex flex-col overflow-hidden">
+                        <span className="font-bold text-zinc-700 truncate">{item.name}</span>
+                        {item.variant_info && (item.variant_info.color || item.variant_info.size) && (
+                          <span className="text-[10px] font-bold text-zinc-400">
+                            {[item.variant_info.color, item.variant_info.size].filter(Boolean).join(' / ')}
+                          </span>
+                        )}
+                      </div>
                     </div>
                     <span className="font-black text-zinc-900 shrink-0">{(item.price * item.quantity).toLocaleString()} ج.م</span>
                   </div>

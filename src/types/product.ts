@@ -12,5 +12,6 @@ export interface Product {
   stock: number | null;
   sale_end_date: string | null;
   is_visible: boolean;
+  variants?: any[];
   created_at: string;
 }

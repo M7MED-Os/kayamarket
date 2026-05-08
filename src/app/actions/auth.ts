@@ -139,8 +139,19 @@ export async function registerMerchant(formData: FormData) {
   }
 
   // 3c. تهيئة الإعدادات
+  // جلب الثيم الافتراضي من النظام
+  const { data: defaultTheme } = await admin
+    .from('platform_themes')
+    .select('id')
+    .eq('is_default', true)
+    .maybeSingle()
+
   await admin.from('store_settings').insert({ store_id: storeId, cod_enabled: true, cod_deposit_required: false, deposit_percentage: 50 })
-  await admin.from('store_branding').insert({ store_id: storeId, primary_color: '#e11d48' })
+  await admin.from('store_branding').insert({ 
+    store_id: storeId, 
+    primary_color: '#e11d48',
+    selected_theme: defaultTheme?.id || 'default'
+  })
 
   if (isPending) {
     return { 
