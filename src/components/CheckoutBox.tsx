@@ -38,8 +38,8 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
   const [selectedVariantIdx, setSelectedVariantIdx] = useState(0)
   const [selectedSizeIdx, setSelectedSizeIdx] = useState(0)
   
-  const selectedVariant = hasVariants ? product.variants[selectedVariantIdx] : null
-  const selectedSize = (selectedVariant && selectedVariant.sizes[selectedSizeIdx]) ? selectedVariant.sizes[selectedSizeIdx] : null
+  const selectedVariant = (hasVariants && product.variants) ? product.variants[selectedVariantIdx] : null
+  const selectedSize = (selectedVariant && selectedVariant.sizes && selectedVariant.sizes[selectedSizeIdx]) ? selectedVariant.sizes[selectedSizeIdx] : null
 
   const router = useRouter()
   const supabase = createClient()
