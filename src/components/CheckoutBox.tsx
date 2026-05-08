@@ -120,10 +120,10 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
   }
 
   const handleAddToCart = () => {
-    const variantInfo = hasVariants ? {
-      color: selectedVariant.color,
-      size: selectedSize?.size
-    } : null
+    const variantInfo = (hasVariants && selectedVariant) ? {
+      color: selectedVariant.color as string | undefined,
+      size: selectedSize?.size as string | undefined
+    } : undefined
 
     // Generate a unique ID for this specific variant combination
     const variantKey = variantInfo ? `-${variantInfo.color}-${variantInfo.size}` : ''
