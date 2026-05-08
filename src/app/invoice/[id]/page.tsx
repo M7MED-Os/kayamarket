@@ -3,6 +3,9 @@ import { headers } from 'next/headers'
 import { getStoreById } from '@/lib/tenant/get-store'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 import { CheckCircle2, Wallet, ArrowRight, Building2, User, MapPin, Phone, MessageSquare, AlertTriangle, Smartphone, CreditCard } from 'lucide-react'
 import { KayaBadge } from '@/components/store/KayaBadge'
 import InvoiceActions from '@/components/InvoiceActions'
@@ -38,6 +41,45 @@ export default async function InvoicePage({
       p_order_id: id,
       p_token: (token && typeof token === 'string' && token !== 'null') ? token : null,
    })
+
+   // 2.5 Manual Fallback (For Vercel stability)
+   if ((!rows || rows.length === 0) && !rpcError) {
+      if (token && typeof token === 'string' && token !== 'null') {
+         const { createAdminClient } = await import('@/lib/supabase/server')
+         const adminSupabase = createAdminClient()
+         const { data: directOrder } = await adminSupabase
+            .from('orders')
+            .select('*, stores(*, store_branding(*), store_settings(*))')
+            .eq('id', id)
+            .eq('public_token', token)
+            .maybeSingle()
+
+         if (directOrder) {
+            const { data: directItems } = await adminSupabase.from('order_items').select('*').eq('order_id', id)
+            const store = (directOrder as any).stores
+            const branding = store?.store_branding?.[0]
+            const settings = store?.store_settings?.[0]
+
+            rows = [{
+               ...directOrder,
+               items: directItems || [],
+               store_name: store?.name,
+               store_slug: store?.slug,
+               whatsapp: store?.whatsapp_phone,
+               plan: store?.plan,
+               logo_url: branding?.logo_url,
+               tagline: branding?.tagline,
+               primary_color: branding?.primary_color,
+               selected_theme: branding?.selected_theme,
+               instapay: branding?.invoice_instapay,
+               wallet: branding?.invoice_wallet,
+               cod_deposit_required: settings?.cod_deposit_required,
+               deposit_percentage: settings?.deposit_percentage,
+               policies: settings?.policies
+            }]
+         }
+      }
+   }
 
    // 3. Fallback for Merchant view
    if ((!rows || rows.length === 0) && user) {
