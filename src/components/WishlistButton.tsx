@@ -15,8 +15,7 @@ export default function WishlistButton({ product }: { product: any }) {
       name: product.name,
       price: product.price,
       image_url: product.image_url,
-      store_id: product.store_id,
-      variants: product.variants
+      store_id: product.store_id
     })
   }
 
