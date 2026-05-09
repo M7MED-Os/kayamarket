@@ -5,6 +5,14 @@ import { assertMerchant } from '@/lib/auth'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { z } from 'zod'
 import { PlanTier, getPlanConfig, getPlanName, getDynamicPlanConfigs } from '@/lib/subscription'
+import { sanitizeHtml, sanitizeObject } from '@/lib/utils/sanitize'
+
+// 🔒 Safe JSON parser — prevents DoS from malformed/oversized payloads
+function safeJsonParse(raw: string | null, maxLength = 50000): any {
+  if (!raw) return null
+  if (raw.length > maxLength) throw new Error('البيانات كبيرة جداً')
+  try { return JSON.parse(raw) } catch { throw new Error('بيانات JSON غير صالحة') }
+}
 
 const productSchema = z.object({
   name: z.string().min(2, 'الاسم يجب أن يكون حرفين على الأقل'),
@@ -42,17 +50,17 @@ export async function createProduct(formData: FormData) {
     const { plan, config } = await getStorePlanConfig(supabase, storeId)
 
     const rawData = {
-      name: formData.get('name'),
-      description: formData.get('description'),
+      name: sanitizeHtml(formData.get('name') as string),
+      description: sanitizeHtml(formData.get('description') as string),
       price: Number(formData.get('price')),
       original_price: formData.get('original_price') ? Number(formData.get('original_price')) : null,
       stock: formData.get('stock') ? Number(formData.get('stock')) : null,
-      category: formData.get('category'),
+      category: sanitizeHtml(formData.get('category') as string),
       image_url: formData.get('image_url'),
-      images: formData.get('images') ? JSON.parse(formData.get('images') as string) : [],
+      images: formData.get('images') ? safeJsonParse(formData.get('images') as string) : [],
       is_visible: formData.get('is_visible') === 'true',
       sale_end_date: formData.get('sale_end_date') || null,
-      variants: formData.get('variants') ? JSON.parse(formData.get('variants') as string) : [],
+      variants: formData.get('variants') ? safeJsonParse(formData.get('variants') as string) : [],
     }
 
     // 1. Check Total Products Limit
@@ -135,17 +143,17 @@ export async function updateProduct(id: string, formData: FormData) {
     const { plan, config } = await getStorePlanConfig(supabase, storeId)
 
     const rawData = {
-      name: formData.get('name'),
-      description: formData.get('description'),
+      name: sanitizeHtml(formData.get('name') as string),
+      description: sanitizeHtml(formData.get('description') as string),
       price: Number(formData.get('price')),
       original_price: formData.get('original_price') ? Number(formData.get('original_price')) : null,
       stock: formData.get('stock') ? Number(formData.get('stock')) : null,
-      category: formData.get('category'),
+      category: sanitizeHtml(formData.get('category') as string),
       image_url: formData.get('image_url'),
-      images: formData.get('images') ? JSON.parse(formData.get('images') as string) : [],
+      images: formData.get('images') ? safeJsonParse(formData.get('images') as string) : [],
       is_visible: formData.get('is_visible') === 'true',
       sale_end_date: formData.get('sale_end_date') || null,
-      variants: formData.get('variants') ? JSON.parse(formData.get('variants') as string) : [],
+      variants: formData.get('variants') ? safeJsonParse(formData.get('variants') as string) : [],
     }
 
     // ✅ Check Images Per Product Limit (now also on update)

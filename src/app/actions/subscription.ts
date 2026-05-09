@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient, createAdminClient } from '@/lib/supabase/server'
-import { assertMerchant } from '@/lib/auth'
+import { assertMerchant, assertSuperAdmin } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 
 export async function submitUpgradeRequest(formData: FormData) {
@@ -46,6 +46,9 @@ export async function submitUpgradeRequest(formData: FormData) {
 }
 
 export async function approveUpgradeRequest(requestId: string, days: number = 30) {
+  // 🔒 Auth Guard: Only Super Admin can approve upgrades
+  const supabase = await createClient()
+  await assertSuperAdmin(supabase)
   const admin = createAdminClient()
   
   try {
@@ -94,7 +97,9 @@ export async function approveUpgradeRequest(requestId: string, days: number = 30
 }
 
 export async function rejectUpgradeRequest(requestId: string, notes: string) {
+  // 🔒 Auth Guard: Only Super Admin can reject upgrades
   const supabase = await createClient()
+  await assertSuperAdmin(supabase)
   
   try {
     const { error } = await supabase

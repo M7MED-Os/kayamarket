@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { assertMerchant } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 
 export async function submitProductReview(
@@ -84,8 +85,10 @@ export async function getProductRatingSummary(productId: string) {
 
 // ── Merchant Actions ─────────────────────────────────────────────────────────
 
-export async function getAllStoreReviews(storeId: string) {
+export async function getAllStoreReviews() {
   const supabase = await createClient()
+  // 🔒 Auth Guard: derive storeId from session, not from client parameter
+  const { storeId } = await assertMerchant(supabase)
   
   const { data, error } = await supabase
     .from('product_reviews')
@@ -104,8 +107,10 @@ export async function getAllStoreReviews(storeId: string) {
   return data
 }
 
-export async function getPendingReviews(storeId: string) {
+export async function getPendingReviews() {
   const supabase = await createClient()
+  // 🔒 Auth Guard: derive storeId from session, not from client parameter
+  const { storeId } = await assertMerchant(supabase)
   
   const { data, error } = await supabase
     .from('product_reviews')

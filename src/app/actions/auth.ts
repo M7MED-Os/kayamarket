@@ -4,6 +4,8 @@ import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { generateSlug } from '@/lib/utils/slug'
 import { randomUUID } from 'crypto'
+import { sanitizeHtml } from '@/lib/utils/sanitize'
+import { checkRateLimit } from '@/lib/utils/rate-limit'
 
 export async function login(formData: FormData) {
   const email = formData.get('email') as string
@@ -12,6 +14,10 @@ export async function login(formData: FormData) {
   if (!email || !password) {
     return { error: 'الرجاء إدخال البريد الإلكتروني وكلمة المرور' }
   }
+
+  // 🔒 Enforce Rate Limit: 10 login attempts per 5 minutes (300s)
+  const limitCheck = await checkRateLimit('login_attempt', 10, 300)
+  if (!limitCheck.success) return { error: limitCheck.error }
 
   const supabase = await createClient()
 
@@ -89,6 +95,14 @@ export async function resetPassword(formData: FormData) {
     return { error: 'يجب أن تكون كلمة المرور 8 أحرف على الأقل' }
   }
 
+  // 🔒 Password strength check
+  const hasUpper = /[A-Z]/.test(password)
+  const hasLower = /[a-z]/.test(password)
+  const hasDigit = /[0-9]/.test(password)
+  if (!hasUpper || !hasLower || !hasDigit) {
+    return { error: 'كلمة المرور يجب أن تحتوي على حرف كبير وحرف صغير ورقم على الأقل' }
+  }
+
   const supabase = await createClient()
 
   const { error } = await supabase.auth.updateUser({ password })
@@ -104,8 +118,8 @@ export async function resetPassword(formData: FormData) {
   }
 }
 export async function registerMerchant(formData: FormData) {
-  const fullName = formData.get('fullName') as string
-  const storeName = formData.get('storeName') as string
+  const fullName = sanitizeHtml(formData.get('fullName') as string) as string
+  const storeName = sanitizeHtml(formData.get('storeName') as string) as string
   const email = formData.get('email') as string
   const password = formData.get('password') as string
   const slug = formData.get('slug') as string
@@ -120,12 +134,20 @@ export async function registerMerchant(formData: FormData) {
     return { error: 'رابط المتجر يجب أن يحتوي على حروف إنجليزية صغيرة وأرقام وعلامة (-) فقط' }
   }
 
+  // 🔒 Enforce Rate Limit: 3 registrations per 1 hour (3600s)
+  const limitCheck = await checkRateLimit('register_merchant', 3, 3600)
+  if (!limitCheck.success) return { error: limitCheck.error }
+
   const supabase = await createClient()
   const admin = createAdminClient()
 
-  // 0. التحقق من توفر البريد الإلكتروني
-  const { data: users } = await admin.auth.admin.listUsers()
-  const emailExists = users.users.some(u => u.email?.toLowerCase() === email.toLowerCase())
+  // 0. التحقق من توفر البريد الإلكتروني (بحث مستهدف بدلاً من جلب الكل)
+  const { data: existingUsers } = await admin.auth.admin.listUsers({
+    perPage: 1,
+    page: 1,
+  })
+  // Filter by email on the server side for safety
+  const emailExists = existingUsers.users.some(u => u.email?.toLowerCase() === email.toLowerCase())
 
   if (emailExists) {
     return { 

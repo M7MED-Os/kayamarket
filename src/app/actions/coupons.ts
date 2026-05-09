@@ -155,17 +155,24 @@ export async function toggleCoupon(id: string, currentStatus: boolean) {
 export async function validateCoupon(code: string, storeId: string) {
   const supabase = await createClient()
 
-  const { data, error } = await supabase
-    .from('coupons')
-    .select('discount_percentage, max_uses, current_uses, expires_at, is_active')
-    .eq('code', code.toUpperCase())
-    .eq('store_id', storeId)
-    .eq('is_active', true)
-    .single()
+  // 🔒 Use secure RPC instead of direct query because coupons table has RLS that blocks public reads
+  const { data, error } = await supabase.rpc('validate_coupon', {
+    p_store_id: storeId,
+    p_code: code
+  })
 
-  if (error || !data) return { error: 'كود الخصم غير صحيح أو غير مفعل' }
-  if (data.expires_at && new Date(data.expires_at) < new Date()) return { error: 'كود الخصم منتهي الصلاحية' }
-  if (data.max_uses !== null && data.current_uses >= data.max_uses) return { error: 'تم استهلاك عدد مرات استخدام هذا الكود' }
+  if (error) {
+    console.error('Coupon validation error:', error)
+    return { error: 'حدث خطأ أثناء التحقق من كود الخصم' }
+  }
 
-  return { success: true, discount: data.discount_percentage }
+  // RPC returns: { is_valid, discount_percentage, error_message }
+  if (!data || data.length === 0) return { error: 'كود الخصم غير صحيح' }
+  
+  const result = data[0]
+  if (!result.is_valid) {
+    return { error: result.error_message || 'كود الخصم غير صحيح' }
+  }
+
+  return { success: true, discount: result.discount_percentage }
 }

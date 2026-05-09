@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server'
 import { assertMerchant } from '@/lib/auth'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { PlanTier, getDynamicPlanConfigs, getPlanConfig, getPlanName } from '@/lib/subscription'
+import { sanitizeHtml } from '@/lib/utils/sanitize'
 
 export async function updateStoreBranding(formData: FormData) {
   const supabase = await createClient()
@@ -18,10 +19,10 @@ export async function updateStoreBranding(formData: FormData) {
     const dynamicConfigs = await getDynamicPlanConfigs(supabase)
     const config = dynamicConfigs[plan] || getPlanConfig(plan)
 
-    const primaryColor = formData.get('primary_color') as string
+    const primaryColor = sanitizeHtml(formData.get('primary_color') as string) as string
     const logoUrl = formData.get('logo_url') as string | null
-    const tagline = formData.get('tagline') as string | null
-    const footerText = formData.get('footer_text') as string | null
+    const tagline = sanitizeHtml(formData.get('tagline') as string) as string | null
+    const footerText = sanitizeHtml(formData.get('footer_text') as string) as string | null
 
     if (!primaryColor) {
       return { success: false, error: 'اللون الرئيسي مطلوب' }

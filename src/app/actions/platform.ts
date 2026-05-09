@@ -1,43 +1,40 @@
 'use server'
 
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, createClient } from '@/lib/supabase/server'
 import { assertSuperAdmin } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 import { getDynamicPlanConfigs } from '@/lib/subscription'
 
-/**
- * Get Platform Global Settings
- */
-export async function getPlatformSettings() {
+// 🔒 Internal helper — does NOT check auth (used by other guarded functions)
+async function _getPlatformSettingsInternal() {
   const admin = createAdminClient()
-  
   try {
     const { data, error } = await admin
       .from('platform_settings')
       .select('*')
       .single()
-
-    if (error) {
-      // If table doesn't exist or is empty, return defaults
-      return {
-        grace_period_days: 3,
-        auto_downgrade_enabled: true
-      }
-    }
-
+    if (error) return { grace_period_days: 3, auto_downgrade_enabled: true }
     return data
-  } catch (error) {
-    return {
-      grace_period_days: 3,
-      auto_downgrade_enabled: true
-    }
+  } catch {
+    return { grace_period_days: 3, auto_downgrade_enabled: true }
   }
+}
+
+/**
+ * Get Platform Global Settings
+ */
+export async function getPlatformSettings() {
+  // Safe to read: The table has public read RLS, and merchants need these rules for UI validation.
+  return _getPlatformSettingsInternal()
 }
 
 /**
  * Update Platform Global Settings
  */
 export async function updatePlatformSettings(updates: any) {
+  // 🔒 Auth Guard: Only Super Admin can update platform settings
+  const supabase = await createClient()
+  await assertSuperAdmin(supabase)
   const admin = createAdminClient()
 
   try {
@@ -63,11 +60,14 @@ export async function updatePlatformSettings(updates: any) {
  * Get Stores Pending Deep Cleanup
  */
 export async function getPendingCleanupStores() {
+  // 🔒 Auth Guard: Only Super Admin can view pending cleanup stores
+  const supabase = await createClient()
+  await assertSuperAdmin(supabase)
   const admin = createAdminClient()
   try {
-    const settings = await getPlatformSettings()
+    const settings = await _getPlatformSettingsInternal()
     const graceDays = settings.grace_period_days
-    
+
     const now = new Date()
     const graceLimit = new Date(now)
     graceLimit.setDate(now.getDate() - graceDays)
@@ -90,12 +90,15 @@ export async function getPendingCleanupStores() {
  * Enforces Grace Period and Data Retention Policies.
  */
 export async function triggerSubscriptionCheck(specificStoreId?: string) {
+  // 🔒 Auth Guard: Only Super Admin can trigger subscription cleanup
+  const supabase = await createClient()
+  await assertSuperAdmin(supabase)
   const admin = createAdminClient()
 
   try {
-    const settings = await getPlatformSettings()
+    const settings = await _getPlatformSettingsInternal()
     const graceDays = settings.grace_period_days
-    
+
     const now = new Date()
     const graceLimit = new Date(now)
     graceLimit.setDate(now.getDate() - graceDays)
@@ -125,7 +128,7 @@ export async function triggerSubscriptionCheck(specificStoreId?: string) {
         const planConfigs = await getDynamicPlanConfigs(admin)
         const maxProds = planConfigs.starter.maxProducts
         const maxCoupons = planConfigs.starter.maxCoupons
-        
+
         // 1.5 Temporarily elevate store to PRO to bypass Postgres PREMIUM_FEATURE Triggers
         await admin.from('stores').update({ plan: 'pro' }).eq('id', store.id)
 
@@ -135,7 +138,7 @@ export async function triggerSubscriptionCheck(specificStoreId?: string) {
         let productsToKeep: any[] = []
 
         if (pFetchErr) {
-           processedDetails.push(`فشل جلب المنتجات: ${pFetchErr.message}`)
+          processedDetails.push(`فشل جلب المنتجات: ${pFetchErr.message}`)
         } else if (products) {
           // A. Delete excess products completely
           if (products.length > maxProds) {
@@ -144,16 +147,16 @@ export async function triggerSubscriptionCheck(specificStoreId?: string) {
             const productIds = productsToDelete.map(p => p.id)
 
             for (const p of productsToDelete) {
-               if (p.image_url) await deleteFromStorage(p.image_url, 'store-assets')
-               if (p.images && Array.isArray(p.images)) {
-                  for (const img of p.images) await deleteFromStorage(img, 'store-assets')
-               }
+              if (p.image_url) await deleteFromStorage(p.image_url, 'store-assets')
+              if (p.images && Array.isArray(p.images)) {
+                for (const img of p.images) await deleteFromStorage(img, 'store-assets')
+              }
             }
             const { error: pErr } = await admin.from('products').delete().in('id', productIds)
             if (!pErr) {
-               deletedProdsCount = productIds.length
+              deletedProdsCount = productIds.length
             } else {
-               processedDetails.push(`خطأ مسح المنتجات: ${pErr.message}`)
+              processedDetails.push(`خطأ مسح المنتجات: ${pErr.message}`)
             }
           } else {
             productsToKeep = products
@@ -162,62 +165,62 @@ export async function triggerSubscriptionCheck(specificStoreId?: string) {
           // B. Enforce image limits on the KEPT products
           const maxImages = planConfigs.starter.maxImagesPerProduct ?? 1
           // Since image_url is the primary image, the extra images array can only hold (maxImages - 1)
-          const allowedExtraImages = Math.max(0, maxImages - 1) 
+          const allowedExtraImages = Math.max(0, maxImages - 1)
           let deletedExtraImagesCount = 0
 
           for (const p of productsToKeep) {
-             if (p.images && Array.isArray(p.images) && p.images.length > allowedExtraImages) {
-                // Determine which images to keep and which to delete
-                const imagesToKeep = p.images.slice(0, allowedExtraImages)
-                const imagesToDelete = p.images.slice(allowedExtraImages)
-                
-                for (const img of imagesToDelete) {
-                   await deleteFromStorage(img, 'store-assets')
-                   deletedExtraImagesCount++
-                }
+            if (p.images && Array.isArray(p.images) && p.images.length > allowedExtraImages) {
+              // Determine which images to keep and which to delete
+              const imagesToKeep = p.images.slice(0, allowedExtraImages)
+              const imagesToDelete = p.images.slice(allowedExtraImages)
 
-                // Update product in DB to remove extra images from the array
-                await admin.from('products').update({ images: imagesToKeep }).eq('id', p.id)
-             }
+              for (const img of imagesToDelete) {
+                await deleteFromStorage(img, 'store-assets')
+                deletedExtraImagesCount++
+              }
+
+              // Update product in DB to remove extra images from the array
+              await admin.from('products').update({ images: imagesToKeep }).eq('id', p.id)
+            }
           }
           if (deletedExtraImagesCount > 0) {
-             processedDetails.push(`تم مسح ${deletedExtraImagesCount} صور إضافية للمنتجات المتبقية.`)
+            processedDetails.push(`تم مسح ${deletedExtraImagesCount} صور إضافية للمنتجات المتبقية.`)
           }
         }
 
         // 3. Cleanup Branding Assets (while still on PRO plan)
         const { data: branding } = await admin.from('store_branding').select('*').eq('store_id', store.id).single()
         if (branding) {
-           if (branding.logo_url) await deleteFromStorage(branding.logo_url, 'store-assets')
-           if (branding.banner_url) await deleteFromStorage(branding.banner_url, 'store-assets')
-           if (branding.favicon_url) await deleteFromStorage(branding.favicon_url, 'store-assets')
-           if (branding.hero_image_url) await deleteFromStorage(branding.hero_image_url, 'store-assets')
+          if (branding.logo_url) await deleteFromStorage(branding.logo_url, 'store-assets')
+          if (branding.banner_url) await deleteFromStorage(branding.banner_url, 'store-assets')
+          if (branding.favicon_url) await deleteFromStorage(branding.favicon_url, 'store-assets')
+          if (branding.hero_image_url) await deleteFromStorage(branding.hero_image_url, 'store-assets')
 
-           const { error: bErr } = await admin.from('store_branding').update({
-              logo_url: null, banner_url: null, favicon_url: null, hero_image_url: null
-           }).eq('store_id', store.id)
-           
-           if (!bErr) {
-             brandingStatus = 'تم المسح'
-           } else {
-             processedDetails.push(`خطأ تحديث الهوية: ${bErr.message}`)
-           }
+          const { error: bErr } = await admin.from('store_branding').update({
+            logo_url: null, banner_url: null, favicon_url: null, hero_image_url: null
+          }).eq('store_id', store.id)
+
+          if (!bErr) {
+            brandingStatus = 'تم المسح'
+          } else {
+            processedDetails.push(`خطأ تحديث الهوية: ${bErr.message}`)
+          }
         } else {
-           processedDetails.push(`تنبيه: لا يوجد سجل هوية (store_branding) لهذا المتجر!`)
+          processedDetails.push(`تنبيه: لا يوجد سجل هوية (store_branding) لهذا المتجر!`)
         }
 
         // 4. Cleanup Coupons
         const { data: coupons } = await admin.from('coupons').select('id').eq('store_id', store.id).order('created_at', { ascending: true })
 
         if (coupons && coupons.length > maxCoupons) {
-           const couponsToDelete = coupons.slice(maxCoupons)
-           const couponIds = couponsToDelete.map(c => c.id)
-           const { error: cErr } = await admin.from('coupons').delete().in('id', couponIds)
-           if (!cErr) {
-             deletedCouponsCount = couponIds.length
-           } else {
-             processedDetails.push(`خطأ مسح الكوبونات: ${cErr.message}`)
-           }
+          const couponsToDelete = coupons.slice(maxCoupons)
+          const couponIds = couponsToDelete.map(c => c.id)
+          const { error: cErr } = await admin.from('coupons').delete().in('id', couponIds)
+          if (!cErr) {
+            deletedCouponsCount = couponIds.length
+          } else {
+            processedDetails.push(`خطأ مسح الكوبونات: ${cErr.message}`)
+          }
         }
 
         // 5. FINALLY: Downgrade to Starter and Clear the expiration marker
@@ -239,17 +242,17 @@ export async function triggerSubscriptionCheck(specificStoreId?: string) {
  * Helper to delete a file from Supabase Storage based on its public URL
  */
 async function deleteFromStorage(url: string, bucket: string) {
-   if (!url || !url.includes('/storage/v1/object/public/')) return
-   
-   const admin = createAdminClient()
-   try {
-      // Extract file path: Everything after the bucket name in the URL
-      const parts = url.split(`/${bucket}/`)
-      if (parts.length < 2) return
-      
-      const filePath = parts[1]
-      await admin.storage.from(bucket).remove([filePath])
-   } catch (error) {
-      console.error(`Failed to delete from storage (${bucket}):`, error)
-   }
+  if (!url || !url.includes('/storage/v1/object/public/')) return
+
+  const admin = createAdminClient()
+  try {
+    // Extract file path: Everything after the bucket name in the URL
+    const parts = url.split(`/${bucket}/`)
+    if (parts.length < 2) return
+
+    const filePath = parts[1]
+    await admin.storage.from(bucket).remove([filePath])
+  } catch (error) {
+    console.error(`Failed to delete from storage (${bucket}):`, error)
+  }
 }

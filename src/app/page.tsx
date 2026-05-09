@@ -5,7 +5,8 @@ import Link from 'next/link'
 import {
   ArrowRight, Languages, Sparkles, MessageCircle,
   FileText, Ticket, Navigation, Palette,
-  Store, UserPlus, Rocket, TrendingUp, Plus, Minus
+  Store, UserPlus, Rocket, TrendingUp, Plus, Minus,
+  ShieldCheck, Cloud
 } from 'lucide-react'
 
 export const KayaLogo = ({ className = "h-9 w-9" }: { className?: string }) => (
@@ -50,7 +51,9 @@ const translations = {
         { title: 'WhatsApp Integration', desc: 'Receive orders and communicate directly with customers via WhatsApp.' },
         { title: 'Live Order Tracking', desc: 'Real-time status updates for customers from "Pending" to "Delivered".' },
         { title: 'Marketing & Coupons', desc: 'Create discount codes and seasonal offers to boost your sales.' },
-        { title: 'Visual Analytics', desc: 'Detailed insights into revenue, visitor traffic, and top-selling products.' }
+        { title: 'Visual Analytics', desc: 'Detailed insights into revenue, visitor traffic, and top-selling products.' },
+        { title: 'Free SSL Certificate', desc: 'Secure hosting with automated Let\'s Encrypt SSL certificates for you and your custom domain.' },
+        { title: 'Cloud Infrastructure', desc: 'Enterprise-grade hosting with auto-scaling and zero-downtime updates.' }
       ]
     },
     steps: {
@@ -101,7 +104,9 @@ const translations = {
         { title: 'الربط مع واتساب', desc: 'استقبل الطلبات وتواصل مباشرة مع عملائك عبر واتساب بنقرة واحدة.' },
         { title: 'تتبع مباشر للطلبات', desc: 'نظام تتبع يتيح لعملائك معرفة حالة طلبهم من "قيد التنفيذ" إلى "تم التوصيل".' },
         { title: 'التسويق والكوبونات', desc: 'أنشئ أكواد خصم وعروض موسمية لزيادة مبيعاتك وجذب عملاء جدد.' },
-        { title: 'تحليلات بصرية', desc: 'رؤية واضحة لأداء متجرك، الأرباح، الزيارات، والمنتجات الأكثر مبيعاً.' }
+        { title: 'تحليلات بصرية', desc: 'رؤية واضحة لأداء متجرك، الأرباح، الزيارات، والمنتجات الأكثر مبيعاً.' },
+        { title: 'أمان وتشفير SSL', desc: 'متجرك محمي بشهادة SSL مجانية وتلقائية تضمن أمان بيانات عملائك.' },
+        { title: 'استضافة سحابية', desc: 'لا تقلق من التحديثات أو سقوط السيرفر، منصتك تعمل على بنية تحتية سحابية متطورة.' }
       ]
     },
     steps: {
@@ -340,6 +345,8 @@ export default function PlatformHomePage() {
                   {i === 3 && <Navigation className="h-8 w-8" />}
                   {i === 4 && <Ticket className="h-8 w-8" />}
                   {i === 5 && <TrendingUp className="h-8 w-8" />}
+                  {i === 6 && <ShieldCheck className="h-8 w-8" />}
+                  {i === 7 && <Cloud className="h-8 w-8" />}
                 </div>
                 <h3 className="text-2xl font-black text-slate-900 mb-4">{feat.title}</h3>
                 <p className="text-slate-500 leading-relaxed font-bold text-sm opacity-70 max-w-[240px]">{feat.desc}</p>

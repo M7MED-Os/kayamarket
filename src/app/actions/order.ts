@@ -54,7 +54,16 @@ export async function createOrderMulti(
   idempotencyKey?: string
 ) {
   try {
+    const { checkRateLimit } = await import('@/lib/utils/rate-limit')
+    
+    // 🔒 Enforce Rate Limit: 5 orders per minute per IP
+    const limitCheck = await checkRateLimit('create_order', 5, 60)
+    if (!limitCheck.success) {
+      return { success: false, error: limitCheck.error }
+    }
+
     const supabase = await createClient()
+    const { sanitizeHtml } = await import('@/lib/utils/sanitize')
 
     // Format items for PostgreSQL JSONB
     const formattedItems = items.map(item => ({
@@ -68,9 +77,9 @@ export async function createOrderMulti(
     const { data, error } = await supabase.rpc('create_order_multi_v2', {
       p_items: formattedItems,
       p_coupon_code: couponCode?.trim() || null,
-      p_customer_name: customerName,
-      p_customer_address: customerAddress,
-      p_customer_phone: customerPhone,
+      p_customer_name: sanitizeHtml(customerName),
+      p_customer_address: sanitizeHtml(customerAddress),
+      p_customer_phone: sanitizeHtml(customerPhone),
       p_payment_method: paymentMethod,
       p_store_id: storeId,
       p_idempotency_key: idempotencyKey

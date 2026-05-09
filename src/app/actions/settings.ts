@@ -4,6 +4,14 @@ import { createClient } from '@/lib/supabase/server'
 import { assertMerchant } from '@/lib/auth'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { PlanTier, getPlanConfig, getDynamicPlanConfigs } from '@/lib/subscription'
+import { sanitizeHtml, sanitizeObject } from '@/lib/utils/sanitize'
+
+// 🔒 Safe JSON parser — prevents DoS from malformed/oversized payloads
+function safeJsonParse(raw: string | null, maxLength = 100000): any {
+  if (!raw) return null
+  if (raw.length > maxLength) throw new Error('البيانات كبيرة جداً')
+  try { return JSON.parse(raw) } catch { throw new Error('بيانات JSON غير صالحة') }
+}
 
 export async function updateStoreSettings(formData: FormData) {
   const supabase = await createClient()
@@ -12,28 +20,28 @@ export async function updateStoreSettings(formData: FormData) {
     const { storeId } = await assertMerchant(supabase)
 
     // 1. Branding Data
-    const storeName = formData.get('store_name') as string
-    const whatsappPhone = formData.get('whatsapp_phone') as string
-    const primaryColor = formData.get('primary_color') as string
+    const storeName = sanitizeHtml(formData.get('store_name') as string) as string
+    const whatsappPhone = sanitizeHtml(formData.get('whatsapp_phone') as string) as string
+    const primaryColor = sanitizeHtml(formData.get('primary_color') as string) as string
     const logoUrl = formData.get('logo_url') as string
     const bannerUrl = formData.get('banner_url') as string
     const faviconUrl = formData.get('favicon_url') as string
-    const tagline = formData.get('tagline') as string
-    const footerText = formData.get('footer_text') as string
+    const tagline = sanitizeHtml(formData.get('tagline') as string) as string
+    const footerText = sanitizeHtml(formData.get('footer_text') as string) as string
     const invoiceInstapay = formData.get('invoice_instapay') as string
     const invoiceWallet = formData.get('invoice_wallet') as string
     const customDomain = formData.get('custom_domain') as string
 
     // Builder Fields
     const showHero = formData.get('show_hero') === 'true'
-    const heroTitle = formData.get('hero_title') as string
-    const heroDescription = formData.get('hero_description') as string
-    const announcementText = formData.get('announcement_text') as string
+    const heroTitle = sanitizeHtml(formData.get('hero_title') as string) as string
+    const heroDescription = sanitizeHtml(formData.get('hero_description') as string) as string
+    const announcementText = sanitizeHtml(formData.get('announcement_text') as string) as string
     const announcementEnabled = formData.get('announcement_enabled') === 'true'
     const facebookUrl = formData.get('facebook_url') as string
     const instagramUrl = formData.get('instagram_url') as string
-    const tiktokUrl = formData.get('tiktok_url') as string
-    const address = formData.get('address') as string
+    const tiktokUrl = sanitizeHtml(formData.get('tiktok_url') as string) as string
+    const address = sanitizeHtml(formData.get('address') as string) as string
     const showHeroMobile = formData.get('show_hero_mobile') === 'true'
 
     // Advanced Builder Fields
@@ -43,25 +51,25 @@ export async function updateStoreSettings(formData: FormData) {
     const headerSettingsRaw = formData.get('header_settings') as string
     const footerSettingsRaw = formData.get('footer_settings') as string
 
-    const sections = sectionsRaw ? JSON.parse(sectionsRaw) : null
-    const headerSettings = headerSettingsRaw ? JSON.parse(headerSettingsRaw) : null
-    const footerSettings = footerSettingsRaw ? JSON.parse(footerSettingsRaw) : null
+    const sections = sectionsRaw ? safeJsonParse(sectionsRaw) : null
+    const headerSettings = headerSettingsRaw ? safeJsonParse(headerSettingsRaw) : null
+    const footerSettings = footerSettingsRaw ? safeJsonParse(footerSettingsRaw) : null
 
     // New Premium Fields
-    const heroAlignment = formData.get('hero_alignment') as string
+    const heroAlignment = sanitizeHtml(formData.get('hero_alignment') as string) as string
     const heroImageUrl = formData.get('hero_image_url') as string
-    const heroCtaText = formData.get('hero_cta_text') as string
+    const heroCtaText = sanitizeHtml(formData.get('hero_cta_text') as string) as string
     const bannerOverlayOpacity = parseInt(formData.get('banner_overlay_opacity') as string) || 50
     const featuresDataRaw = formData.get('features_data') as string
-    const footerDescription = formData.get('footer_description') as string
+    const footerDescription = sanitizeHtml(formData.get('footer_description') as string) as string
 
-    const featuresData = featuresDataRaw ? JSON.parse(featuresDataRaw) : null
+    const featuresData = featuresDataRaw ? sanitizeObject(safeJsonParse(featuresDataRaw)) : null
 
     // 2. General Settings Data
     const codEnabled = formData.get('cod_enabled') === 'true'
     const codDepositRequired = formData.get('cod_deposit_required') === 'true'
     const depositPercentage = parseInt(formData.get('deposit_percentage') as string) || 0
-    const policies = formData.get('policies') as string
+    const policies = sanitizeHtml(formData.get('policies') as string) as string
 
     // --- Update Store Data (Name & Phone & Domain) ---
     const { data: store } = await supabase.from('stores').select('plan, slug').eq('id', storeId).single()
@@ -118,7 +126,7 @@ export async function updateStoreSettings(formData: FormData) {
       features_data: featuresData,
       footer_description: footerDescription || null,
       show_hero_mobile: showHeroMobile,
-      faq_data: formData.get('faq_data') ? JSON.parse(formData.get('faq_data') as string) : null,
+      faq_data: formData.get('faq_data') ? sanitizeObject(safeJsonParse(formData.get('faq_data') as string)) : null,
       selected_theme: formData.get('selected_theme') as string || 'default',
       updated_at: new Date().toISOString()
     }

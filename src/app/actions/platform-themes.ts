@@ -1,11 +1,15 @@
 'use server'
 
-import { createAdminClient } from '@/lib/supabase/server'
+import { createAdminClient, createClient } from '@/lib/supabase/server'
+import { assertSuperAdmin } from '@/lib/auth'
 import { revalidatePath } from 'next/cache'
 
 export async function getPlatformThemes() {
-  const supabase = createAdminClient()
-  const { data, error } = await supabase
+  // 🔒 Auth Guard: Only Super Admin
+  const supabase = await createClient()
+  await assertSuperAdmin(supabase)
+  const admin = createAdminClient()
+  const { data, error } = await admin
     .from('platform_themes')
     .select('*')
     .order('created_at', { ascending: true })
@@ -32,17 +36,20 @@ export async function getPlatformThemes() {
 }
 
 export async function updateThemeSettings(id: string, updates: any) {
-  const supabase = createAdminClient()
+  // 🔒 Auth Guard: Only Super Admin
+  const supabase = await createClient()
+  await assertSuperAdmin(supabase)
+  const admin = createAdminClient()
 
   // If setting as default, first unset other defaults
   if (updates.is_default === true) {
-    await supabase
+    await admin
       .from('platform_themes')
       .update({ is_default: false })
       .neq('id', id)
   }
 
-  const { error } = await supabase
+  const { error } = await admin
     .from('platform_themes')
     .update(updates)
     .eq('id', id)
@@ -53,10 +60,13 @@ export async function updateThemeSettings(id: string, updates: any) {
 }
 
 export async function disableThemeAndMigrate(themeId: string, fallbackThemeId: string = 'default') {
-  const supabase = createAdminClient()
+  // 🔒 Auth Guard: Only Super Admin
+  const supabase = await createClient()
+  await assertSuperAdmin(supabase)
+  const admin = createAdminClient()
 
   // 1. Update the theme status
-  const { error: themeError } = await supabase
+  const { error: themeError } = await admin
     .from('platform_themes')
     .update({ is_active: false, is_visible: false })
     .eq('id', themeId)
@@ -64,7 +74,7 @@ export async function disableThemeAndMigrate(themeId: string, fallbackThemeId: s
   if (themeError) throw themeError
 
   // 2. Migrate all stores using this theme to the fallback theme
-  const { error: migrateError } = await supabase
+  const { error: migrateError } = await admin
     .from('store_branding')
     .update({ selected_theme: fallbackThemeId })
     .eq('selected_theme', themeId)
@@ -77,8 +87,11 @@ export async function disableThemeAndMigrate(themeId: string, fallbackThemeId: s
 }
 
 export async function addPlatformTheme(theme: any) {
-  const supabase = createAdminClient()
-  const { error } = await supabase
+  // 🔒 Auth Guard: Only Super Admin
+  const supabase = await createClient()
+  await assertSuperAdmin(supabase)
+  const admin = createAdminClient()
+  const { error } = await admin
     .from('platform_themes')
     .insert([theme])
 

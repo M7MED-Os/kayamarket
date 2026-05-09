@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { assertMerchant } from '@/lib/auth'
 import { redirect } from 'next/navigation'
-import { Star } from 'lucide-react'
 import { getAllStoreReviews } from '@/app/actions/reviews'
 import AdminReviewsClient from './AdminReviewsClient'
 
@@ -11,16 +10,14 @@ export const metadata = {
 
 export default async function AdminReviewsPage() {
   const supabase = await createClient()
-  let storeId: string
 
   try {
-    const authData = await assertMerchant(supabase)
-    storeId = authData.storeId
+    await assertMerchant(supabase)
   } catch {
     redirect('/login')
   }
 
-  const allReviews = await getAllStoreReviews(storeId)
+  const allReviews = await getAllStoreReviews()
   const pendingCount = allReviews.filter(r => r.status === 'pending').length
   const totalReviews = allReviews.length
 
