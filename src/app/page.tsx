@@ -52,6 +52,7 @@ const translations = {
         { title: 'Live Order Tracking', desc: 'Real-time status updates for customers from "Pending" to "Delivered".' },
         { title: 'Marketing & Coupons', desc: 'Create discount codes and seasonal offers to boost your sales.' },
         { title: 'Visual Analytics', desc: 'Detailed insights into revenue, visitor traffic, and top-selling products.' },
+        { title: 'Free Setup Support', desc: 'We help you set up your store and upload products if you encounter any difficulty.' },
         { title: 'Free SSL Certificate', desc: 'Secure hosting with automated Let\'s Encrypt SSL certificates for you and your custom domain.' },
         { title: 'Cloud Infrastructure', desc: 'Enterprise-grade hosting with auto-scaling and zero-downtime updates.' }
       ]
@@ -104,8 +105,9 @@ const translations = {
         { title: 'الربط مع واتساب', desc: 'استقبل الطلبات وتواصل مباشرة مع عملائك عبر واتساب بنقرة واحدة.' },
         { title: 'تتبع مباشر للطلبات', desc: 'نظام تتبع يتيح لعملائك معرفة حالة طلبهم من "قيد التنفيذ" إلى "تم التوصيل".' },
         { title: 'التسويق والكوبونات', desc: 'أنشئ أكواد خصم وعروض موسمية لزيادة مبيعاتك وجذب عملاء جدد.' },
-        { title: 'تحليلات بصرية', desc: 'رؤية واضحة لأداء متجرك، الأرباح، الزيارات، والمنتجات الأكثر مبيعاً.' },
-        { title: 'أمان وتشفير SSL', desc: 'متجرك محمي بشهادة SSL مجانية وتلقائية تضمن أمان بيانات عملائك.' },
+        { title: 'تحليلات مرئية', desc: 'تقارير مفصلة عن الأرباح، الزيارات، والمنتجات الأكثر مبيعاً في متجرك.' },
+        { title: 'دعم وتجهيز مجاني', desc: 'نوفر لك المساعدة في تجهيز متجرك ورفع منتجاتك إذا واجهت أي صعوبة.' },
+        { title: 'شهادة SSL مجانية', desc: 'استضافة آمنة تماماً مع شهادات SSL تلقائية لمتجرك وللدومين الخاص بك.' },
         { title: 'استضافة سحابية', desc: 'لا تقلق من التحديثات أو سقوط السيرفر، منصتك تعمل على بنية تحتية سحابية متطورة.' }
       ]
     },
@@ -345,8 +347,9 @@ export default function PlatformHomePage() {
                   {i === 3 && <Navigation className="h-8 w-8" />}
                   {i === 4 && <Ticket className="h-8 w-8" />}
                   {i === 5 && <TrendingUp className="h-8 w-8" />}
-                  {i === 6 && <ShieldCheck className="h-8 w-8" />}
-                  {i === 7 && <Cloud className="h-8 w-8" />}
+                  {i === 6 && <Sparkles className="h-8 w-8" />}
+                  {i === 7 && <ShieldCheck className="h-8 w-8" />}
+                  {i === 8 && <Cloud className="h-8 w-8" />}
                 </div>
                 <h3 className="text-2xl font-black text-slate-900 mb-4">{feat.title}</h3>
                 <p className="text-slate-500 leading-relaxed font-bold text-sm opacity-70 max-w-[240px]">{feat.desc}</p>

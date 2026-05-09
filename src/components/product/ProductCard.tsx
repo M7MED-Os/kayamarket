@@ -20,7 +20,7 @@ function StarRating({ rating }: { rating: number | null }) {
   const remainder = rating % 1
   const half = remainder >= 0.25 && remainder < 0.75
   const extraFull = remainder >= 0.75 ? 1 : 0
-  
+
   const totalFull = full + extraFull
   const empty = Math.max(0, 5 - totalFull - (half ? 1 : 0))
 
@@ -85,9 +85,14 @@ export default function ProductCard({ product, slug }: ProductCardProps) {
     e.preventDefault()
     e.stopPropagation()
 
+    if (product.stock === 0) {
+      toast.error('هذا المنتج غير متوفر حالياً')
+      return
+    }
+
     // If product has variants, redirect to product page instead of adding directly
     const hasVariants = product.variants && product.variants.length > 0
-    
+
     if (hasVariants) {
       toast('يرجى اختيار المقاس واللون أولاً ثم الضغط على زر "أضف للسلة"', { icon: '📝' })
       router.push(`/store/${slug}/products/${product.id}`)
@@ -115,16 +120,16 @@ export default function ProductCard({ product, slug }: ProductCardProps) {
   }
   return (
     <div className="group relative flex flex-col bg-white rounded-[2.5rem] border border-zinc-100 shadow-sm hover:shadow-2xl hover:shadow-zinc-200/50 transition-all duration-500 hover:-translate-y-2 overflow-hidden">
-      
+
       <div className="absolute top-3 left-3 z-20 flex flex-col gap-2">
-        <button 
+        <button
           onClick={handleToggleWishlist}
           className={`h-8 w-8 md:h-10 md:w-10 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-md transition-all shadow-sm ${isFavorite ? 'text-rose-500 bg-white' : 'text-zinc-400 hover:text-rose-500 hover:bg-white'}`}
         >
           <Heart className={`h-4 w-4 md:h-5 md:w-5 ${isFavorite ? 'fill-rose-500' : ''}`} />
         </button>
 
-        <button 
+        <button
           onClick={handleAddToCart}
           disabled={product.stock === 0}
           className="h-8 w-8 md:h-10 md:w-10 flex items-center justify-center rounded-full bg-zinc-900/90 text-white backdrop-blur-md transition-all shadow-sm hover:scale-110 active:scale-95 disabled:opacity-50"

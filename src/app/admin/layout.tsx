@@ -78,12 +78,6 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         <div className="flex-1 flex flex-col">
           <AdminNav storeSlug={storeSlug} />
 
-          <div className="p-8 mt-auto border-t border-slate-50">
-            <LogoutButton className="flex items-center justify-center gap-3 w-full px-4 py-5 rounded-2xl font-black text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all border border-transparent hover:border-rose-100 group shadow-sm hover:shadow-md">
-              <LogOut className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
-              تسجيل الخروج
-            </LogoutButton>
-          </div>
         </div>
       </aside>
 
@@ -94,6 +88,16 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         </Link>
 
         <div className="flex items-center gap-3">
+          <a
+            href={`https://wa.me/201124417693?text=${encodeURIComponent('مرحباً، أحتاج إلى مساعدة في إعدادات متجري على كايا ماركت.')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="h-10 w-10 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-500 active:scale-95 transition-all shadow-sm"
+          >
+            <svg className="h-5 w-5 fill-current" viewBox="0 0 24 24">
+              <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.483 8.412-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.308 1.655zm6.757-4.047c1.513.897 3.01 1.348 4.636 1.349 5.38 0 9.756-4.376 9.756-9.756 0-2.608-1.016-5.059-2.859-6.903-1.841-1.841-4.29-2.857-6.895-2.857-5.378 0-9.754 4.377-9.754 9.756 0 2.008.618 3.518 1.691 5.31l-1.006 3.673 3.766-.988zM17.202 14.18c-.284-.143-1.681-.83-1.944-.925-.262-.096-.453-.143-.645.143-.191.286-.74.925-.907 1.117-.167.191-.334.215-.618.072-.284-.143-1.198-.442-2.283-1.411-.844-.753-1.413-1.683-1.579-1.97-.167-.286-.018-.441.124-.582.128-.127.284-.334.426-.502.142-.167.19-.286.284-.477.095-.19.047-.358-.024-.502-.071-.143-.645-1.551-.882-2.124-.231-.557-.466-.481-.645-.49-.167-.008-.358-.01-.55-.01s-.502.072-.765.358c-.262.286-1.003.979-1.003 2.388s1.026 2.769 1.169 2.96c.143.191 2.019 3.083 4.891 4.324.683.295 1.216.471 1.632.604.686.218 1.311.187 1.804.113.55-.083 1.68-.686 1.919-1.349.239-.663.239-1.233.167-1.349-.071-.117-.262-.19-.546-.334z"/>
+            </svg>
+          </a>
           {storeSlug && (
             <Link
               href={`/store/${storeSlug}`}
@@ -123,9 +127,6 @@ export default async function AdminLayout({ children }: { children: ReactNode })
         </div>
       </main>
 
-      <div className="xl:hidden">
-        <AdminNav storeSlug={storeSlug} />
-      </div>
     </div>
   )
 }

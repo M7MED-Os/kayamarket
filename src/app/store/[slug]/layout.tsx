@@ -19,6 +19,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
+import { incrementStoreViews } from '@/app/actions/analytics';
+
 export default async function StoreLayout({
   children,
   params,
@@ -32,6 +34,9 @@ export default async function StoreLayout({
   if (!store) {
     notFound();
   }
+
+  // Increment view counter asynchronously (don't block render)
+  incrementStoreViews(store.id).catch(console.error);
 
   const primaryColor = branding?.primary_color || '#e11d48';
 

@@ -249,6 +249,11 @@ export function FloralProductCard({ product, slug }: { product: any; slug: strin
   const handleAdd = (e: React.MouseEvent) => {
     e.preventDefault(); e.stopPropagation()
     
+    if (product.stock === 0) {
+      toast.error('هذا المنتج غير متوفر حالياً')
+      return
+    }
+    
     // If product has variants, redirect to product page
     const hasVariants = product.variants && product.variants.length > 0
     
@@ -310,7 +315,8 @@ export function FloralProductCard({ product, slug }: { product: any; slug: strin
 
           {/* Add to cart */}
           <button onClick={handleAdd}
-            className={`h-10 w-10 rounded-full flex items-center justify-center backdrop-blur-xl border border-white/30 shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 ${adding ? 'bg-emerald-500 text-white' : 'bg-white/75 text-zinc-500 hover:text-[var(--primary)]'}`}>
+            disabled={product.stock === 0}
+            className={`h-10 w-10 rounded-full flex items-center justify-center backdrop-blur-xl border border-white/30 shadow-lg transition-all duration-300 hover:scale-110 active:scale-95 ${product.stock === 0 ? 'bg-zinc-100 text-zinc-400 opacity-50 cursor-not-allowed' : adding ? 'bg-emerald-500 text-white' : 'bg-white/75 text-zinc-500 hover:text-[var(--primary)]'}`}>
             {adding ? <CheckCircle2 className="h-5 w-5" /> : <ShoppingBag className="h-4.5 w-4.5" />}
           </button>
         </div>

@@ -46,6 +46,11 @@ export const ElegantProductCard = ({ product, slug }: any) => {
     e.preventDefault()
     e.stopPropagation()
 
+    if (product.stock === 0) {
+      toast.error('هذا المنتج غير متوفر حالياً')
+      return
+    }
+
     // If product has variants, redirect to product page instead of adding directly
     const hasVariants = product.variants && product.variants.length > 0
     
@@ -95,7 +100,8 @@ export const ElegantProductCard = ({ product, slug }: any) => {
           <div className="relative flex items-center gap-2">
             <button
               onClick={handleAddToCart}
-              className="h-8 w-8 md:h-10 md:w-10 flex items-center justify-center rounded-none bg-[var(--primary)] text-white backdrop-blur-md border border-[var(--primary)]/20 transition-all hover:brightness-110 active:scale-95 shadow-lg"
+              disabled={product.stock === 0}
+              className={`h-8 w-8 md:h-10 md:w-10 flex items-center justify-center rounded-none backdrop-blur-md border border-[var(--primary)]/20 transition-all shadow-lg ${product.stock === 0 ? 'bg-zinc-100 text-zinc-400 opacity-50 cursor-not-allowed border-zinc-200' : 'bg-[var(--primary)] text-white hover:brightness-110 active:scale-95'}`}
             >
               <ShoppingBag className="h-4 w-4 md:h-5 md:w-5" strokeWidth={1.5} />
             </button>

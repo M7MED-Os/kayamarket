@@ -120,6 +120,11 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
   }
 
   const handleAddToCart = () => {
+    if (product.stock === 0) {
+      toast.error('هذا المنتج غير متوفر حالياً')
+      return
+    }
+
     const variantInfo = (hasVariants && selectedVariant) ? {
       color: selectedVariant.color as string | undefined,
       size: selectedSize?.size as string | undefined
@@ -275,7 +280,7 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
                 <button onClick={() => setQuantity(quantity + 1)} className="w-10 h-10 flex items-center justify-center text-zinc-300 hover:text-zinc-900 transition-colors"><Plus className="h-3 w-3" /></button>
               </div>
               <div className="flex-1 relative flex gap-4">
-                <button onClick={handleAddToCart} className="flex-1 bg-white border border-[var(--primary)] text-[var(--primary)] h-14 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[var(--primary)] hover:text-white transition-all duration-500">
+                <button onClick={handleAddToCart} disabled={product.stock === 0} className={`flex-1 bg-white border border-[var(--primary)] text-[var(--primary)] h-14 flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500 ${product.stock === 0 ? 'opacity-50 cursor-not-allowed border-zinc-200 text-zinc-400' : 'hover:bg-[var(--primary)] hover:text-white'}`}>
                   <ShoppingCart className="h-4 w-4" />
                   <span className="hidden sm:inline">إضافة للسلة</span>
                 </button>
@@ -553,7 +558,8 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
 
           <button
             onClick={handleAddToCart}
-            className="w-full sm:flex-[1] flex items-center justify-center gap-2 h-14 bg-[var(--primary)]/10 border-2 border-[var(--primary)] text-[var(--primary)] rounded-2xl font-black text-sm hover:bg-[var(--primary)] transition-all hover:text-white shadow-sm active:scale-95 group"
+            disabled={product.stock === 0}
+            className={`w-full sm:flex-[1] flex items-center justify-center gap-2 h-14 border-2 rounded-2xl font-black text-sm transition-all shadow-sm active:scale-95 group ${product.stock === 0 ? 'bg-zinc-100 border-zinc-200 text-zinc-400 cursor-not-allowed opacity-50' : 'bg-[var(--primary)]/10 border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary)] hover:text-white'}`}
             title="إضافة للسلة"
           >
             <ShoppingCart className="h-5 w-5 group-hover:scale-110 transition-transform" />
