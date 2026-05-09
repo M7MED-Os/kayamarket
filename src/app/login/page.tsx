@@ -84,7 +84,7 @@ export default function LoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between px-2">
                 <label className="block text-[11px] font-black text-zinc-400 uppercase tracking-widest">كلمة المرور</label>
-                <Link href="/forgot-password" strokeWidth={3} className="text-[10px] text-sky-500 hover:text-sky-600 font-black transition-colors">
+                <Link href="/forgot-password" className="text-[10px] text-sky-500 hover:text-sky-600 font-black transition-colors">
                   نسيت كلمة المرور؟
                 </Link>
               </div>
