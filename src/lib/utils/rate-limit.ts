@@ -10,7 +10,8 @@ import { headers } from 'next/headers'
  */
 export async function checkRateLimit(actionType: string, maxRequests: number, windowSeconds: number): Promise<{ success: boolean; error?: string }> {
   try {
-    const ip = headers().get('x-forwarded-for') || 'unknown_ip'
+    const headersList = await headers()
+    const ip = headersList.get('x-forwarded-for') || 'unknown_ip'
     
     // Bypass if we can't determine IP (e.g. localhost testing without proper headers)
     // But in production, Vercel always provides x-forwarded-for
