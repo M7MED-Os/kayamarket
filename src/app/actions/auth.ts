@@ -48,6 +48,61 @@ export async function login(formData: FormData) {
   redirect('/admin')
 }
 
+export async function forgotPassword(formData: FormData) {
+  const email = formData.get('email') as string
+
+  if (!email) {
+    return { error: 'يرجى إدخال البريد الإلكتروني' }
+  }
+
+  const supabase = await createClient()
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
+  })
+
+  if (error) {
+    console.error('Reset password error:', error)
+    return { error: 'حدث خطأ أثناء إرسال الرسالة. تأكد من صحة البريد الإلكتروني.' }
+  }
+
+  return {
+    success: true,
+    message: 'تم إرسال رسالة إعادة تعيين كلمة المرور. يرجى التحقق من بريدك الإلكتروني.'
+  }
+}
+
+export async function resetPassword(formData: FormData) {
+  const password = formData.get('password') as string
+  const confirmPassword = formData.get('confirmPassword') as string
+
+  if (!password || !confirmPassword) {
+    return { error: 'يرجى إدخال كلمة المرور الجديدة وتأكيدها' }
+  }
+
+  if (password !== confirmPassword) {
+    return { error: 'كلمتا المرور غير متطابقتين' }
+  }
+
+  if (password.length < 8) {
+    return { error: 'يجب أن تكون كلمة المرور 8 أحرف على الأقل' }
+  }
+
+  const supabase = await createClient()
+
+  const { error } = await supabase.auth.updateUser({ password })
+
+  if (error) {
+    console.error('Update password error:', error)
+    return { error: 'حدث خطأ أثناء تحديث كلمة المرور. يرجى المحاولة مرة أخرى.' }
+  }
+
+  return {
+    success: true,
+    message: 'تم تحديث كلمة المرور بنجاح! يمكنك الآن تسجيل الدخول.'
+  }
+}
 export async function registerMerchant(formData: FormData) {
   const fullName = formData.get('fullName') as string
   const storeName = formData.get('storeName') as string
@@ -68,7 +123,17 @@ export async function registerMerchant(formData: FormData) {
   const supabase = await createClient()
   const admin = createAdminClient()
 
-  // 0. التحقق من توفر الـ Slug
+  // 0. التحقق من توفر البريد الإلكتروني
+  const { data: users } = await admin.auth.admin.listUsers()
+  const emailExists = users.users.some(u => u.email?.toLowerCase() === email.toLowerCase())
+
+  if (emailExists) {
+    return { 
+      error: 'هذا البريد الإلكتروني مسجل بالفعل. يرجى تسجيل الدخول أو استعادة كلمة المرور إذا نسيتها.' 
+    }
+  }
+
+  // 1. التحقق من توفر الـ Slug
   const { data: existingStore } = await admin
     .from('stores')
     .select('id')
@@ -79,7 +144,7 @@ export async function registerMerchant(formData: FormData) {
     return { error: 'عذراً، هذا الرابط مستخدم بالفعل. يرجى اختيار رابط آخر.' }
   }
 
-  // 1. محاولة إنشاء حساب (Sign up)
+  // 2. محاولة إنشاء حساب (Sign up)
   const { data: authData, error: authError } = await supabase.auth.signUp({
     email,
     password,

@@ -28,7 +28,7 @@ export const metadata: Metadata = {
   description: "أنشئ متجرك الإلكتروني الاحترافي في دقائق مع KayaMarket. المنصة العصرية لإدارة التجارة الإلكترونية.",
   icons: {
     icon: [
-      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.svg?v=2', type: 'image/svg+xml' },
     ],
     apple: [
       { url: '/favicon.svg', type: 'image/svg+xml' },

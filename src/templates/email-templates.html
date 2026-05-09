@@ -1,0 +1,176 @@
+<!-- ============================================================
+     SUPABASE EMAIL TEMPLATES — KayaMarket
+     نسخ هذه القوالب في لوحة تحكم Supabase:
+     Authentication → Email Templates
+     ============================================================ -->
+
+
+<!-- ============================================================
+     1. CONFIRM SIGNUP (تأكيد إنشاء الحساب)
+     ============================================================ -->
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تأكيد حسابك في KayaMarket</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f4f5;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;direction:rtl;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f5;padding:40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="100%" style="max-width:560px;background:#ffffff;border-radius:24px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+          
+          <!-- Header -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#0ea5e9 0%,#0284c7 100%);padding:40px 40px 32px;text-align:center;">
+              <div style="display:inline-block;background:rgba(255,255,255,0.15);border-radius:16px;padding:16px 24px;margin-bottom:16px;">
+                <span style="font-size:28px;font-weight:900;color:#ffffff;letter-spacing:-1px;">KayaMarket</span>
+              </div>
+              <p style="color:rgba(255,255,255,0.85);font-size:14px;font-weight:600;margin:0;">منصة المتاجر الإلكترونية</p>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:40px;">
+              <h1 style="font-size:22px;font-weight:800;color:#09090b;margin:0 0 12px;">مرحباً بك في KayaMarket! 🎉</h1>
+              <p style="font-size:15px;color:#52525b;line-height:1.7;margin:0 0 32px;">
+                شكراً لتسجيلك! متجرك الجديد في طريقه للانطلاق.
+                فقط تأكيد بريدك الإلكتروني ونبدأ معاً.
+              </p>
+
+              <!-- CTA Button -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="padding:8px 0 32px;">
+                    <a href="{{ .ConfirmationURL }}"
+                       style="display:inline-block;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:16px 40px;border-radius:14px;box-shadow:0 4px 16px rgba(14,165,233,0.35);">
+                      ✓ تفعيل الحساب الآن
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Info Box -->
+              <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:14px;padding:20px 24px;margin-bottom:24px;">
+                <p style="font-size:13px;font-weight:700;color:#0369a1;margin:0 0 8px;">⏱ الرابط صالح لمدة 24 ساعة</p>
+                <p style="font-size:12px;color:#0284c7;margin:0;line-height:1.6;">
+                  إذا لم تنشئ هذا الحساب، يمكنك تجاهل هذه الرسالة بأمان.
+                </p>
+              </div>
+
+              <p style="font-size:13px;color:#a1a1aa;line-height:1.6;margin:0;">
+                إذا لم يعمل الزر، انسخ هذا الرابط والصقه في متصفحك:
+                <br>
+                <span style="word-break:break-all;color:#0ea5e9;font-size:11px;">{{ .ConfirmationURL }}</span>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background:#fafafa;border-top:1px solid #f4f4f5;padding:24px 40px;text-align:center;">
+              <p style="font-size:12px;color:#a1a1aa;margin:0;">
+                © 2026 KayaMarket · منصة المتاجر الإلكترونية المتكاملة
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+
+
+<!-- ============================================================
+     2. RESET PASSWORD (إعادة تعيين كلمة المرور)
+     ============================================================ -->
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>إعادة تعيين كلمة المرور — KayaMarket</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f4f5;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;direction:rtl;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f5;padding:40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="100%" style="max-width:560px;background:#ffffff;border-radius:24px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+          
+          <!-- Header -->
+          <tr>
+            <td style="background:linear-gradient(135deg,#18181b 0%,#3f3f46 100%);padding:40px 40px 32px;text-align:center;">
+              <div style="display:inline-block;background:rgba(255,255,255,0.1);border-radius:16px;padding:16px 24px;margin-bottom:16px;">
+                <span style="font-size:28px;font-weight:900;color:#ffffff;letter-spacing:-1px;">KayaMarket</span>
+              </div>
+              <p style="color:rgba(255,255,255,0.7);font-size:14px;font-weight:600;margin:0;">إعادة تعيين كلمة المرور</p>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:40px;">
+              <!-- Lock Icon -->
+              <div style="text-align:center;margin-bottom:24px;">
+                <div style="display:inline-block;background:#f4f4f5;border-radius:50%;width:72px;height:72px;line-height:72px;font-size:32px;">
+                  🔑
+                </div>
+              </div>
+
+              <h1 style="font-size:22px;font-weight:800;color:#09090b;margin:0 0 12px;text-align:center;">طلب إعادة تعيين كلمة المرور</h1>
+              <p style="font-size:15px;color:#52525b;line-height:1.7;margin:0 0 32px;text-align:center;">
+                تلقينا طلباً لإعادة تعيين كلمة المرور الخاصة بحسابك.
+                اضغط على الزر أدناه لإنشاء كلمة مرور جديدة.
+              </p>
+
+              <!-- CTA Button -->
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="padding:8px 0 32px;">
+                    <a href="{{ .ConfirmationURL }}"
+                       style="display:inline-block;background:#18181b;color:#ffffff;font-size:15px;font-weight:700;text-decoration:none;padding:16px 40px;border-radius:14px;box-shadow:0 4px 16px rgba(0,0,0,0.2);">
+                      🔒 إعادة تعيين كلمة المرور
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Warning Box -->
+              <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:14px;padding:20px 24px;margin-bottom:24px;">
+                <p style="font-size:13px;font-weight:700;color:#c2410c;margin:0 0 8px;">⚠️ تنبيه أمني هام</p>
+                <p style="font-size:12px;color:#ea580c;margin:0;line-height:1.6;">
+                  هذا الرابط صالح لمدة ساعة واحدة فقط.
+                  إذا لم تطلب إعادة التعيين، يرجى تجاهل هذه الرسالة وحسابك بأمان تام.
+                </p>
+              </div>
+
+              <p style="font-size:13px;color:#a1a1aa;line-height:1.6;margin:0;">
+                إذا لم يعمل الزر، انسخ هذا الرابط والصقه في متصفحك:
+                <br>
+                <span style="word-break:break-all;color:#71717a;font-size:11px;">{{ .ConfirmationURL }}</span>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background:#fafafa;border-top:1px solid #f4f4f5;padding:24px 40px;text-align:center;">
+              <p style="font-size:12px;color:#a1a1aa;margin:0 0 6px;">
+                © 2026 KayaMarket · منصة المتاجر الإلكترونية المتكاملة
+              </p>
+              <p style="font-size:11px;color:#d4d4d8;margin:0;">
+                هذه الرسالة أُرسلت تلقائياً، الرجاء عدم الرد عليها.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { 
   Eye, Clock, CheckCircle, PackageCheck, XCircle, ChevronRight, ChevronLeft, 
   Trash2, CreditCard, AlertTriangle, RefreshCw, BellRing, Edit2, Package, Check,
-  Phone, User, Calendar, MoreVertical, Hash, Receipt
+  Phone, User, Calendar, MoreVertical, Hash, Receipt, Search
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
@@ -47,6 +47,7 @@ export default function OrderTable({ orders, currentPage, totalPages, totalCount
   const [isAudioEnabled, setIsAudioEnabled] = useState(false)
   const [notificationSound, setNotificationSound] = useState('/sounds/new-notification-027.mp3')
   const [activeStatusOrderId, setActiveStatusOrderId] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const audioEnabledRef = useRef(isAudioEnabled)
   const soundUrlRef = useRef(notificationSound)
@@ -134,43 +135,65 @@ export default function OrderTable({ orders, currentPage, totalPages, totalCount
     }
   }
 
+  const filteredOrders = orders.filter(order => {
+    const query = searchQuery.toLowerCase()
+    return (
+      order.id.toLowerCase().includes(query) ||
+      (order.customer_name || '').toLowerCase().includes(query) ||
+      (order.customer_phone || '').includes(query)
+    )
+  })
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
       
-      {/* ── Action Bar (Simplified - No Title) ────────────────────────── */}
-      <div className="flex items-center justify-end gap-3 w-full">
-          <div className="flex-1 md:flex-none flex items-center gap-2 bg-white border border-slate-100 p-2 rounded-2xl shadow-sm">
-            <select
-              value={notificationSound}
-              onChange={(e) => handleSoundChange(e.target.value)}
-              className="bg-transparent text-xs font-black text-slate-400 outline-none px-2 cursor-pointer"
-            >
-              {SOUND_OPTIONS.map(s => <option key={s.url} value={s.url}>{s.name}</option>)}
-            </select>
-            <button
-              onClick={() => {
-                const newState = !isAudioEnabled;
-                setIsAudioEnabled(newState);
-                if (newState) {
-                  const audio = new Audio(notificationSound);
-                  audio.play().catch(() => { });
-                }
-              }}
-              className={`flex items-center justify-center p-2 rounded-xl transition-all ${isAudioEnabled ? 'bg-sky-500 text-white shadow-lg shadow-sky-100' : 'bg-slate-50 text-slate-400'}`}
-            >
-              <BellRing className={`h-4 w-4 ${isAudioEnabled ? 'animate-pulse' : 'opacity-50'}`} />
-            </button>
+      {/* ── Action Bar (Search & Settings) ────────────────────────── */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full">
+          <div className="relative w-full md:max-w-md">
+            <Search className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="ابحث برقم الطلب، اسم العميل، أو الهاتف..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full h-12 pr-12 pl-4 rounded-2xl border border-slate-100 bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all font-inter text-sm shadow-sm"
+            />
           </div>
 
-          <button onClick={handleRefresh} disabled={isRefreshing} className="px-6 h-12 bg-white border border-slate-200 rounded-2xl text-xs font-black text-slate-700 shadow-sm active:scale-95 disabled:opacity-50 flex items-center gap-2">
-            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">تحديث</span>
-          </button>
+          <div className="flex items-center gap-3 w-full md:w-auto">
+            <div className="flex-1 md:flex-none flex items-center gap-2 bg-white border border-slate-100 p-2 rounded-2xl shadow-sm">
+              <select
+                value={notificationSound}
+                onChange={(e) => handleSoundChange(e.target.value)}
+                className="bg-transparent text-[10px] font-black text-slate-400 outline-none px-2 cursor-pointer"
+              >
+                {SOUND_OPTIONS.map(s => <option key={s.url} value={s.url}>{s.name}</option>)}
+              </select>
+              <button
+                onClick={() => {
+                  const newState = !isAudioEnabled;
+                  setIsAudioEnabled(newState);
+                  if (newState) {
+                    const audio = new Audio(notificationSound);
+                    audio.play().catch(() => { });
+                  }
+                }}
+                className={`flex items-center justify-center p-2 rounded-xl transition-all ${isAudioEnabled ? 'bg-sky-500 text-white shadow-lg shadow-sky-100' : 'bg-slate-50 text-slate-400'}`}
+              >
+                <BellRing className={`h-4 w-4 ${isAudioEnabled ? 'animate-pulse' : 'opacity-50'}`} />
+              </button>
+            </div>
+
+            <button onClick={handleRefresh} disabled={isRefreshing} className="px-5 h-12 bg-white border border-slate-100 rounded-2xl text-[10px] font-black text-slate-700 shadow-sm active:scale-95 disabled:opacity-50 flex items-center gap-2">
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <span>تحديث</span>
+            </button>
+          </div>
       </div>
 
       {/* ── Precise Grid System ────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(min(100%,430px),1fr))] gap-6 md:gap-8">
-        {orders.map((order) => {
+      <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(min(100%,320px),1fr))] gap-6 md:gap-8">
+        {filteredOrders.map((order) => {
           const statusObj = STATUS_MAP[order.status] || STATUS_MAP.pending
           const StatusIcon = statusObj.icon
           const paymentLabel = PAYMENT_MAP[order.payment_method] || order.payment_method || 'غير محدد'
@@ -180,12 +203,12 @@ export default function OrderTable({ orders, currentPage, totalPages, totalCount
           return (
             <div 
               key={order.id} 
-              className={`bg-white rounded-[2.5rem] border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col h-full hover:shadow-xl hover:border-sky-100 transition-all duration-300 group relative ${isSelectorOpen ? 'z-50' : 'z-0'} ${isProcessing ? 'opacity-50 pointer-events-none scale-95' : ''}`}
+              className={`bg-white rounded-3xl border border-slate-100 shadow-[0_4px_20px_rgba(0,0,0,0.02)] flex flex-col h-full hover:shadow-xl hover:border-sky-100 transition-all duration-300 group relative ${isSelectorOpen ? 'z-50' : 'z-0'} ${isProcessing ? 'opacity-50 pointer-events-none scale-95' : ''}`}
             >
-              <div className="px-6 py-5 bg-slate-50/50 flex items-center justify-between border-b border-slate-100 rounded-t-[2.5rem]">
-                <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 rounded-full bg-sky-500 animate-pulse" />
-                  <span className="text-lg font-black text-slate-900 font-poppins uppercase tracking-wider" dir="ltr">#{order.id.split('-')[0].toUpperCase()}</span>
+              <div className="px-5 py-3 bg-slate-50/50 flex items-center justify-between border-b border-slate-100 rounded-t-3xl">
+                <div className="flex items-center gap-2.5">
+                  <div className="h-1.5 w-1.5 rounded-full bg-sky-500 animate-pulse" />
+                  <span className="text-sm font-black text-slate-900 font-poppins uppercase tracking-wider" dir="ltr">#{order.id.split('-')[0].toUpperCase()}</span>
                 </div>
                 <div className="relative">
                   <button
@@ -193,14 +216,14 @@ export default function OrderTable({ orders, currentPage, totalPages, totalCount
                       e.stopPropagation();
                       setActiveStatusOrderId(isSelectorOpen ? null : order.id);
                     }}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black border transition-all ${statusObj.bg} ${statusObj.text} ${statusObj.border} shadow-sm active:scale-95`}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[9px] font-black border transition-all ${statusObj.bg} ${statusObj.text} ${statusObj.border} shadow-sm active:scale-95`}
                   >
-                    <StatusIcon className="h-3.5 w-3.5" />
+                    <StatusIcon className="h-3 w-3" />
                     {statusObj.label}
                   </button>
 
                   {isSelectorOpen && (
-                    <div className="absolute top-full left-0 mt-3 w-48 bg-white rounded-2xl shadow-2xl border border-slate-100 z-[100] p-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="absolute top-full left-0 mt-2 w-44 bg-white rounded-xl shadow-2xl border border-slate-100 z-[100] p-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
                        {Object.entries(STATUS_MAP).map(([key, val]) => (
                          <button
                            key={key}
@@ -208,12 +231,12 @@ export default function OrderTable({ orders, currentPage, totalPages, totalCount
                              e.stopPropagation();
                              handleStatusChange(order.id, key);
                            }}
-                           className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-[10px] font-black transition-all mb-1 last:mb-0 ${
+                           className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-[9px] font-black transition-all mb-1 last:mb-0 ${
                              order.status === key ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-500 hover:bg-slate-50'
                            }`}
                          >
                             <span className="font-inter">{val.label}</span>
-                            {order.status === key && <Check className="h-3 w-3" />}
+                            {order.status === key && <Check className="h-2.5 w-2.5" />}
                          </button>
                        ))}
                     </div>
@@ -221,14 +244,14 @@ export default function OrderTable({ orders, currentPage, totalPages, totalCount
                 </div>
               </div>
 
-              <div className="p-7 flex-grow space-y-6">
+              <div className="p-5 flex-grow space-y-4">
                  {/* Order Total Header */}
-                 <div className="flex justify-between items-center pb-4 border-b border-slate-50">
-                    <div className="space-y-1">
-                       <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest">إجمالي الطلب</p>
+                 <div className="flex justify-between items-center pb-3 border-b border-slate-50">
+                    <div className="space-y-0.5">
+                       <p className="text-[9px] font-black text-slate-300 uppercase tracking-widest">إجمالي الطلب</p>
                        <div className="flex items-baseline gap-1">
-                          <span className="text-3xl font-black text-sky-600 font-poppins">{order.final_price.toLocaleString()}</span>
-                          <span className="text-[10px] font-bold text-slate-400 uppercase">ج.م</span>
+                          <span className="text-2xl font-black text-sky-600 font-poppins">{order.final_price.toLocaleString()}</span>
+                          <span className="text-[9px] font-bold text-slate-400 uppercase">ج.م</span>
                        </div>
                     </div>
                     {order.order_items && order.order_items.length > 1 && (

@@ -2,8 +2,10 @@
 
 import { useState } from 'react'
 import { login } from '@/app/actions/auth'
-import { Lock, Mail, Loader2, ArrowRight } from 'lucide-react'
+import { Lock, Mail, Loader2, ArrowRight, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
+
+import { KayaLogo } from '@/components/common/KayaLogo'
 
 export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
@@ -24,38 +26,48 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 flex items-center justify-center p-4" dir="rtl">
-      <div className="w-full max-w-md">
-        {/* Logo / Header */}
-        <div className="flex flex-col items-center mb-10 animate-in fade-in zoom-in duration-700">
-          <div className="h-28 w-28 bg-white rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-sky-100 border border-zinc-50 mb-4 hover:scale-105 transition-transform duration-500">
-            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-20 w-20">
-              <path d="M15 50 C15 30.67 30.67 15 50 15 C69.33 15 85 30.67 85 50" stroke="#0ea5e9" strokeWidth="6" strokeLinecap="round" />
-              <path d="M85 50 C85 69.33 69.33 85 50 85 C30.67 85 15 69.33 15 50" stroke="#0ea5e9" strokeWidth="6" strokeLinecap="round" />
-              <path d="M30 35 L30 65" stroke="#0ea5e9" strokeWidth="6" strokeLinecap="round" />
-              <path d="M50 50 L50 70" stroke="#0ea5e9" strokeWidth="6" strokeLinecap="round" />
-              <path d="M35 30 L50 50 L65 30" stroke="#0ea5e9" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M70 35 L70 65" stroke="#0ea5e9" strokeWidth="6" strokeLinecap="round" />
-            </svg>
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-sky-50/50 via-zinc-50 to-white flex items-center justify-center p-6 selection:bg-sky-100 selection:text-sky-900" dir="rtl">
+      <div className="w-full max-w-[440px] animate-in fade-in slide-in-from-bottom-8 duration-1000">
+        
+        {/* Logo / Header Area */}
+        <div className="flex flex-col items-center mb-12">
+          <Link href="/" className="group relative">
+            <div className="absolute inset-0 bg-sky-500/20 blur-3xl rounded-full scale-150 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+            <div className="relative h-24 w-24 bg-white rounded-[2rem] flex items-center justify-center shadow-[0_20px_50px_rgba(14,165,233,0.1)] border border-white/50 mb-6 hover:scale-105 active:scale-95 transition-all duration-500">
+              <KayaLogo className="h-14 w-14 text-sky-500" iconOnly />
+            </div>
+          </Link>
+          
+          <div className="text-center space-y-2">
+            <h1 className="text-4xl font-black tracking-tight flex items-center justify-center" dir="ltr">
+              <span className="text-sky-500">Kaya</span>
+              <span className="text-slate-400 font-normal">Market</span>
+            </h1>
+            <div className="flex items-center justify-center gap-3">
+              <div className="h-[1px] w-8 bg-zinc-200" />
+              <p className="text-zinc-400 font-bold text-[10px] uppercase tracking-[0.3em]">لوحة تحكم المتجر</p>
+              <div className="h-[1px] w-8 bg-zinc-200" />
+            </div>
           </div>
-          <h1 className="text-3xl font-black text-zinc-900 tracking-tight">KayaMarket</h1>
-          <p className="text-zinc-500 font-bold text-xs mt-1">لوحة تحكم المتجر</p>
         </div>
 
         {/* Form Card */}
-        <div className="bg-white rounded-3xl p-8 shadow-xl shadow-zinc-200/50 border border-zinc-100">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 md:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-sky-500/10 transition-colors duration-700" />
+          
+          <form onSubmit={handleSubmit} className="relative space-y-6">
             
             {error && (
-              <div className="bg-rose-50 border border-rose-100 text-rose-600 px-4 py-3 rounded-xl text-sm font-bold text-center">
+              <div className="bg-rose-50 border border-rose-100 text-rose-600 px-5 py-4 rounded-2xl text-xs font-black text-center animate-in zoom-in duration-300 flex items-center justify-center gap-2">
+                <AlertCircle className="h-4 w-4" />
                 {error}
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-bold text-zinc-700 mb-2">البريد الإلكتروني</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-zinc-400">
+            <div className="space-y-2">
+              <label className="block text-[11px] font-black text-zinc-400 mr-2 uppercase tracking-widest">البريد الإلكتروني</label>
+              <div className="relative group/input">
+                <div className="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none text-zinc-300 group-focus-within/input:text-sky-500 transition-colors">
                   <Mail className="h-5 w-5" />
                 </div>
                 <input
@@ -63,16 +75,21 @@ export default function LoginPage() {
                   name="email"
                   required
                   placeholder="admin@example.com"
-                  className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl py-3 pl-4 pr-12 text-zinc-900 outline-none focus:border-zinc-400 focus:bg-white transition-colors"
+                  className="w-full bg-zinc-50/50 border border-zinc-100 rounded-2xl py-4 pl-5 pr-14 text-sm font-bold text-zinc-900 outline-none focus:ring-4 focus:ring-sky-500/5 focus:border-sky-500 focus:bg-white transition-all duration-300"
                   dir="ltr"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-bold text-zinc-700 mb-2">كلمة المرور</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-zinc-400">
+            <div className="space-y-2">
+              <div className="flex items-center justify-between px-2">
+                <label className="block text-[11px] font-black text-zinc-400 uppercase tracking-widest">كلمة المرور</label>
+                <Link href="/forgot-password" strokeWidth={3} className="text-[10px] text-sky-500 hover:text-sky-600 font-black transition-colors">
+                  نسيت كلمة المرور؟
+                </Link>
+              </div>
+              <div className="relative group/input">
+                <div className="absolute inset-y-0 right-0 pr-5 flex items-center pointer-events-none text-zinc-300 group-focus-within/input:text-sky-500 transition-colors">
                   <Lock className="h-5 w-5" />
                 </div>
                 <input
@@ -80,7 +97,7 @@ export default function LoginPage() {
                   name="password"
                   required
                   placeholder="••••••••"
-                  className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl py-3 pl-4 pr-12 text-zinc-900 outline-none focus:border-zinc-400 focus:bg-white transition-colors"
+                  className="w-full bg-zinc-50/50 border border-zinc-100 rounded-2xl py-4 pl-5 pr-14 text-sm font-bold text-zinc-900 outline-none focus:ring-4 focus:ring-sky-500/5 focus:border-sky-500 focus:bg-white transition-all duration-300"
                   dir="ltr"
                 />
               </div>
@@ -89,31 +106,32 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-zinc-900 text-white rounded-2xl py-4 font-bold flex items-center justify-center gap-2 hover:bg-zinc-800 transition-all shadow-lg shadow-zinc-200 disabled:opacity-70"
+              className="w-full bg-zinc-900 text-white rounded-2xl py-5 font-black text-sm flex items-center justify-center gap-3 hover:bg-zinc-800 active:scale-[0.98] transition-all shadow-xl shadow-zinc-200 disabled:opacity-70 group/btn"
             >
               {loading ? (
                 <Loader2 className="h-5 w-5 animate-spin" />
               ) : (
                 <>
                   الدخول للوحة التحكم
-                  <ArrowRight className="h-5 w-5 rotate-180" />
+                  <ArrowRight className="h-5 w-5 rotate-180 group-hover:-translate-x-1 transition-transform" />
                 </>
               )}
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-zinc-500 text-sm font-medium">
+          <div className="mt-8 text-center pt-8 border-t border-zinc-50 relative">
+            <p className="text-zinc-400 text-xs font-bold">
               ليس لديك متجر بعد؟{' '}
-              <Link href="/register" className="text-zinc-900 font-bold hover:underline">
+              <Link href="/register" className="text-zinc-900 font-black hover:text-sky-500 transition-colors">
                 أنشئ متجرك الآن
               </Link>
             </p>
           </div>
         </div>
 
-        <div className="mt-8 text-center">
-          <Link href="/" className="text-zinc-500 hover:text-zinc-900 text-sm font-bold transition-colors">
+        <div className="mt-10 text-center">
+          <Link href="/" className="inline-flex items-center gap-2 text-zinc-400 hover:text-zinc-900 text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:gap-3">
+            <ArrowRight className="h-3 w-3" />
             العودة للمنصة الرئيسية
           </Link>
         </div>

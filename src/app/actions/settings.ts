@@ -124,14 +124,34 @@ export async function updateStoreSettings(formData: FormData) {
     }
 
     // --- Branding Restrictions ---
-    // Allow colors for all, but lock Logo and Banner for free users
-    if (plan === 'starter') {
-      if ((logoUrl && logoUrl !== currentBranding?.logo_url) || (bannerUrl && bannerUrl !== currentBranding?.banner_url)) {
-        return {
-          success: false,
-          error: 'عذراً، رفع الشعار والبانر متاح فقط في الباقات المدفوعة.',
-          code: 'BRANDING_LOCKED'
-        }
+    // Fetch current branding to compare for changes
+    const { data: currentBrandingDb } = await supabase
+      .from('store_branding')
+      .select('logo_url, banner_url, favicon_url, hero_image_url')
+      .eq('store_id', storeId)
+      .single()
+
+    // 1. General Branding (Logo, Banner, Favicon)
+    const brandingChanged = 
+      (logoUrl && logoUrl !== currentBrandingDb?.logo_url) || 
+      (bannerUrl && bannerUrl !== currentBrandingDb?.banner_url) ||
+      (faviconUrl && faviconUrl !== currentBrandingDb?.favicon_url);
+
+    if (brandingChanged && !config.hasCustomBranding) {
+      return {
+        success: false,
+        error: 'عذراً، رفع الشعار والبانر والأيقونة متاح فقط في الباقات المدفوعة.',
+        code: 'BRANDING_LOCKED'
+      }
+    }
+
+    // 2. Hero Image specifically
+    const heroImageChanged = (heroImageUrl && heroImageUrl !== currentBrandingDb?.hero_image_url);
+    if (heroImageChanged && !config.hasHeroImage) {
+      return {
+        success: false,
+        error: 'عذراً، ميزة صورة الواجهة (Hero Image) تتطلب باقة أعلى.',
+        code: 'HERO_IMAGE_LOCKED'
       }
     }
 

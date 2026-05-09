@@ -38,7 +38,8 @@ export default function SettingsForm({
    plan = 'starter', 
    allPlans, 
    userEmail,
-   themes = []
+   themes = [],
+   platformSettings
 }: { 
    initialStore: any, 
    initialBranding: any, 
@@ -46,7 +47,8 @@ export default function SettingsForm({
    plan?: PlanTier, 
    allPlans?: any, 
    userEmail?: string,
-   themes?: any[]
+   themes?: any[],
+   platformSettings?: any
 }) {
    // Defensive check: if plan is invalid or not found in PLAN_CONFIG, fallback to starter
    const currentPlan = ((plan as string) === 'free' ? 'starter' : plan) as PlanTier
@@ -231,10 +233,11 @@ export default function SettingsForm({
             setHasChanges(false)
             router.refresh()
          } else {
-            if (res.code === 'BRANDING_LOCKED' || res.code === 'DOMAIN_LOCKED') {
+            if (res.code === 'BRANDING_LOCKED' || res.code === 'DOMAIN_LOCKED' || res.code === 'HERO_IMAGE_LOCKED') {
                setUpgradeModal({
                   isOpen: true,
-                  name: res.code === 'BRANDING_LOCKED' ? 'الهوية البصرية' : 'الدومين المخصص',
+                  name: res.code === 'BRANDING_LOCKED' ? 'الهوية البصرية' : 
+                        res.code === 'HERO_IMAGE_LOCKED' ? 'صورة الواجهة' : 'الدومين المخصص',
                   description: res.error
                })
             } else {
@@ -315,7 +318,7 @@ export default function SettingsForm({
             <>
 
                {/* Top Sticky Header - Responsive Labels */}
-               <div className="sticky top-16 xl:top-0 bg-slate-50/95 backdrop-blur-2xl py-4 md:py-6 mb-8 md:mb-12 flex items-center justify-between border-b border-slate-200 -mx-4 px-4 md:-mx-8 md:px-8" style={{ zIndex: 99999 }}>
+               <div className="sticky top-16 xl:top-0 bg-slate-50/95 backdrop-blur-2xl py-4 md:py-6 mb-0 flex items-center justify-between -mx-4 px-4 md:-mx-8 md:px-8" style={{ zIndex: 99999 }}>
                   <div className="flex items-center gap-4">
                      <button
                         onClick={() => setView('hub')}
@@ -347,7 +350,7 @@ export default function SettingsForm({
                   </div>
                </div>
 
-               <div className="max-w-full space-y-10 animate-in slide-in-from-left-4 duration-500 pb-20">
+               <div className="max-w-full space-y-10 animate-in slide-in-from-left-4 duration-500 pb-20 mt-[45px]">
 
                   {/* Themes Selection View */}
                   {currentView === 'themes' && (
@@ -361,8 +364,8 @@ export default function SettingsForm({
                                  <div
                                     key={theme.id}
                                     className={`group relative flex flex-col bg-white rounded-[2.5rem] border transition-all duration-500 overflow-hidden shadow-sm
-                                ${isActive ? 'border-indigo-600 ring-2 ring-indigo-600/10 shadow-indigo-100' : 'border-slate-100 hover:border-slate-300'}
-                                ${isLocked ? 'grayscale-[0.5] opacity-80' : ''}`}
+                                 ${isActive ? 'border-indigo-600 ring-2 ring-indigo-600/10 shadow-indigo-100' : 'border-slate-100 hover:border-slate-300'}
+                                 ${isLocked ? 'grayscale-[0.5] opacity-80' : ''}`}
                                  >
                                     <div className="relative h-52 overflow-hidden">
                                        <img src={theme.preview} alt={theme.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
@@ -748,7 +751,7 @@ export default function SettingsForm({
                                     key={font.name}
                                     onClick={() => setFontFamily(font.name)}
                                     className={`group relative h-24 rounded-2xl border-2 transition-all flex flex-col items-center justify-center gap-1 overflow-hidden
-                                ${fontFamily === font.name
+                                 ${fontFamily === font.name
                                           ? 'border-slate-900 bg-slate-900 text-white shadow-md'
                                           : 'border-slate-100 bg-slate-50 text-slate-400 hover:border-slate-300 hover:bg-white'}`}
                                     style={{ fontFamily: font.name }}
@@ -774,47 +777,50 @@ export default function SettingsForm({
                         <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm">
                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                               {[
-                                 { label: 'لوجو المتجر', val: logoUrl, set: setLogoUrl, cat: 'logos', tip: 'يظهر في الهيدر والفوتر والفاتورة الخ....' },
-                                 { label: 'بانر المتجر (الغلاف)', val: bannerUrl, set: setBannerUrl, cat: 'banners', tip: 'يظهر كخلفية، يمكنك ضبط الشفافية من قسم تنسيق المتجر.' },
-                                 { label: 'صورة الواجهة (Hero Image)', val: heroImageUrl, set: setHeroImageUrl, cat: 'banners', tip: 'تظهر في المتجر، يفضل أن تكون بخلفية شفافة PNG, و اخفاءها في الهاتف.' },
-                                 { label: 'أيقونة المتجر (Favicon)', val: faviconUrl, set: setFaviconUrl, cat: 'favicons', tip: 'تظهر في تبويب المتصفح، يفضل أن تكون مربعة وشفافة.' }
-                              ].map((item, idx) => (
-                                 <div key={item.label} className="space-y-4">
-                                    <div className="flex items-center justify-between">
-                                       <h4 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                                          {item.label}
-                                          {!config.hasCustomBranding && (
-                                             <Sparkles className="h-3 w-3 text-amber-500" />
+                                 { label: 'لوجو المتجر', val: logoUrl, set: setLogoUrl, cat: 'logos', tip: 'يظهر في الهيدر والفوتر والفاتورة الخ....', feature: 'hasCustomBranding' },
+                                 { label: 'بانر المتجر (الغلاف)', val: bannerUrl, set: setBannerUrl, cat: 'banners', tip: 'يظهر كخلفية، يمكنك ضبط الشفافية من قسم تنسيق المتجر.', feature: 'hasCustomBranding' },
+                                 { label: 'صورة الواجهة (Hero Image)', val: heroImageUrl, set: setHeroImageUrl, cat: 'banners', tip: 'تظهر في المتجر، يفضل أن تكون بخلفية شفافة PNG, و اخفاءها في الهاتف.', feature: 'hasHeroImage' },
+                                 { label: 'أيقونة المتجر (Favicon)', val: faviconUrl, set: setFaviconUrl, cat: 'favicons', tip: 'تظهر في تبويب المتصفح، يفضل أن تكون مربعة وشفافة.', feature: 'hasCustomBranding' }
+                              ].map((item, idx) => {
+                                 const isAllowed = config[item.feature as keyof typeof config];
+                                 return (
+                                    <div key={item.label} className="space-y-4">
+                                       <div className="flex items-center justify-between">
+                                          <h4 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                                             {item.label}
+                                             {!isAllowed && (
+                                                <Sparkles className="h-3 w-3 text-amber-500" />
+                                             )}
+                                          </h4>
+                                          {item.val && isAllowed && (
+                                             <button
+                                                onClick={() => item.set('')}
+                                                className="flex items-center gap-2 text-[10px] font-bold text-red-500 hover:text-red-600 transition-colors bg-red-50 px-3 py-1.5 rounded-lg border border-red-100"
+                                             >
+                                                <Trash2 className="h-3.5 w-3.5" />
+                                                مسح الصورة
+                                             </button>
                                           )}
-                                       </h4>
-                                       {item.val && config.hasCustomBranding && (
-                                          <button
-                                             onClick={() => item.set('')}
-                                             className="flex items-center gap-2 text-[10px] font-bold text-red-500 hover:text-red-600 transition-colors bg-red-50 px-3 py-1.5 rounded-lg border border-red-100"
-                                          >
-                                             <Trash2 className="h-3.5 w-3.5" />
-                                             مسح الصورة
-                                          </button>
-                                       )}
-                                    </div>
-                                    <p className="text-[10px] font-bold text-slate-400 leading-relaxed -mt-2 mb-3">{item.tip}</p>
-                                    <div className="w-full relative group">
-                                       {!config.hasCustomBranding ? (
-                                          <div className="relative">
-                                             <div className="absolute inset-0 z-10 bg-white/40 backdrop-blur-[2px] flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200">
-                                                <Zap className="h-5 w-5 text-amber-500 mb-1" />
-                                                <p className="text-[9px] font-black text-slate-500">متاح في الباقات المدفوعة</p>
+                                       </div>
+                                       <p className="text-[10px] font-bold text-slate-400 leading-relaxed -mt-2 mb-3">{item.tip}</p>
+                                       <div className="w-full relative group">
+                                          {!isAllowed ? (
+                                             <div className="relative">
+                                                <div className="absolute inset-0 z-10 bg-white/40 backdrop-blur-[2px] flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200">
+                                                   <Zap className="h-5 w-5 text-amber-500 mb-1" />
+                                                   <p className="text-[9px] font-black text-slate-500">متاح في الباقات المدفوعة</p>
+                                                </div>
+                                                <div className="opacity-40 grayscale pointer-events-none">
+                                                   <ImageUpload category={item.cat as any} currentUrl={item.val} onUploadSuccess={item.set} />
+                                                </div>
                                              </div>
-                                             <div className="opacity-40 grayscale pointer-events-none">
-                                                <ImageUpload category={item.cat as any} currentUrl={item.val} onUploadSuccess={item.set} />
-                                             </div>
-                                          </div>
-                                       ) : (
-                                          <ImageUpload category={item.cat as any} currentUrl={item.val} onUploadSuccess={item.set} />
-                                       )}
+                                          ) : (
+                                             <ImageUpload category={item.cat as any} currentUrl={item.val} onUploadSuccess={item.set} />
+                                          )}
+                                       </div>
                                     </div>
-                                 </div>
-                              ))}
+                                 );
+                              })}
                            </div>
                         </div>
                      </div>
@@ -1031,7 +1037,7 @@ export default function SettingsForm({
 
                                  <div className="grid grid-cols-2 gap-4 md:gap-8">
                                     {[
-                                       { label: 'تاريخ البدء', val: initialStore?.created_at ? new Date(initialStore.created_at).toLocaleDateString('ar-EG') : '...', icon: Calendar },
+                                       { label: 'تاريخ البدء', val: initialStore?.last_renewed_at ? new Date(initialStore.last_renewed_at).toLocaleDateString('ar-EG') : (initialStore?.created_at ? new Date(initialStore.created_at).toLocaleDateString('ar-EG') : '...'), icon: Calendar },
                                        { label: 'تاريخ الانتهاء', val: initialStore?.plan_expires_at ? new Date(initialStore.plan_expires_at).toLocaleDateString('ar-EG') : 'غير محدود', icon: Clock },
                                        {
                                           label: 'الأيام المتبقية',
@@ -1145,6 +1151,7 @@ export default function SettingsForm({
                                              { label: planCfg.maxCoupons > 0 ? `حتى ${planCfg.maxCoupons} كوبونات خصم` : 'كوبونات خصم', allowed: planCfg.maxCoupons > 0, icon: Zap },
                                              { label: 'دومين مخصص', allowed: planCfg.hasCustomDomain, icon: Globe },
                                              { label: 'هوية بصرية كاملة', allowed: planCfg.hasCustomBranding, icon: Brush },
+                                             { label: 'صورة واجهة احترافية', allowed: planCfg.hasHeroImage, icon: Layout },
                                              { label: 'فواتير PDF', allowed: planCfg.hasPdfInvoice, icon: Landmark },
                                              { label: 'واتساب برو', allowed: planCfg.hasProfessionalWhatsapp, icon: MessageSquare },
                                           ].map((feat, i) => (

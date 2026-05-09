@@ -2,21 +2,13 @@ import { ReactNode } from 'react'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { assertMerchant } from '@/lib/auth'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import LogoutButton from '@/components/LogoutButton'
 import AdminNav from './AdminNav'
+import { KayaLogo } from '@/components/common/KayaLogo'
 import { Store, LogOut, LayoutGrid } from 'lucide-react'
 import { PlanTier } from '@/lib/subscription'
-
-const KayaLogo = ({ className = "h-8 w-8" }: { className?: string }) => (
-  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-    <path d="M15 50 C15 30.67 30.67 15 50 15 C69.33 15 85 30.67 85 50" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
-    <path d="M85 50 C85 69.33 69.33 85 50 85 C30.67 85 15 69.33 15 50" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
-    <path d="M30 35 L30 65" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
-    <path d="M50 50 L50 70" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
-    <path d="M35 30 L50 50 L65 30" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M70 35 L70 65" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
-  </svg>
-)
+import SubscriptionAlert from '@/components/SubscriptionAlert'
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const supabase = await createClient()
@@ -31,18 +23,24 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   const { data: store } = await supabase
     .from('stores')
-    .select('name, slug, plan, plan_expires_at')
+    .select('name, slug, plan, plan_expires_at, last_renewed_at, created_at')
     .eq('id', storeId)
     .single()
 
-  // 🕒 Automatic Downgrade Check
+  // 🕒 Global Platform Settings
+  const { data: platformSettings } = await supabase.from('platform_settings').select('*').single()
+  const graceDays = platformSettings?.grace_period_days || 3
+
+  // 🕒 Automatic Downgrade Check (Grace Period Aware)
   if (store?.plan !== 'starter' && store?.plan_expires_at) {
     const expiryDate = new Date(store.plan_expires_at)
-    if (expiryDate < new Date()) {
-      // Plan expired! Downgrade using Admin Client to bypass RLS
+    const graceLimit = new Date(expiryDate)
+    graceLimit.setDate(expiryDate.getDate() + graceDays)
+
+    if (graceLimit < new Date()) {
+      // Grace period expired! Downgrade using Admin Client, but leave plan_expires_at as a marker for Deep Cleanup
       const admin = createAdminClient()
-      await admin.from('stores').update({ plan: 'starter', plan_expires_at: null }).eq('id', storeId)
-      // Refresh context or redirect
+      await admin.from('stores').update({ plan: 'starter' }).eq('id', storeId)
       redirect('/admin/settings?expired=true')
     }
   }
@@ -52,18 +50,15 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col xl:flex-row font-sans selection:bg-sky-100 selection:text-sky-900" dir="rtl">
-
+      
       {/* ── Sidebar (Desktop) ───────────────────────────────────────────── */}
       <aside className="hidden xl:flex w-80 bg-white border-l border-slate-200 flex-col shrink-0 sticky top-0 h-screen z-40 overflow-y-auto no-scrollbar">
 
         {/* Brand Header */}
         <div className="p-8 border-b border-slate-50 flex flex-col items-start gap-10">
-          <div className="flex items-center gap-4 text-sky-500">
-            <KayaLogo className="h-10 w-10 shrink-0 shadow-sm" />
-            <span className="text-3xl font-black font-poppins text-slate-900 tracking-tight">
-              Kaya<span className="text-slate-400 font-bold">Market</span>
-            </span>
-          </div>
+          <Link href="/" className="hover:opacity-80 transition-opacity">
+            <KayaLogo className="h-10 w-10 shrink-0" />
+          </Link>
 
           <div className="flex flex-col w-full">
             <span className="text-[11px] font-black text-slate-300 uppercase tracking-widest mb-3 font-inter">المتجر الحالي</span>
@@ -94,18 +89,36 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
       {/* ── Mobile Header (Tablets & Phones) ───────────────────────────── */}
       <header className="xl:hidden sticky top-0 bg-white/80 backdrop-blur-xl border-b border-slate-200 z-40 px-6 py-4 flex items-center justify-between shadow-sm">
-        <div className="flex items-center gap-3 text-sky-500">
+        <Link href="/" className="hover:opacity-80 transition-opacity">
           <KayaLogo className="h-8 w-8" />
-          <span className="text-xl font-black font-poppins text-slate-900 tracking-tighter">KayaMarket</span>
-        </div>
-        <div className="h-10 w-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600">
-          <Store className="h-5 w-5" />
+        </Link>
+
+        <div className="flex items-center gap-3">
+          {storeSlug && (
+            <Link
+              href={`/store/${storeSlug}`}
+              target="_blank"
+              className="h-10 w-10 rounded-full bg-slate-50 border border-slate-200 flex items-center justify-center text-slate-600 relative group active:scale-95 transition-all"
+            >
+              <div className="absolute inset-0 bg-sky-500 rounded-full opacity-10 animate-ping" />
+              <Store className="h-5 w-5 relative z-10 group-hover:text-sky-500 transition-colors" />
+            </Link>
+          )}
+          <LogoutButton className="h-10 w-10 rounded-full bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-500 active:scale-95 transition-all">
+            <LogOut className="h-5 w-5" />
+          </LogoutButton>
         </div>
       </header>
 
       {/* ── Main Content ─────────────────────────────────────────────────── */}
       <main className="flex-1 w-full max-w-full p-6 md:p-10 lg:p-12 pb-32 xl:pb-12 overflow-x-hidden min-h-screen relative z-10 xl:z-auto">
-        <div className="w-full">
+        <div className="w-full space-y-6">
+          {/* Dynamic Alerts */}
+          <SubscriptionAlert 
+            planExpiresAt={store?.plan_expires_at} 
+            gracePeriodDays={graceDays} 
+            currentPlan={store?.plan || 'starter'} 
+          />
           {children}
         </div>
       </main>

@@ -3,6 +3,7 @@ import { assertMerchant } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import SettingsForm from './SettingsForm'
 import { PlanTier, getDynamicPlanConfigs } from '@/lib/subscription'
+import { getPlatformSettings } from '@/app/actions/platform'
 
 export const metadata = {
   title: 'الإعدادات والهوية | لوحة تحكم التاجر',
@@ -22,7 +23,7 @@ export default async function AdminSettingsPage() {
   // 1. Fetch Store Data (for Name & Phone & Plan & Expiry)
   const { data: store } = await supabase
     .from('stores')
-    .select('name, whatsapp_phone, plan, created_at, plan_expires_at')
+    .select('name, whatsapp_phone, plan, created_at, last_renewed_at, plan_expires_at')
     .eq('id', storeId)
     .single()
 
@@ -57,6 +58,9 @@ export default async function AdminSettingsPage() {
   // 6. Get User Email for Auto-fill
   const { data: { user } } = await supabase.auth.getUser()
 
+  // 7. Fetch Platform Global Rules
+  const platformSettings = await getPlatformSettings()
+
   if (brandingError && brandingError.code !== 'PGRST116') {
     return <div className="text-red-500">حدث خطأ أثناء تحميل الإعدادات.</div>
   }
@@ -73,6 +77,7 @@ export default async function AdminSettingsPage() {
         allPlans={allPlans}
         userEmail={user?.email}
         themes={themes || []}
+        platformSettings={platformSettings}
       />
     </div>
   )

@@ -144,6 +144,7 @@ export default function PlanEditor({ initialConfigs }: PlanEditorProps) {
                 <div className="space-y-3">
                   <FeatureToggle label="إصدار فواتير PDF"      enabled={config.hasPdfInvoice}        onToggle={() => toggleFeature(tier, 'hasPdfInvoice')} />
                   <FeatureToggle label="تخصيص الهوية البصرية"  enabled={config.hasCustomBranding}    onToggle={() => toggleFeature(tier, 'hasCustomBranding')} />
+                  <FeatureToggle label="صورة واجهة احترافية"    enabled={config.hasHeroImage}          onToggle={() => toggleFeature(tier, 'hasHeroImage')} />
                   <FeatureToggle label="دومين مخصص"            enabled={config.hasCustomDomain}      onToggle={() => toggleFeature(tier, 'hasCustomDomain')} />
                   <FeatureToggle label="تحليلات متقدمة"        enabled={config.hasAdvancedAnalytics} onToggle={() => toggleFeature(tier, 'hasAdvancedAnalytics')} />
                   <FeatureToggle label="إزالة شعار المنصة"     enabled={config.canRemoveWatermark}   onToggle={() => toggleFeature(tier, 'canRemoveWatermark')} />

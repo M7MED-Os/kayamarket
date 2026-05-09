@@ -26,6 +26,7 @@ export default async function SuperAdminLayout({
     { href: '/super-admin/upgrade-requests', label: 'طلبات الترقية', icon: CreditCard },
     { href: '/super-admin/merchants', label: 'إدارة المتاجر', icon: Store },
     { href: '/super-admin/plans', label: 'الاشتراكات والأسعار', icon: Settings },
+    { href: '/super-admin/settings', label: 'إعدادات المنصة', icon: Globe },
     { href: '/super-admin/themes', label: 'إدارة الثيمات', icon: Palette },
     { href: '/super-admin/analytics', label: 'الإحصائيات', icon: Activity },
   ]

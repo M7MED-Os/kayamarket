@@ -13,6 +13,7 @@ export interface PlanLimits {
   maxCoupons: number;           // 0 = coupons disabled
   hasPdfInvoice: boolean;
   hasCustomBranding: boolean;
+  hasHeroImage: boolean;
   hasCustomDomain: boolean;
   hasAdvancedAnalytics: boolean;
   canRemoveWatermark: boolean;
@@ -29,11 +30,12 @@ export interface PlanLimits {
 export const PLAN_CONFIG: Record<PlanTier, PlanLimits> = {
   starter: {
     name: 'Free',
-    maxProducts: 5,
+    maxProducts: 3,
     maxImagesPerProduct: 1,
     maxCoupons: 0,
     hasPdfInvoice: false,
     hasCustomBranding: false,
+    hasHeroImage: false,
     hasCustomDomain: false,
     hasAdvancedAnalytics: false,
     canRemoveWatermark: false,
@@ -46,6 +48,7 @@ export const PLAN_CONFIG: Record<PlanTier, PlanLimits> = {
     maxCoupons: 20,
     hasPdfInvoice: true,
     hasCustomBranding: true,
+    hasHeroImage: true,
     hasCustomDomain: false,
     hasAdvancedAnalytics: true,
     canRemoveWatermark: true,
@@ -58,6 +61,7 @@ export const PLAN_CONFIG: Record<PlanTier, PlanLimits> = {
     maxCoupons: 100,
     hasPdfInvoice: true,
     hasCustomBranding: true,
+    hasHeroImage: true,
     hasCustomDomain: true,
     hasAdvancedAnalytics: true,
     canRemoveWatermark: true,
@@ -85,6 +89,7 @@ export async function getDynamicPlanConfigs(supabase: any): Promise<Record<PlanT
       maxCoupons: p.max_coupons ?? 0,
       hasPdfInvoice: p.has_pdf_invoice,
       hasCustomBranding: p.has_custom_branding,
+      hasHeroImage: p.has_hero_image ?? p.has_custom_branding, // Fallback to custom branding if column missing
       hasCustomDomain: p.has_custom_domain,
       hasAdvancedAnalytics: p.has_advanced_analytics,
       canRemoveWatermark: p.can_remove_watermark,

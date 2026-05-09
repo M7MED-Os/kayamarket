@@ -8,16 +8,30 @@ import { PlanTier } from '@/lib/subscription'
 /**
  * Update a store's subscription plan (Super Admin Only)
  */
-export async function updateStorePlan(storeId: string, plan: PlanTier) {
+export async function updateStorePlan(storeId: string, plan: PlanTier, durationDays?: number) {
   const admin = createAdminClient()
 
   try {
     const supabase = await createClient()
     await assertSuperAdmin(supabase)
 
+    const updateData: any = { plan }
+    
+    // If duration provided, calculate expiry
+    if (durationDays && durationDays > 0) {
+      const now = new Date()
+      const expiryDate = new Date()
+      expiryDate.setDate(expiryDate.getDate() + durationDays)
+      updateData.plan_expires_at = expiryDate.toISOString()
+      updateData.last_renewed_at = now.toISOString() // Record start date
+    } else if (plan === 'starter') {
+      updateData.plan_expires_at = null
+      updateData.last_renewed_at = new Date().toISOString()
+    }
+
     const { error } = await admin
       .from('stores')
-      .update({ plan })
+      .update(updateData)
       .eq('id', storeId)
 
     if (error) throw error
@@ -69,6 +83,7 @@ export async function updatePlanConfig(planId: string, updates: any) {
         max_coupons: updates.maxCoupons ?? 0,
         has_pdf_invoice: updates.hasPdfInvoice,
         has_custom_branding: updates.hasCustomBranding,
+        has_hero_image: updates.hasHeroImage,
         has_custom_domain: updates.hasCustomDomain,
         has_advanced_analytics: updates.hasAdvancedAnalytics,
         can_remove_watermark: updates.canRemoveWatermark,

@@ -64,51 +64,57 @@ export default async function AdminProductsPage() {
         <ProductHeaderActions />
       </div>
       
-      {/* ── Precise Grid System (430px) ─────────────────────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(min(100%,430px),1fr))] gap-8 md:gap-12">
+      {/* ── Compact Grid System ─────────────────────────────── */}
+      <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fill,minmax(min(100%,300px),1fr))] gap-6 md:gap-8">
         {products && products.length > 0 ? (
           products.map((product) => {
             const isOutOfStock = product.stock !== null && product.stock <= 0
             
             return (
-              <div key={product.id} className="bg-white rounded-[3rem] border border-slate-100 shadow-[0_10px_40px_rgba(0,0,0,0.03)] hover:shadow-[0_25px_60px_rgba(0,0,0,0.1)] hover:border-sky-100 transition-all duration-700 group flex flex-col relative h-full">
-                <div className="relative h-80 md:h-96 bg-slate-50 flex items-center justify-center overflow-hidden rounded-t-[3rem] border-b border-slate-50">
-                  <div className="absolute inset-0 group-hover:scale-105 transition-transform duration-1000 ease-out">
+              <div key={product.id} className="bg-white rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:border-sky-100 transition-all duration-500 group flex flex-col relative h-full overflow-hidden">
+                <div className="relative h-56 md:h-64 bg-slate-50 flex items-center justify-center overflow-hidden border-b border-slate-50">
+                  <div className="absolute inset-0 group-hover:scale-110 transition-transform duration-700 ease-out">
                     <ProductImage src={product.image_url} alt={product.name} />
                   </div>
-                  <div className="absolute top-6 right-6 flex flex-col gap-2.5 z-20">
+                  
+                  {/* Status Badges */}
+                  <div className="absolute top-4 right-4 flex flex-col gap-2 z-20">
                     {!product.is_visible && (
-                      <div className="bg-slate-900/90 backdrop-blur-xl text-white text-[11px] font-black px-4 py-2 rounded-2xl border border-white/10 shadow-2xl flex items-center gap-2">
-                        <Archive className="h-4 w-4" /> مخفي
+                      <div className="bg-slate-900/90 backdrop-blur-md text-white text-[9px] font-black px-3 py-1.5 rounded-xl border border-white/10 shadow-lg flex items-center gap-1.5">
+                        <Archive className="h-3 w-3" /> مخفي
                       </div>
                     )}
                     {isOutOfStock && (
-                      <div className="bg-rose-500/90 backdrop-blur-xl text-white text-[11px] font-black px-4 py-2 rounded-2xl border border-white/10 shadow-2xl flex items-center gap-2">
-                        <PackageX className="h-4 w-4" /> نفدت الكمية
+                      <div className="bg-rose-500/90 backdrop-blur-md text-white text-[9px] font-black px-3 py-1.5 rounded-xl border border-white/10 shadow-lg flex items-center gap-1.5">
+                        <PackageX className="h-3 w-3" /> نفد
                       </div>
                     )}
                   </div>
-                  <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-xl px-5 py-3 rounded-[1.5rem] border border-white shadow-lg z-20 flex items-baseline gap-1.5 transition-transform group-hover:-translate-y-1">
-                    <span className="text-2xl font-black text-slate-900 font-poppins">{product.price.toLocaleString()}</span>
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">ج.م</span>
+
+                  {/* Price Tag */}
+                  <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-md px-4 py-2 rounded-2xl border border-white shadow-md z-20 flex items-baseline gap-1 transition-transform group-hover:-translate-y-1">
+                    <span className="text-lg font-black text-slate-900 font-poppins">{product.price.toLocaleString()}</span>
+                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none">ج.م</span>
                   </div>
                 </div>
-                <div className="p-10 flex flex-col flex-1 space-y-8">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2.5 text-[10px] font-black text-sky-500/60 uppercase tracking-[0.2em]">
-                       <div className="h-1 w-4 bg-sky-500/20 rounded-full" />
-                       <Tag className="h-3 w-3" /> تصنيف المنتج
+
+                <div className="p-6 flex flex-col flex-1 space-y-5">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-[9px] font-black text-sky-500/60 uppercase tracking-widest">
+                       <Tag className="h-2.5 w-2.5" /> تصنيف المنتج
                     </div>
-                    <h3 className="text-2xl md:text-3xl font-black text-slate-900 font-inter line-clamp-1 group-hover:text-sky-600 transition-colors leading-tight">{product.name}</h3>
-                    <p className="text-base font-bold text-slate-400 line-clamp-2 font-inter leading-relaxed min-h-[3rem]">{product.description || 'لا يوجد وصف مضاف لهذا المنتج.'}</p>
+                    <h3 className="text-xl font-black text-slate-900 font-inter line-clamp-1 group-hover:text-sky-600 transition-colors">{product.name}</h3>
+                    <p className="text-sm font-bold text-slate-400 line-clamp-2 font-inter leading-relaxed min-h-[2.5rem] opacity-80">{product.description || 'لا يوجد وصف مضاف لهذا المنتج.'}</p>
                   </div>
-                  <div className="flex items-center gap-4 py-6 border-y border-slate-50/80">
-                    <div className={`flex-1 flex items-center justify-center gap-3 px-6 py-4 rounded-2xl border text-sm font-black transition-all ${isOutOfStock ? 'bg-rose-50/50 text-rose-600 border-rose-100' : 'bg-slate-50 text-slate-600 border-slate-100 group-hover:bg-sky-50'}`}>
-                      <Box className="h-5 w-5" />
+
+                  <div className="flex items-center gap-3 py-4 border-y border-slate-50/80">
+                    <div className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border text-[11px] font-black transition-all ${isOutOfStock ? 'bg-rose-50/50 text-rose-600 border-rose-100' : 'bg-slate-50 text-slate-500 border-slate-100 group-hover:bg-sky-50'}`}>
+                      <Box className="h-4 w-4" />
                       <span>المخزون: {product.stock !== null ? product.stock : '∞'}</span>
                     </div>
                   </div>
-                  <div className="pt-2 mt-auto">
+
+                  <div className="pt-1 mt-auto">
                     <ProductActions productId={product.id} storeSlug={storeSlug} />
                   </div>
                 </div>

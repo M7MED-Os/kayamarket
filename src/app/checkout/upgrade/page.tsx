@@ -32,6 +32,8 @@ import { submitUpgradeRequest } from '@/app/actions/subscription'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
+import { KayaLogo } from '@/components/common/KayaLogo'
+
 export default function UpgradeCheckoutPage() {
    const searchParams = useSearchParams()
    const router = useRouter()
@@ -118,20 +120,8 @@ export default function UpgradeCheckoutPage() {
          
          <header className="bg-white border-b border-slate-200 sticky top-0 z-50 h-20">
             <div className="max-w-5xl mx-auto px-6 h-full flex items-center justify-between">
-               <div className="flex items-center gap-1 shrink-0">
-                  <div className="text-sky-500 shrink-0">
-                     <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 shrink-0">
-                        <path d="M15 50 C15 30.67 30.67 15 50 15 C69.33 15 85 30.67 85 50" stroke="currentColor" strokeWidth="6" strokeLinecap="round"></path>
-                        <path d="M85 50 C85 69.33 69.33 85 50 85 C30.67 85 15 69.33 15 50" stroke="currentColor" strokeWidth="6" strokeLinecap="round"></path>
-                        <path d="M30 35 L30 65" stroke="currentColor" strokeWidth="6" strokeLinecap="round"></path>
-                        <path d="M50 50 L50 70" stroke="currentColor" strokeWidth="6" strokeLinecap="round"></path>
-                        <path d="M35 30 L50 50 L65 30" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"></path>
-                        <path d="M70 35 L70 65" stroke="currentColor" strokeWidth="6" strokeLinecap="round"></path>
-                     </svg>
-                  </div>
-                  <span className="text-lg md:text-xl font-black text-sky-500 tracking-tight whitespace-nowrap">
-                     Kaya<span className="font-semibold text-slate-400">Market</span>
-                  </span>
+               <div className="flex items-center shrink-0">
+                  <KayaLogo className="h-10 w-10 shrink-0" />
                </div>
                
                <Link href="/admin/settings" className="text-[10px] font-bold text-slate-400 hover:text-slate-900 transition-colors flex items-center gap-2">

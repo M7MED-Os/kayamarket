@@ -2,17 +2,28 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, BarChart2, LayoutTemplate, ShieldCheck, Zap, Globe, ShoppingBag, CheckCircle2, Languages, Sparkles } from 'lucide-react'
+import {
+  ArrowRight, Languages, Sparkles, MessageCircle,
+  FileText, Ticket, Navigation, Palette,
+  Store, UserPlus, Rocket, TrendingUp, Plus, Minus
+} from 'lucide-react'
 
-export const KayaLogo = ({ className = "h-8 w-8" }: { className?: string }) => (
-  <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${className} shrink-0`}>
-    <path d="M15 50 C15 30.67 30.67 15 50 15 C69.33 15 85 30.67 85 50" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
-    <path d="M85 50 C85 69.33 69.33 85 50 85 C30.67 85 15 69.33 15 50" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
-    <path d="M30 35 L30 65" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
-    <path d="M50 50 L50 70" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
-    <path d="M35 30 L50 50 L65 30" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M70 35 L70 65" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
-  </svg>
+export const KayaLogo = ({ className = "h-9 w-9" }: { className?: string }) => (
+  <div className="flex items-center" dir="ltr">
+    <div className="text-sky-500 shrink-0">
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className={`${className} shrink-0`}>
+        <path d="M15 50 C15 30.67 30.67 15 50 15 C69.33 15 85 30.67 85 50" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+        <path d="M85 50 C85 69.33 69.33 85 50 85 C30.67 85 15 69.33 15 50" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+        <path d="M30 35 L30 65" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+        <path d="M50 50 L50 70" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+        <path d="M35 30 L50 50 L65 30" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M70 35 L70 65" stroke="currentColor" strokeWidth="6" strokeLinecap="round" />
+      </svg>
+    </div>
+    <span className="text-xl md:text-2xl font-black text-sky-500 tracking-tight whitespace-nowrap leading-none">
+      Kaya<span className="font-normal text-slate-400">Market</span>
+    </span>
+  </div>
 )
 
 const translations = {
@@ -20,31 +31,50 @@ const translations = {
     nav: {
       features: 'Features',
       pricing: 'Pricing',
-      resources: 'Resources',
       login: 'Log in',
       start: 'Start Your Store'
     },
     hero: {
       badge: 'KayaMarket 2.0 is live',
-      title: 'Grow Your Business Online',
-      desc: 'The easiest way to create and manage your online store. Setup in minutes, customize your brand, and start selling today with zero technical skills required.',
-      cta1: 'Start Your Store',
-      cta2: 'View Dashboard'
+      title_part1: 'Launch Your Professional',
+      title_part2: 'Online Store',
+      desc: 'The complete platform to start, manage, and scale your business professionally with zero technical skills required.',
+      cta1: 'Start Your Store Now'
     },
     features: {
       title: 'Everything you need to succeed',
       desc: 'Powerful tools designed to simplify your business management and scale your growth.',
       list: [
-        { title: 'Simple Store Builder', desc: 'Drag and drop interface to customize your theme, colors, fonts, and logo with live preview.' },
-        { title: 'Product Management', desc: 'Easily add, edit, and organize your products. Track stock levels and variations effortlessly.' },
-        { title: 'Visual Analytics', desc: 'Understand your growth with clear, simple charts showing revenue, orders, and visitors.' },
-        { title: 'Fast Checkout Flow', desc: 'Smooth customer experience from product discovery to final payment.' },
-        { title: 'Secure & Scalable', desc: 'Enterprise-grade security and isolated databases for every store.' },
-        { title: 'Mobile First', desc: 'Your store looks and works perfectly on any device, right out of the box.' }
+        { title: 'Elegant Store Builder', desc: 'Customizable themes with live preview and brand personalization.' },
+        { title: 'Smart Invoice System', desc: 'Automatically generate professional invoices for every order with custom branding.' },
+        { title: 'WhatsApp Integration', desc: 'Receive orders and communicate directly with customers via WhatsApp.' },
+        { title: 'Live Order Tracking', desc: 'Real-time status updates for customers from "Pending" to "Delivered".' },
+        { title: 'Marketing & Coupons', desc: 'Create discount codes and seasonal offers to boost your sales.' },
+        { title: 'Visual Analytics', desc: 'Detailed insights into revenue, visitor traffic, and top-selling products.' }
+      ]
+    },
+    steps: {
+      title: 'Start in 3 simple steps',
+      desc: 'Join our ecosystem and launch your business today.',
+      list: [
+        { title: 'Create Account', desc: 'Sign up in seconds and name your store.' },
+        { title: 'Add Products', desc: 'Upload your items with photos and prices.' },
+        { title: 'Start Selling', desc: 'Launch your link and receive orders immediately.' }
+      ]
+    },
+    faq: {
+      title: 'Got Questions?',
+      desc: 'Find answers to common questions about our platform.',
+      list: [
+        { q: 'Do I need coding skills?', a: 'Not at all, the platform is designed for total simplicity. You can manage everything through an intuitive dashboard.' },
+        { q: 'How do I receive orders?', a: 'Orders arrive directly in your dashboard with instant notifications. You also get WhatsApp alerts if enabled.' },
+        { q: 'Can I use a custom domain?', a: 'Yes, custom domain mapping is available in our professional plans to help you build a stronger brand.' },
+        { q: 'What about payment methods?', a: 'We support Cash on Delivery, Mobile Wallets, and InstaPay.' },
+        { q: 'Do you take commission on sales?', a: 'No, we do not take any commission or percentage of your sales. Your profits are entirely yours.' }
       ]
     },
     footer: {
-      tagline: 'Grow your business online. The modern platform for modern entrepreneurs.',
+      tagline: 'The modern platform for modern entrepreneurs.',
       rights: 'All rights reserved.'
     }
   },
@@ -52,34 +82,144 @@ const translations = {
     nav: {
       features: 'المميزات',
       pricing: 'الأسعار',
-      resources: 'المصادر',
       login: 'تسجيل الدخول',
       start: 'أنشئ متجرك الآن'
     },
     hero: {
       badge: 'تم إطلاق KayaMarket 2.0',
-      title: 'نمِّ تجارتك عبر الإنترنت',
-      desc: 'الطريقة الأسهل لإنشاء وإدارة متجرك الإلكتروني. إعداد في دقائق، تخصيص هويتك التجارية، وابدأ البيع اليوم دون الحاجة لخبرة تقنية.',
-      cta1: 'أنشئ متجرك الآن',
-      cta2: 'لوحة التحكم'
+      title_part1: 'أنشئ متجرك الإلكتروني',
+      title_part2: 'الاحترافي في دقائق',
+      desc: 'المنصة المتكاملة التي تمنحك كل ما تحتاجه لإطلاق مبيعاتك وتوسيع نطاق عملك بسهولة واحترافية، دون الحاجة لأي خبرة تقنية.',
+      cta1: 'ابدأ متجرك الآن'
     },
     features: {
       title: 'كل ما تحتاجه للنجاح',
       desc: 'أدوات قوية مصممة لتبسيط إدارة أعمالك وقياس نموك وتوسعه.',
       list: [
-        { title: 'منشئ متاجر بسيط', desc: 'واجهة سحب وإفلات لتخصيص القالب، الألوان، الخطوط، والشعار مع معاينة مباشرة.' },
-        { title: 'إدارة المنتجات', desc: 'أضف، عدل، ونظم منتجاتك بسهولة. تتبع مستويات المخزون والأنواع المختلفة بجهد أقل.' },
-        { title: 'تحليلات بصرية', desc: 'افهم نموك من خلال رسوم بيانية واضحة وبسيطة تعرض الإيرادات، الطلبات، والزوار.' },
-        { title: 'تدفق شراء سريع', desc: 'تجربة عملاء سلسة تبدأ من اكتشاف المنتج وحتى إتمام عملية الدفع النهائية.' },
-        { title: 'آمن وقابل للتوسع', desc: 'أمان بمستوى الشركات وقواعد بيانات مستقلة ومعزولة لكل متجر.' },
-        { title: 'الأولوية للهاتف', desc: 'متجرك يبدو ويعمل بشكل مثالي على أي جهاز، بمجرد إطلاقه مباشرة.' }
+        { title: 'منشئ متاجر احترافي', desc: 'ثيمات عصرية  مع تخصيص كامل للهوية البصرية والمعاينة المباشرة.' },
+        { title: 'نظام فواتير ذكي', desc: 'إصدار فواتير احترافية تلقائياً لكل طلب مع شعار متجرك وبياناتك الخاصة.' },
+        { title: 'الربط مع واتساب', desc: 'استقبل الطلبات وتواصل مباشرة مع عملائك عبر واتساب بنقرة واحدة.' },
+        { title: 'تتبع مباشر للطلبات', desc: 'نظام تتبع يتيح لعملائك معرفة حالة طلبهم من "قيد التنفيذ" إلى "تم التوصيل".' },
+        { title: 'التسويق والكوبونات', desc: 'أنشئ أكواد خصم وعروض موسمية لزيادة مبيعاتك وجذب عملاء جدد.' },
+        { title: 'تحليلات بصرية', desc: 'رؤية واضحة لأداء متجرك، الأرباح، الزيارات، والمنتجات الأكثر مبيعاً.' }
+      ]
+    },
+    steps: {
+      title: 'ابدأ في 3 خطوات بسيطة',
+      desc: 'انضم إلى منظومتنا وأطلق مشروعك اليوم.',
+      list: [
+        { title: 'أنشئ حسابك', desc: 'سجل في ثوانٍ واختر اسماً لمتجرك.' },
+        { title: 'أضف منتجاتك', desc: 'ارفع صور منتجاتك وحدد أسعارك بسهولة.' },
+        { title: 'ابدأ البيع', desc: 'انشر رابط متجرك واستقبل طلباتك فوراً.' }
+      ]
+    },
+    faq: {
+      title: 'لديك استفسار؟',
+      desc: 'إليك الأجوبة على أكثر الأسئلة شيوعاً حول المنصة.',
+      list: [
+        { q: 'هل أحتاج لخبرة في البرمجة؟', a: 'بالطبع لا، المنصة مصممة لتبسيط العملية تماماً. يمكنك إدارة كل شيء من لوحة تحكم بديهية.' },
+        { q: 'كيف أستقبل الطلبات؟', a: 'تصل الطلبات مباشرة إلى لوحة التحكم مع تنبيهات فورية، كما يمكنك تفعيل تنبيهات واتساب.' },
+        { q: 'هل يمكنني ربط دومين خاص؟', a: 'نعم، يمكنك ربط دومينك الخاص في الخطط الاحترافية لتعزيز هوية متجرك.' },
+        { q: 'ماذا عن وسائل الدفع في المتجر؟', a: 'الدفع عند الاستلام وعلى المحافظ الإلكترونية وإنستا باي.' },
+        { q: 'هل المنصة تأخذ نسبة على المبيعات؟', a: 'لا، لا نأخذ أي عمولة على مبيعاتك، أرباحك لك بالكامل.' }
       ]
     },
     footer: {
-      tagline: 'نمِّ تجارتك عبر الإنترنت. المنصة العصرية لرواد الأعمال الطموحين.',
+      tagline: 'المنصة العصرية لرواد الأعمال الطموحين.',
       rights: 'جميع الحقوق محفوظة.'
     }
   }
+}
+
+const SectionHeading = ({ title, desc }: { title: string, desc: string }) => (
+  <div className="mb-16 space-y-4 flex flex-col items-center text-center">
+    <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">{title}</h2>
+    <div className="h-1.5 w-16 bg-sky-500 rounded-full" />
+    <p className="text-slate-500 text-base md:text-lg font-semibold max-w-2xl opacity-70 leading-relaxed">{desc}</p>
+  </div>
+)
+
+const FAQItem = ({ q, a }: { q: string, a: string }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  return (
+    <div className="border border-slate-100 rounded-[2rem] overflow-hidden transition-all bg-white shadow-sm hover:shadow-md">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between p-8 text-right hover:bg-slate-50/50 transition-colors"
+      >
+        <span className="text-xl font-black text-slate-900">{q}</span>
+        <div className={`p-2 rounded-xl transition-all ${isOpen ? 'bg-sky-500 text-white' : 'bg-slate-50 text-slate-400'}`}>
+          {isOpen ? <Minus className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+        </div>
+      </button>
+      {isOpen && (
+        <div className="p-8 pt-0 text-slate-500 font-bold text-lg leading-relaxed animate-in fade-in slide-in-from-top-4 duration-300">
+          {a}
+        </div>
+      )}
+    </div>
+  )
+}
+
+export function Footer({ lang, t }: { lang: 'en' | 'ar', t: any }) {
+  return (
+    <footer className="bg-white border-t border-slate-100 pt-24 pb-12 w-full">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-20">
+          {/* Logo and Tagline Column */}
+          <div className="md:col-span-6 lg:col-span-5 flex flex-col items-center md:items-start space-y-6">
+            <KayaLogo className="h-10 w-10" />
+            <p className="text-slate-400 leading-relaxed text-sm font-bold max-w-sm text-center md:text-start">
+              {t.footer.tagline}
+            </p>
+          </div>
+
+          <div className="hidden lg:block lg:col-span-1"></div>
+
+          {/* Links Columns */}
+          <div className="md:col-span-6 lg:col-span-6 grid grid-cols-1 sm:grid-cols-3 gap-12 text-center md:text-start">
+            {[
+              { title: lang === 'en' ? 'Product' : 'المنتج', links: lang === 'en' ? ['Features', 'Pricing'] : ['المميزات', 'الأسعار'] },
+              { title: lang === 'en' ? 'Resources' : 'المصادر', links: lang === 'en' ? ['Help Center', 'Guides'] : ['مركز المساعدة', 'الدلائل'] },
+              { title: lang === 'en' ? 'Legal' : 'قانوني', links: lang === 'en' ? ['Privacy', 'Terms'] : ['الخصوصية', 'الشروط'] }
+            ].map((section, i) => (
+              <div key={i} className="space-y-6">
+                <h4 className="text-slate-900 font-black uppercase tracking-widest text-xs">{section.title}</h4>
+                <ul className="space-y-4">
+                  {section.links.map((link, li) => (
+                    <li key={li}>
+                      <Link href={link === 'Pricing' || link === 'الأسعار' ? '/pricing' : '#'} className="text-slate-400 hover:text-sky-500 transition-colors font-bold text-sm block">{link}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="pt-12 border-t border-slate-100 flex flex-col md:flex-row items-center justify-between gap-8">
+          <p className="text-slate-400 text-xs font-bold order-2 md:order-1">
+            © {new Date().getFullYear()} KayaMarket. {t.footer.rights}
+          </p>
+          <div className="flex items-center gap-4 order-1 md:order-2">
+            {/* X / Twitter */}
+            <a href="#" className="h-10 w-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:text-sky-500 hover:bg-white hover:shadow-md transition-all">
+              <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
+            </a>
+            {/* LinkedIn */}
+            <a href="#" className="h-10 w-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:text-sky-500 hover:bg-white hover:shadow-md transition-all">
+              <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" /></svg>
+            </a>
+            {/* Facebook */}
+            <a href="#" className="h-10 w-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 hover:text-sky-500 hover:bg-white hover:shadow-md transition-all">
+              <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  )
 }
 
 export default function PlatformHomePage() {
@@ -88,39 +228,32 @@ export default function PlatformHomePage() {
   const isRtl = lang === 'ar'
 
   return (
-    <div className={`min-h-screen bg-slate-50 text-slate-900 selection:bg-sky-100 ${isRtl ? 'font-cairo' : 'font-poppins'}`} dir={isRtl ? 'rtl' : 'ltr'}>
-      
+    <div className={`min-h-screen bg-white text-slate-900 selection:bg-sky-100 ${isRtl ? 'font-cairo' : 'font-poppins'}`} dir={isRtl ? 'rtl' : 'ltr'}>
+
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-50">
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 md:px-12">
-          <div className="flex items-center gap-1 shrink-0">
-            <div className="text-sky-500 shrink-0">
-              <KayaLogo className="h-10 w-10" />
-            </div>
-            <span className="text-xl md:text-2xl font-black text-sky-500 tracking-tight whitespace-nowrap">
-              Kaya<span className="font-semibold text-slate-400">Market</span>
-            </span>
-          </div>
-          
-          <div className="flex items-center gap-2 md:gap-8">
+          <KayaLogo />
+
+          <div className="flex items-center gap-3 md:gap-8">
             <nav className="hidden lg:flex items-center gap-8 text-xs font-black uppercase tracking-widest text-slate-500">
               <a href="#features" className="hover:text-sky-500 transition-colors whitespace-nowrap">{t.nav.features}</a>
               <Link href="/pricing" className="hover:text-sky-500 transition-colors whitespace-nowrap">{t.nav.pricing}</Link>
             </nav>
-            
-            <button 
+
+            <button
               onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}
-              className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 text-zinc-900 hover:bg-white border border-transparent hover:border-slate-200 transition-all shrink-0"
+              className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 text-zinc-900 hover:bg-white border border-transparent hover:border-slate-200 transition-all"
             >
               <Languages className="h-4 w-4 text-sky-500" />
-              <span className="text-[10px] font-black">{lang === 'en' ? 'العربية' : 'ENGLISH'}</span>
+              <span className="text-[10px] font-black">{lang === 'en' ? 'AR' : 'EN'}</span>
             </button>
 
-            <div className="flex items-center gap-3 md:pl-8 md:border-l border-slate-200 md:rtl:pl-0 md:rtl:pr-8 md:rtl:border-l-0 md:rtl:border-r">
+            <div className="flex items-center gap-3">
               <Link href="/login" className="hidden md:block text-xs font-black uppercase tracking-widest text-slate-900 hover:text-sky-500 transition-colors whitespace-nowrap">
                 {t.nav.login}
               </Link>
-              <Link href="/register" className="rounded-xl md:rounded-2xl bg-sky-500 px-3.5 md:px-6 py-2.5 md:py-3 text-[10px] md:text-xs font-black uppercase tracking-widest text-white hover:bg-sky-600 transition-all shadow-lg shadow-sky-200 whitespace-nowrap">
+              <Link href="/register" className="rounded-xl md:rounded-2xl bg-sky-500 px-5 md:px-7 py-3 md:py-3.5 text-[10px] md:text-xs font-black uppercase tracking-widest text-white hover:bg-sky-600 transition-all shadow-lg shadow-sky-100 whitespace-nowrap">
                 {t.nav.start}
               </Link>
             </div>
@@ -129,242 +262,133 @@ export default function PlatformHomePage() {
       </header>
 
       {/* Hero Section */}
-      <main className="flex-1 flex flex-col items-center px-6 pt-24 pb-20 text-center">
-        <div className="max-w-4xl space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-sky-50 border border-sky-100 text-[10px] font-black uppercase tracking-widest text-sky-600 mb-2">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
-            </span>
-            {t.hero.badge}
-          </div>
+      <section className="relative flex flex-col items-center justify-center px-6 min-h-[calc(100vh-81px)] text-center bg-white overflow-hidden py-10 md:py-16">
+        {/* Abstract background elements for flair */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full pointer-events-none opacity-50">
+          <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-sky-50 blur-[120px] rounded-full" />
+          <div className="absolute bottom-[10%] right-[-10%] w-[30%] h-[30%] bg-blue-50 blur-[100px] rounded-full" />
+        </div>
 
-          <h1 className={`text-4xl md:text-7xl font-black tracking-tight text-slate-900 leading-[1.15]`}>
-            {lang === 'en' ? (
-              <>Grow Your Business <br className="hidden md:block" /> <span className="text-sky-500">Online</span></>
-            ) : (
-              <>نمِّ تجارتك <span className="text-sky-500">عبر الإنترنت</span> <br className="hidden md:block" /> بسهولة تامة</>
-            )}
+        <div className="max-w-5xl space-y-5 animate-in fade-in slide-in-from-bottom-8 duration-1000 relative z-10">
+          <h1 className="text-4xl md:text-7xl font-black tracking-tight text-slate-900 leading-[1.15]">
+            {t.hero.title_part1} <br className="hidden md:block" />
+            <span className="text-sky-500">{t.hero.title_part2}</span>
           </h1>
-          
-          <p className="text-lg md:text-xl text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed px-4">
+
+          <p className="text-base md:text-lg text-slate-500 font-semibold max-w-2xl mx-auto leading-relaxed px-4 opacity-80">
             {t.hero.desc}
           </p>
-          
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
-            <Link href="/register" className="group flex items-center justify-center gap-3 w-full sm:w-auto rounded-2xl bg-zinc-900 px-10 py-5 text-lg font-black text-white hover:bg-zinc-800 transition-all hover:-translate-y-1 shadow-2xl shadow-zinc-200">
+
+          <div className="flex pt-1 justify-center">
+            <Link href="/register" className="group flex items-center justify-center gap-4 rounded-2xl bg-zinc-900 px-10 md:px-14 py-4 md:py-5 text-lg md:text-xl font-black text-white hover:bg-zinc-800 transition-all hover:-translate-y-1 shadow-2xl shadow-zinc-200">
               {t.hero.cta1}
-              <ArrowRight className={`h-5 w-5 group-hover:translate-x-1 transition-transform ${isRtl ? 'rotate-180' : ''}`} />
-            </Link>
-            <Link href="/admin" className="flex items-center justify-center w-full sm:w-auto rounded-2xl bg-white border border-slate-200 px-10 py-5 text-lg font-black text-slate-700 hover:bg-slate-50 transition-all shadow-sm">
-              {t.hero.cta2}
+              <ArrowRight className={`h-5 w-5 md:h-6 md:w-6 transition-transform group-hover:translate-x-1 ${isRtl ? 'rotate-180 group-hover:-translate-x-1' : ''}`} />
             </Link>
           </div>
-        </div>
 
-        {/* Dashboard Preview - Hidden on mobile */}
-        <div className="hidden md:block w-full max-w-5xl mt-24 relative rounded-[3rem] overflow-hidden border border-slate-200 bg-white shadow-2xl p-4 md:p-6 group">
-           <div className="aspect-[1.2/1] md:aspect-[16/9] w-full rounded-[2rem] bg-slate-50 border border-slate-100 flex items-center justify-center overflow-hidden relative shadow-inner">
-              {/* Mock Dashboard UI - Represents the actual Admin UI but with platform colors */}
-              <div className="absolute inset-0 bg-[#fffbfc] flex flex-col scale-[0.8] sm:scale-100 transition-all duration-700 origin-center min-w-[500px] left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 sm:min-w-0 sm:w-full">
-                {/* Header */}
-                <div className="h-16 border-b border-zinc-100 bg-white flex items-center justify-between px-8">
-                  <div className="flex items-center gap-4">
-                    <div className="h-9 w-9 bg-sky-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-sky-200">
-                      <KayaLogo className="h-5 w-5" />
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      <div className="h-2 w-24 bg-zinc-100 rounded-full"></div>
-                      <div className="h-1.5 w-16 bg-zinc-50 rounded-full"></div>
-                    </div>
-                  </div>
-                  <div className="flex gap-3">
-                    <div className="h-8 w-8 rounded-full bg-zinc-50 border border-zinc-100"></div>
-                    <div className="h-8 w-24 rounded-full bg-sky-50 border border-sky-100"></div>
-                  </div>
-                </div>
-
-                <div className="flex-1 flex overflow-hidden">
-                  {/* Sidebar - Hidden on extreme small/scaled views for better clarity */}
-                  <div className="w-60 border-r border-zinc-100 p-6 hidden lg:block bg-white">
-                    <div className="space-y-3">
-                      <div className="h-10 bg-sky-50 rounded-xl w-full flex items-center px-4 gap-3">
-                         <div className="h-4 w-4 rounded-md bg-sky-200"></div>
-                         <div className="h-2 w-20 bg-sky-300 rounded-full"></div>
-                      </div>
-                      {[1, 2, 3, 4].map(i => (
-                        <div key={i} className="h-10 bg-white rounded-xl w-full border border-zinc-50 flex items-center px-4 gap-3">
-                           <div className="h-4 w-4 rounded-md bg-zinc-100"></div>
-                           <div className="h-2 w-16 bg-zinc-100 rounded-full"></div>
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <div className="mt-auto pt-40">
-                      <div className="h-20 bg-zinc-50 rounded-2xl w-full border border-zinc-100 border-dashed"></div>
-                    </div>
-                  </div>
-
-                  {/* Main Content */}
-                  <div className="flex-1 p-8 space-y-8 overflow-hidden bg-zinc-50/30">
-                    <div className="flex justify-between items-center">
-                      <div className="space-y-2">
-                        <div className="h-6 w-48 bg-zinc-800 rounded-lg"></div>
-                        <div className="h-3 w-32 bg-zinc-400 rounded-full opacity-50"></div>
-                      </div>
-                      <div className="h-10 w-32 bg-sky-500 rounded-xl shadow-lg shadow-sky-200 flex items-center justify-center">
-                         <div className="h-2 w-16 bg-white/40 rounded-full"></div>
-                      </div>
-                    </div>
-
-                    {/* Stats */}
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                      <div className="bg-white p-5 rounded-2xl border border-zinc-100 shadow-sm space-y-3">
-                        <div className="h-8 w-8 bg-sky-100 rounded-lg"></div>
-                        <div className="h-3 w-20 bg-zinc-100 rounded-full"></div>
-                        <div className="h-6 w-12 bg-zinc-900 rounded-lg"></div>
-                      </div>
-                      <div className="bg-white p-5 rounded-2xl border border-zinc-100 shadow-sm space-y-3">
-                        <div className="h-8 w-8 bg-blue-100 rounded-lg"></div>
-                        <div className="h-3 w-20 bg-zinc-100 rounded-full"></div>
-                        <div className="h-6 w-12 bg-zinc-900 rounded-lg"></div>
-                      </div>
-                      <div className="bg-white p-5 rounded-2xl border border-zinc-100 shadow-sm space-y-3 hidden sm:block">
-                        <div className="h-8 w-8 bg-amber-100 rounded-lg"></div>
-                        <div className="h-3 w-20 bg-zinc-100 rounded-full"></div>
-                        <div className="h-6 w-12 bg-zinc-900 rounded-lg"></div>
-                      </div>
-                    </div>
-
-                    {/* Table/List Mock */}
-                    <div className="bg-white border border-zinc-100 rounded-3xl shadow-sm overflow-hidden">
-                       <div className="h-12 bg-zinc-50/50 border-b border-zinc-100 flex items-center px-6 justify-between">
-                          <div className="h-2 w-24 bg-zinc-200 rounded-full"></div>
-                          <div className="flex gap-4">
-                            <div className="h-2 w-12 bg-zinc-100 rounded-full"></div>
-                            <div className="h-2 w-12 bg-zinc-100 rounded-full"></div>
-                          </div>
-                       </div>
-                       <div className="p-6 space-y-6">
-                          {[1, 2].map(i => (
-                            <div key={i} className="flex items-center justify-between pb-6 border-b border-zinc-50 last:border-0 last:pb-0">
-                               <div className="flex items-center gap-4">
-                                  <div className="h-12 w-12 bg-sky-50 rounded-xl border border-sky-100 flex items-center justify-center">
-                                     <div className="h-6 w-6 bg-sky-200/50 rounded-md"></div>
-                                  </div>
-                                  <div className="space-y-2">
-                                     <div className="h-3 w-32 bg-zinc-800 rounded-full"></div>
-                                     <div className="h-2 w-20 bg-zinc-400 rounded-full opacity-40"></div>
-                                  </div>
-                               </div>
-                               <div className="flex gap-3">
-                                  <div className="h-8 w-8 rounded-lg bg-zinc-50"></div>
-                                  <div className="h-8 w-8 rounded-lg bg-zinc-50"></div>
-                               </div>
-                            </div>
-                          ))}
-                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-           </div>
-        </div>
-
-        {/* Features Grid */}
-        <div id="features" className="w-full max-w-7xl mt-40">
-          <div className="text-center mb-24 px-6">
-            <h2 className="text-3xl md:text-5xl font-black mb-8 text-zinc-900">{t.features.title}</h2>
-            <p className="text-slate-500 text-lg max-w-2xl mx-auto font-bold opacity-80">{t.features.desc}</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 px-6">
-            {t.features.list.map((feat, i) => (
-              <div key={i} className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all group flex flex-col items-center text-center">
-                <div className="h-14 w-14 rounded-2xl bg-sky-50 text-sky-500 flex items-center justify-center mb-6 group-hover:bg-sky-500 group-hover:text-white transition-all shadow-sm">
-                  {i === 0 && <LayoutTemplate className="h-7 w-7" />}
-                  {i === 1 && <ShoppingBag className="h-7 w-7" />}
-                  {i === 2 && <BarChart2 className="h-7 w-7" />}
-                  {i === 3 && <Zap className="h-7 w-7" />}
-                  {i === 4 && <ShieldCheck className="h-7 w-7" />}
-                  {i === 5 && <Globe className="h-7 w-7" />}
-                </div>
-                <h3 className="text-xl font-black text-zinc-900 mb-4">{feat.title}</h3>
-                <p className="text-slate-500 leading-relaxed text-sm font-bold opacity-70">{feat.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* CTA Section */}
-        <div className="w-full max-w-5xl mx-auto mt-24 md:mt-32 bg-zinc-900 rounded-[2.5rem] md:rounded-[3rem] p-8 md:py-20 md:px-12 text-center relative overflow-hidden shadow-2xl shadow-zinc-200">
-           <div className="absolute top-0 right-0 w-80 h-80 bg-sky-500/20 blur-[100px] rounded-full -mr-40 -mt-40" />
-           <div className="absolute bottom-0 left-0 w-64 h-64 bg-sky-500/10 blur-[80px] rounded-full -ml-32 -mb-32" />
-           
-           <div className="relative z-10 max-w-2xl mx-auto space-y-8">
-             <h2 className="text-3xl md:text-5xl font-black text-white leading-tight">
-               {isRtl ? 'جاهز لإطلاق متجرك؟' : 'Ready to launch your store?'}
-             </h2>
-             <p className="text-zinc-400 text-sm md:text-base font-bold">
-               {isRtl ? 'ابدأ رحلتك اليوم وأنشئ متجر أحلامك الإلكتروني مع أدوات KayaMarket القوية والبسيطة.' : 'Start your journey today and build the online store of your dreams with KayaMarket\'s powerful and simple tools.'}
-             </p>
-             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                <Link href="/register" className="group flex items-center gap-3 bg-white text-zinc-900 px-8 md:px-10 py-3.5 md:py-4 rounded-xl md:rounded-2xl font-black text-sm md:text-base hover:bg-sky-50 transition-all shadow-xl">
-                  {t.nav.start}
-                  <Sparkles className="h-5 w-5 text-sky-500 group-hover:scale-125 transition-transform" />
-                </Link>
-             </div>
-           </div>
-        </div>
-      </main>
-      
-      {/* Footer */}
-      <footer className="bg-white border-t border-slate-100 pt-24 pb-12">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-24">
-            <div className={`md:col-span-1 ${isRtl ? 'text-right' : 'text-left'}`}>
-              <div className={`flex items-center gap-1 mb-8 text-sky-500`}>
-                <KayaLogo className="h-10 w-10" />
-                <span className="text-2xl font-black text-sky-500 tracking-tight">Kaya<span className="text-slate-500">Market</span></span>
-              </div>
-              <p className="text-slate-400 leading-relaxed text-sm font-bold mb-6">
-                {t.footer.tagline}
-              </p>
-              <button 
-                onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}
-                className="flex lg:hidden items-center gap-2 px-4 py-2 rounded-xl bg-slate-50 text-slate-900 hover:bg-slate-100 border border-slate-100 transition-all text-xs font-black"
-              >
-                <Languages className="h-4 w-4 text-sky-500" />
-                {lang === 'en' ? 'العربية' : 'English'}
-              </button>
-            </div>
-            
+          {/* Social proof stats - Responsive wrap */}
+          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-16 pt-6 border-t border-slate-100 mt-6">
             {[
-              { title: lang === 'en' ? 'Product' : 'المنتج', links: lang === 'en' ? ['Features', 'Pricing'] : ['المميزات', 'الأسعار'] },
-              { title: lang === 'en' ? 'Resources' : 'المصادر', links: lang === 'en' ? ['Help Center', 'Guides'] : ['مركز المساعدة', 'الدلائل'] },
-              { title: lang === 'en' ? 'Legal' : 'قانوني', links: lang === 'en' ? ['Privacy', 'Terms'] : ['الخصوصية', 'الشروط'] }
-            ].map((section, i) => (
-              <div key={i} className={isRtl ? 'text-right' : 'text-left'}>
-                <h4 className={`text-zinc-900 font-black mb-8 uppercase tracking-widest text-xs`}>{section.title}</h4>
-                <ul className="space-y-5 text-slate-400 text-sm font-bold">
-                  {section.links.map((link, li) => (
-                    <Link key={li} href={link === 'Pricing' || link === 'الأسعار' ? '/pricing' : '#'} className="text-slate-400 hover:text-sky-500 transition-colors font-bold text-sm block">{link}</Link>
-                  ))}
-                </ul>
+              { value: '500+', label: isRtl ? 'تاجر نشط' : 'Active Merchants' },
+              { value: '4.9★', label: isRtl ? 'تقييم المنصة' : 'Platform Rating' },
+              { value: isRtl ? 'مجاناً' : 'Free', label: isRtl ? 'للبدء' : 'to Start' },
+            ].map((stat, i) => (
+              <div key={i} className="text-center min-w-[80px]">
+                <div className="text-xl md:text-3xl font-black text-slate-900">{stat.value}</div>
+                <div className="text-[10px] md:text-xs font-bold text-slate-400 mt-1 uppercase tracking-wider">{stat.label}</div>
               </div>
             ))}
           </div>
-          
-          <div className="pt-12 border-t border-slate-50 text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] flex flex-col md:flex-row items-center justify-between gap-8">
-            <p>© {new Date().getFullYear()} KayaMarket. {t.footer.rights}</p>
-            <div className="flex items-center gap-8">
-               <a href="#" className="hover:text-sky-500 transition-colors">Twitter</a>
-               <a href="#" className="hover:text-sky-500 transition-colors">LinkedIn</a>
-               <a href="#" className="hover:text-sky-500 transition-colors">Instagram</a>
+        </div>
+      </section>
+
+      {/* Steps Section - Very Light Azure */}
+      <section className="py-32 bg-[#fcfdfe]">
+        <div className="max-w-7xl mx-auto px-6">
+          <SectionHeading title={t.steps.title} desc={t.steps.desc} />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+            {t.steps.list.map((step, i) => (
+              <div key={i} className="flex flex-col items-center text-center space-y-6 bg-white p-10 rounded-[3rem] border border-slate-50 shadow-xl shadow-slate-200/40 hover:-translate-y-2 transition-all">
+                <div className="h-20 w-20 rounded-3xl bg-sky-500 text-white flex items-center justify-center shadow-lg shadow-sky-100">
+                  {i === 0 && <UserPlus className="h-10 w-10" />}
+                  {i === 1 && <Store className="h-10 w-10" />}
+                  {i === 2 && <Rocket className="h-10 w-10" />}
+                </div>
+                <div className="space-y-3">
+                  <h3 className="text-2xl font-black text-slate-900">{step.title}</h3>
+                  <p className="text-slate-500 font-bold text-base leading-relaxed opacity-70">{step.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid - Clean White Background */}
+      <section id="features" className="py-32 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <SectionHeading title={t.features.title} desc={t.features.desc} />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {t.features.list.map((feat, i) => (
+              <div key={i} className="bg-slate-50/50 p-10 rounded-[2.5rem] border border-slate-100 hover:border-sky-200 hover:bg-white hover:shadow-2xl hover:shadow-sky-100/50 transition-all duration-500 flex flex-col items-center text-center group">
+                <div className="h-16 w-16 rounded-2xl bg-white border border-slate-100 text-sky-500 flex items-center justify-center mb-8 group-hover:bg-sky-500 group-hover:text-white group-hover:border-transparent transition-all shadow-sm">
+                  {i === 0 && <Palette className="h-8 w-8" />}
+                  {i === 1 && <FileText className="h-8 w-8" />}
+                  {i === 2 && <MessageCircle className="h-8 w-8" />}
+                  {i === 3 && <Navigation className="h-8 w-8" />}
+                  {i === 4 && <Ticket className="h-8 w-8" />}
+                  {i === 5 && <TrendingUp className="h-8 w-8" />}
+                </div>
+                <h3 className="text-2xl font-black text-slate-900 mb-4">{feat.title}</h3>
+                <p className="text-slate-500 leading-relaxed font-bold text-sm opacity-70 max-w-[240px]">{feat.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section - Very Light Slate */}
+      <section className="py-32 bg-[#fafbfc]">
+        <div className="max-w-4xl mx-auto px-6">
+          <SectionHeading title={t.faq.title} desc={t.faq.desc} />
+          <div className="space-y-4">
+            {t.faq.list.map((faq, i) => (
+              <FAQItem key={i} q={faq.q} a={faq.a} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section - Elegant Design */}
+      <section className="px-6 py-20 md:py-32 bg-white">
+        <div className="max-w-5xl mx-auto rounded-[2.5rem] md:rounded-[3.5rem] p-10 md:p-24 text-center relative overflow-hidden border border-slate-100 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.05)] bg-white">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-sky-50 blur-[100px] -mr-40 -mt-40 rounded-full" />
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-50 blur-[100px] -ml-40 -mb-40 rounded-full" />
+
+          <div className="relative z-10 space-y-8 md:space-y-10">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-100 text-[10px] font-black uppercase tracking-widest text-sky-600 shadow-sm">
+              <Rocket className="h-3.5 w-3.5" />
+              {isRtl ? 'ابدأ اليوم' : 'Get Started Today'}
+            </div>
+            <h2 className="text-3xl md:text-6xl font-black text-slate-900 leading-tight tracking-tight">
+              {isRtl ? 'جاهز لإطلاق مشروعك؟' : 'Ready to launch your store?'}
+            </h2>
+            <p className="text-slate-500 text-base md:text-xl font-semibold max-w-2xl mx-auto opacity-70 px-2">
+              {isRtl ? 'انضم إلى آلاف التجار الناجحين وابدأ رحلتك اليوم مع KayaMarket.' : 'Join thousands of successful merchants and start your journey today with KayaMarket.'}
+            </p>
+            <div className="flex pt-4 md:pt-6 justify-center">
+              <Link href="/register" className="group flex items-center gap-3 md:gap-4 bg-sky-500 text-white px-8 md:px-12 py-4 md:py-5 rounded-xl md:rounded-2xl font-black text-lg md:text-xl hover:bg-sky-600 transition-all shadow-xl shadow-sky-200 hover:scale-[1.02] active:scale-[0.98]">
+                {t.nav.start}
+                <Sparkles className="h-5 w-5 md:h-6 md:w-6 text-white group-hover:rotate-12 transition-transform" />
+              </Link>
             </div>
           </div>
         </div>
-      </footer>
+      </section>
+
+      <Footer lang={lang} t={t} />
     </div>
   )
 }

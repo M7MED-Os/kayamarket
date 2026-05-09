@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: store.name,
     description: branding?.tagline || `Welcome to ${store.name}`,
     icons: {
-      icon: branding?.favicon_url || branding?.logo_url || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg"/>',
+      icon: branding?.favicon_url || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
     },
   };
 }
