@@ -404,6 +404,17 @@ export default async function InvoicePage({
                   )}
                </div>
             </main>
+
+            <footer className="py-12 text-center no-print relative z-10">
+               {!showWatermark && (
+                  <p className="text-[9px] font-black text-zinc-300 uppercase tracking-[0.5em]">Kaya Market Platform</p>
+               )}
+            </footer>
+            {showWatermark && (
+               <div className="fixed bottom-6 right-6 z-[9999] no-print">
+                  <KayaBadge href="https://kayamarket.vercel.app" />
+               </div>
+            )}
          </div>
       )
    }
