@@ -130,7 +130,7 @@ export default function OrganicView({ product, store, branding, slug, galleryIma
 
               {/* Checkout Box */}
               <div className="bg-white rounded-[2rem] p-6 border border-zinc-100 shadow-lg shadow-zinc-200/30">
-                <CheckoutBox product={product} store={store} branding={branding} slug={slug} />
+                <CheckoutBox product={product} storeId={store.id} storeSlug={slug} selectedTheme={branding?.theme_id} />
               </div>
 
               {/* Trust badges */}
