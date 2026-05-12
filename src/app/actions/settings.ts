@@ -61,9 +61,11 @@ export async function updateStoreSettings(formData: FormData) {
     const heroCtaText = sanitizeHtml(formData.get('hero_cta_text') as string) as string
     const bannerOverlayOpacity = parseInt(formData.get('banner_overlay_opacity') as string) || 50
     const featuresDataRaw = formData.get('features_data') as string
+    const shippingConfigRaw = formData.get('shipping_config') as string
     const footerDescription = sanitizeHtml(formData.get('footer_description') as string) as string
 
     const featuresData = featuresDataRaw ? sanitizeObject(safeJsonParse(featuresDataRaw)) : null
+    const shippingConfig = shippingConfigRaw ? safeJsonParse(shippingConfigRaw) : null
 
     // 2. General Settings Data
     const codEnabled = formData.get('cod_enabled') === 'true'
@@ -128,6 +130,7 @@ export async function updateStoreSettings(formData: FormData) {
       show_hero_mobile: showHeroMobile,
       faq_data: formData.get('faq_data') ? sanitizeObject(safeJsonParse(formData.get('faq_data') as string)) : null,
       selected_theme: formData.get('selected_theme') as string || 'default',
+      shipping_config: shippingConfig || { type: 'flat', flat_rate: 0, governorates: {} },
       updated_at: new Date().toISOString()
     }
 

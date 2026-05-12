@@ -75,7 +75,7 @@ export function FloralHeader({ store, branding, slug }: { store: any; branding: 
   }, [])
 
   return (
-    <header className={`sticky top-0 z-50 transition-all duration-500 ${scrolled ? 'bg-white/95 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.04)] border-b border-rose-50 py-3' : 'bg-white/80 backdrop-blur-md py-5'}`}>
+    <header className={`sticky top-0 z-50 transition-all duration-500 border-b border-zinc-100/50 ${scrolled ? 'bg-white/95 backdrop-blur-xl shadow-sm py-3' : 'bg-white/80 backdrop-blur-md shadow-sm py-5'}`}>
       <div className="mx-auto max-w-7xl px-6 flex items-center justify-between relative">
 
         {/* Right: Nav Links (in RTL) */}

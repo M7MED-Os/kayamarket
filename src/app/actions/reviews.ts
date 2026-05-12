@@ -18,14 +18,16 @@ export async function submitProductReview(
       return { success: false, error: 'بيانات التقييم غير صحيحة' }
     }
 
+    const { sanitizeHtml } = await import('@/lib/utils/sanitize')
+
     const { error } = await supabase
       .from('product_reviews')
       .insert({
         store_id: storeId,
         product_id: productId,
-        customer_name: customerName.trim(),
+        customer_name: sanitizeHtml(customerName.trim()),
         rating,
-        comment: comment.trim() || null,
+        comment: sanitizeHtml(comment.trim()) || null,
         status: 'pending'
       })
 

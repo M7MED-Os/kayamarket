@@ -19,7 +19,8 @@ export async function createOrder(
   idempotencyKey?: string,
   quantity: number = 1,
   variantInfo?: any,
-  price?: number
+  price?: number,
+  shippingCost: number = 0
 ) {
   // Map single product to items array for the new multi-product function
   const items = [{
@@ -39,7 +40,8 @@ export async function createOrder(
     customerPhone,
     paymentMethod,
     storeId!,
-    idempotencyKey
+    idempotencyKey,
+    shippingCost
   )
 }
 
@@ -51,7 +53,8 @@ export async function createOrderMulti(
   customerPhone: string,
   paymentMethod: string,
   storeId: string,
-  idempotencyKey?: string
+  idempotencyKey?: string,
+  shippingCost: number = 0
 ) {
   try {
     const { checkRateLimit } = await import('@/lib/utils/rate-limit')
@@ -82,6 +85,7 @@ export async function createOrderMulti(
       p_customer_phone: sanitizeHtml(customerPhone),
       p_payment_method: paymentMethod,
       p_store_id: storeId,
+      p_shipping_cost: shippingCost,
       p_idempotency_key: idempotencyKey
     })
 

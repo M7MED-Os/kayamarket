@@ -11,7 +11,7 @@ import {
    ImageIcon as BannerIcon, Type, Smartphone, Laptop,
    Activity, Eye, EyeOff, GripVertical, ChevronLeft,
    Layers, Brush, Building2, BellRing, Info, Share2,
-   CheckCircle2, Clock, SmartphoneIcon, MonitorIcon, Truck, ShieldCheck, Headphones, Calendar,
+   CheckCircle2, Clock, SmartphoneIcon, MonitorIcon, Truck, ShieldCheck, Headphones, Calendar, Store,
    ChevronRight, ArrowLeft, MoreHorizontal, Check, Wallet, MousePointer2, MapPin,
    Copy, Trash2, Maximize2, UploadCloud, ArrowRight, Hash, Percent, Zap, Package, X, Lock
 } from 'lucide-react'
@@ -162,6 +162,31 @@ export default function SettingsForm({
    const [depositPercentage, setDepositPercentage] = useState(initialSettings?.deposit_percentage || 50)
    const [policies, setPolicies] = useState(initialSettings?.policies || '')
 
+   // Shipping Config
+   const [shippingConfig, setShippingConfig] = useState(initialBranding?.shipping_config || { type: 'flat', flat_rate: 0, governorates: {}, allow_pickup: false })
+
+   const GOVERNORATES = [
+      "القاهرة", "الجيزة", "الإسكندرية", "الدقهلية", "البحر الأحمر", "البحيرة", "الفيوم", "الغربية", "الإسماعيلية", "المنوفية", "المنيا", "القليوبية", "الوادي الجديد", "السويس", "الشرقية", "دمياط", "بورسعيد", "جنوب سيناء", "كفر الشيخ", "مطروح", "الأقصر", "قنا", "شمال سيناء", "سوهاج", "بني سويف", "أسيوط", "أسوان"
+   ]
+
+   const handleShippingTypeChange = (type: string) => {
+      let newConfig = { ...shippingConfig, type }
+      
+      // Smart Populate: If switching to per_governorate and we have a flat rate, fill all governorates with it
+      if (type === 'per_governorate') {
+         const currentGovs = shippingConfig.governorates || {}
+         const hasData = Object.values(currentGovs).some(v => Number(v) > 0)
+         
+         if (!hasData && shippingConfig.flat_rate > 0) {
+            const newGovs: any = {}
+            GOVERNORATES.forEach(g => newGovs[g] = shippingConfig.flat_rate)
+            newConfig.governorates = newGovs
+         }
+      }
+      
+      setShippingConfig(newConfig)
+   }
+
    const [hasChanges, setHasChanges] = useState(false)
    const [isLoaded, setIsLoaded] = useState(false)
 
@@ -179,7 +204,7 @@ export default function SettingsForm({
       sections, headerSettings, showHeroMobile, heroTitle, heroDescription, announcementText, announcementEnabled,
       facebookUrl, instagramUrl, tiktokUrl, storeAddress, codEnabled, codDepositRequired, depositPercentage, policies,
       heroAlignment, heroImageUrl, heroCtaText, bannerOverlayOpacity, featuresData, footerDescription,
-      invoiceInstapay, invoiceWallet, faqData, selectedTheme
+      invoiceInstapay, invoiceWallet, faqData, selectedTheme, shippingConfig
    ])
 
    const toggleSection = (id: string) => {
@@ -226,6 +251,7 @@ export default function SettingsForm({
          formData.append('cod_deposit_required', codDepositRequired.toString())
          formData.append('deposit_percentage', depositPercentage.toString())
          formData.append('policies', policies)
+         formData.append('shipping_config', JSON.stringify(shippingConfig))
 
          const res = await updateStoreSettings(formData)
          if (res.success) {
@@ -271,6 +297,13 @@ export default function SettingsForm({
          desc: 'تصميم عصري بخلفيات متدرجة وتأثيرات زجاجية، مثالي للمتاجر التي تبحث عن مظهر فخم.',
          requiredPlan: 'starter',
          preview: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop'
+      },
+      {
+         id: 'organic',
+         name: 'الطبيعة (Organic Eco)',
+         desc: 'تصميم طبيعي وهادئ يعتمد على الألوان الترابية والمنحنيات الناعمة، مثالي للمنتجات العضوية والمستدامة.',
+         requiredPlan: 'starter',
+         preview: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=2070&auto=format&fit=crop'
       }
    ]
 
@@ -1007,6 +1040,112 @@ export default function SettingsForm({
                               className="w-full h-48 p-4 bg-slate-50 border border-slate-100 rounded-2xl text-xs font-bold outline-none leading-relaxed focus:bg-white focus:border-slate-900 transition-all resize-none"
                               placeholder="اكتب هنا سياسات متجرك بوضوح..."
                            />
+                        </div>
+
+                        {/* --- Shipping Settings --- */}
+                        <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
+                           <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
+                                 <Truck className="h-5 w-5" />
+                              </div>
+                              <div className="text-right">
+                                 <h4 className="text-lg font-black text-slate-900">إعدادات الشحن</h4>
+                                 <p className="text-[10px] font-bold text-slate-400">حدد أسعار الشحن لمختلف المحافظات</p>
+                                 {shippingConfig.type === 'per_governorate' && (
+                                    <button 
+                                       onClick={() => {
+                                          const newGovs: any = {}
+                                          GOVERNORATES.forEach(g => newGovs[g] = shippingConfig.flat_rate || 0)
+                                          setShippingConfig({ ...shippingConfig, governorates: newGovs })
+                                       }}
+                                       className="text-[10px] font-black text-emerald-600 hover:underline"
+                                    >
+                                       تطبيق السعر الموحد على الكل
+                                    </button>
+                                 )}
+                              </div>
+                           </div>
+
+                           {/* Pickup Option */}
+                           <div className="flex items-center justify-between p-4 bg-emerald-50/50 border border-emerald-100 rounded-2xl">
+                              <div className="flex items-center gap-3">
+                                 <div className="h-8 w-8 bg-white rounded-lg flex items-center justify-center shadow-sm text-emerald-600">
+                                    <Store className="h-4 w-4" />
+                                 </div>
+                                 <div className="text-right">
+                                    <p className="text-xs font-black text-slate-800">تفعيل الاستلام من المكان</p>
+                                    <p className="text-[9px] font-bold text-slate-400">السماح للعميل باستلام الطلب بنفسه (شحن مجاني)</p>
+                                 </div>
+                              </div>
+                              <button
+                                 onClick={() => setShippingConfig({ ...shippingConfig, allow_pickup: !shippingConfig.allow_pickup })}
+                                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${shippingConfig.allow_pickup ? 'bg-emerald-500' : 'bg-slate-200'}`}
+                              >
+                                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${shippingConfig.allow_pickup ? '-translate-x-6' : '-translate-x-1'}`} />
+                              </button>
+                           </div>
+
+                           <div className="flex items-center gap-4 bg-slate-50 p-1.5 rounded-2xl border border-slate-100">
+                              {[
+                                 { id: 'flat', label: 'سعر موحد' },
+                                 { id: 'per_governorate', label: 'حسب المحافظة' }
+                              ].map(type => (
+                                 <button
+                                    key={type.id}
+                                    onClick={() => handleShippingTypeChange(type.id)}
+                                    className={`flex-1 py-3 rounded-xl text-xs font-black transition-all ${shippingConfig.type === type.id ? 'bg-white text-slate-900 shadow-sm border border-slate-200' : 'text-slate-400 hover:text-slate-600'}`}
+                                 >
+                                    {type.label}
+                                 </button>
+                              ))}
+                           </div>
+
+                           {shippingConfig.type === 'flat' ? (
+                              <div className="flex items-center justify-between gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 animate-in fade-in duration-300">
+                                 <div className="flex items-center gap-3">
+                                    <div className="h-8 w-8 bg-white rounded-lg flex items-center justify-center shadow-sm text-slate-900">
+                                       <Hash className="h-4 w-4" />
+                                    </div>
+                                    <span className="text-xs font-black text-slate-800">سعر الشحن الموحد</span>
+                                 </div>
+                                 <div className="flex items-center bg-white border border-slate-200 rounded-lg px-3 h-10 w-32 shadow-sm">
+                                    <input
+                                       type="number"
+                                       value={shippingConfig.flat_rate}
+                                       onChange={e => setShippingConfig({ ...shippingConfig, flat_rate: Number(e.target.value) })}
+                                       className="w-full bg-transparent text-sm font-black outline-none text-center font-inter"
+                                    />
+                                    <span className="text-xs font-black text-slate-300 mr-1">ج.م</span>
+                                 </div>
+                              </div>
+                           ) : (
+                              <div className="space-y-4 animate-in fade-in duration-300">
+                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    {GOVERNORATES.map(gov => (
+                                       <div key={gov} className="flex items-center justify-between gap-2 p-3 bg-slate-50 rounded-xl border border-slate-100 group hover:border-sky-200 transition-all">
+                                          <span className="text-[11px] font-black text-slate-600">{gov}</span>
+                                          <div className="flex items-center bg-white border border-slate-200 rounded-lg px-2 h-8 w-20 shadow-sm focus-within:border-sky-500 transition-all">
+                                             <input
+                                                type="number"
+                                                value={shippingConfig.governorates?.[gov] || 0}
+                                                onChange={e => {
+                                                   const val = Number(e.target.value)
+                                                   setShippingConfig({
+                                                      ...shippingConfig,
+                                                      governorates: {
+                                                         ...shippingConfig.governorates,
+                                                         [gov]: val
+                                                      }
+                                                   })
+                                                }}
+                                                className="w-full bg-transparent text-[11px] font-black outline-none text-center font-inter"
+                                             />
+                                          </div>
+                                       </div>
+                                    ))}
+                                 </div>
+                              </div>
+                           )}
                         </div>
                      </div>
                   )}

@@ -80,7 +80,7 @@ export default function ProductReviews({
 
         <button
           onClick={() => setFormVisible(!formVisible)}
-          className={`h-14 px-10 bg-[var(--primary)] text-[10px] font-black uppercase tracking-widest hover:brightness-125 disabled:brightness-75 ${isFloral ? 'rounded-xl' : 'rounded-none'} text-white transition-all active:scale-95 w-full md:w-auto`}
+          className={`h-14 px-10 bg-[var(--primary)] text-[10px] font-black uppercase tracking-widest hover:brightness-125 disabled:brightness-75 ${isFloral ? 'rounded-2xl shadow-lg' : 'rounded-none'} text-white transition-all active:scale-95 w-full md:w-auto`}
         >
           {formVisible ? 'إلغاء' : 'أضف تقييمك'}
         </button>
@@ -114,7 +114,7 @@ export default function ProductReviews({
               <textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="اكتب تجربتك مع المنتج هنا..." rows={4} className={`w-full bg-zinc-50 border-none p-6 italic ${isFloral ? 'rounded-xl' : 'rounded-none'} focus:ring-1 focus:ring-[var(--primary)] text-sm outline-none transition-all resize-none`} />
             </div>
 
-            <button type="submit" disabled={isSubmitting || !name.trim()} className={`w-full h-16 flex items-center justify-center gap-3 bg-[var(--primary)] text-white text-[10px] font-black uppercase tracking-[0.2em] hover:brightness-125 disabled:brightness-75 ${isFloral ? 'rounded-xl' : 'rounded-none'} shadow-xl transition disabled:opacity-50`}>
+            <button type="submit" disabled={isSubmitting || !name.trim()} className={`w-full h-16 flex items-center justify-center gap-3 bg-[var(--primary)] text-white text-[10px] font-black uppercase tracking-[0.2em] hover:brightness-125 disabled:brightness-75 ${isFloral ? 'rounded-2xl shadow-lg' : 'rounded-none'} shadow-xl transition disabled:opacity-50`}>
               <Send className="h-4 w-4" />
               {isSubmitting ? 'جاري الإرسال...' : 'إرسال التقييم'}
             </button>
