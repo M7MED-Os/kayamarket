@@ -27,18 +27,15 @@ export default async function AdminLayout({ children }: { children: ReactNode })
     .eq('id', storeId)
     .single()
 
-  // 🕒 Global Platform Settings
   const { data: platformSettings } = await supabase.from('platform_settings').select('*').single()
   const graceDays = platformSettings?.grace_period_days || 3
 
-  // 🕒 Automatic Downgrade Check (Grace Period Aware)
   if (store?.plan !== 'starter' && store?.plan_expires_at) {
     const expiryDate = new Date(store.plan_expires_at)
     const graceLimit = new Date(expiryDate)
     graceLimit.setDate(expiryDate.getDate() + graceDays)
 
     if (graceLimit < new Date()) {
-      // Grace period expired! Downgrade using Admin Client, but leave plan_expires_at as a marker for Deep Cleanup
       const admin = createAdminClient()
       await admin.from('stores').update({ plan: 'starter' }).eq('id', storeId)
       redirect('/admin/settings?expired=true')
@@ -51,9 +48,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col xl:flex-row font-sans selection:bg-sky-100 selection:text-sky-900" dir="rtl">
       
-      {/* ── Sidebar (Desktop) ───────────────────────────────────────────── */}
+      {/* ── Sidebar (Desktop Only) ───────────────────────────────────────────── */}
       <aside className="hidden xl:flex w-80 bg-white border-l border-slate-200 flex-col shrink-0 sticky top-0 h-screen z-40 overflow-y-auto no-scrollbar">
-
         {/* Brand Header */}
         <div className="p-8 border-b border-slate-50 flex flex-col items-start gap-10">
           <Link href="/" className="hover:opacity-80 transition-opacity">
@@ -74,14 +70,18 @@ export default async function AdminLayout({ children }: { children: ReactNode })
           </div>
         </div>
 
-        {/* Navigation Area */}
-        <div className="flex-1 flex flex-col">
+        {/* Desktop Navigation */}
+        <div className="flex-1">
           <AdminNav storeSlug={storeSlug} />
-
         </div>
       </aside>
 
-      {/* ── Mobile Header (Tablets & Phones) ───────────────────────────── */}
+      {/* ── Mobile Navigation (Visible only on mobile/tablet) ────────────────── */}
+      <div className="xl:hidden">
+        <AdminNav storeSlug={storeSlug} />
+      </div>
+
+      {/* ── Mobile Header ───────────────────────────────────────────── */}
       <header className="xl:hidden sticky top-0 bg-white/80 backdrop-blur-xl border-b border-slate-200 z-40 px-6 py-4 flex items-center justify-between shadow-sm">
         <Link href="/" className="hover:opacity-80 transition-opacity">
           <KayaLogo className="h-8 w-8" />
@@ -117,7 +117,6 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       {/* ── Main Content ─────────────────────────────────────────────────── */}
       <main className="flex-1 w-full max-w-full p-6 md:p-10 lg:p-12 pb-32 xl:pb-12 overflow-x-hidden min-h-screen relative z-10 xl:z-auto">
         <div className="w-full space-y-6">
-          {/* Dynamic Alerts */}
           <SubscriptionAlert 
             planExpiresAt={store?.plan_expires_at} 
             gracePeriodDays={graceDays} 

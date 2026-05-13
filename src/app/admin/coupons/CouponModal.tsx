@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { X, Save, Ticket, Percent, Hash, Calendar, CheckCircle, Loader2 } from 'lucide-react'
+import { X, Save, Ticket, Percent, Hash, Calendar, CheckCircle, Loader2, Sparkles, LayoutGrid } from 'lucide-react'
 import { createCoupon, updateCoupon } from '@/app/actions/coupons'
 import toast from 'react-hot-toast'
 
@@ -86,130 +86,96 @@ export default function CouponModal({ isOpen, onClose, coupon, onSuccess }: Coup
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200" dir="rtl">
-      <div className="bg-white rounded-3xl w-full max-w-lg shadow-xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
-        {/* Header */}
-        <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200" dir="rtl">
+      <div className="bg-white rounded-[1.5rem] w-full max-w-md shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[85vh]">
+        
+        {/* Compact Header */}
+        <div className="p-5 border-b border-slate-50 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-sky-100 flex items-center justify-center">
-              <Ticket className="h-5 w-5 text-sky-600" />
+            <div className="h-10 w-10 rounded-xl bg-sky-500 text-white flex items-center justify-center shadow-lg shadow-sky-100">
+              <Ticket className="h-5 w-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900 font-poppins">{isEditing ? 'تعديل الكوبون' : 'إضافة كوبون جديد'}</h3>
-              <p className="text-[11px] font-bold text-slate-400 font-inter">أدخل تفاصيل الخصم والعروض أدناه</p>
+              <h3 className="text-base font-black text-slate-900">{isEditing ? 'تعديل الكوبون' : 'كوبون جديد'}</h3>
+              <p className="text-[10px] font-bold text-slate-400">تخصيص العروض والخصومات</p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition-colors">
-            <X className="h-5 w-5 text-slate-400" />
+          <button onClick={onClose} className="h-8 w-8 flex items-center justify-center hover:bg-slate-100 rounded-lg text-slate-400 transition-all">
+            <X className="h-4 w-4" />
           </button>
         </div>
 
-        {/* Content */}
-        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto flex-1 space-y-5">
+        {/* Compact Form */}
+        <form onSubmit={handleSubmit} className="p-5 overflow-y-auto flex-1 space-y-5 no-scrollbar">
           <div className="space-y-4">
-            <div>
-              <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2 font-inter">
-                <Hash className="h-4 w-4 text-slate-400" />
-                كود الخصم
-              </label>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">كود الخصم (CODE)</label>
               <input
-                required
-                type="text"
-                placeholder="مثال: SAVE20"
-                className="w-full h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm font-black text-sky-600 uppercase placeholder:text-slate-300 placeholder:font-normal focus:outline-none focus:ring-4 focus:ring-sky-50 focus:border-sky-400 transition-all font-poppins tracking-wider"
+                required type="text" placeholder="مثال: WELCOME20"
+                className="w-full h-11 rounded-xl border-2 border-slate-50 bg-slate-50 px-4 text-sm font-black text-sky-600 uppercase focus:outline-none focus:bg-white focus:border-sky-500 transition-all"
                 value={formData.code}
                 onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2 font-inter">
-                  <Percent className="h-4 w-4 text-slate-400" />
-                  نسبة الخصم
-                </label>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">نسبة الخصم (%)</label>
                 <input
-                  required
-                  type="number"
-                  min="1"
-                  max="100"
-                  placeholder="20"
-                  className="w-full h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-sky-50 focus:border-sky-400 transition-all font-poppins"
+                  required type="number" min="1" max="100" placeholder="20"
+                  className="w-full h-11 rounded-xl border-2 border-slate-50 bg-slate-50 px-4 text-sm font-black text-slate-900 focus:outline-none focus:bg-white focus:border-sky-500 transition-all"
                   value={formData.discount_percentage}
                   onChange={(e) => setFormData({ ...formData, discount_percentage: e.target.value })}
                 />
               </div>
-
-              <div>
-                <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2 font-inter">
-                  <Calendar className="h-4 w-4 text-slate-400" />
-                  تاريخ الانتهاء
-                </label>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">تاريخ الانتهاء</label>
                 <input
                   type="date"
-                  className="w-full h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-sky-50 focus:border-sky-400 transition-all font-inter"
+                  className="w-full h-11 rounded-xl border-2 border-slate-50 bg-slate-50 px-4 text-xs font-black text-slate-900 focus:outline-none focus:bg-white focus:border-sky-500 transition-all"
                   value={formData.expires_at}
                   onChange={(e) => setFormData({ ...formData, expires_at: e.target.value })}
                 />
               </div>
             </div>
 
-            <div>
-              <label className="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2 font-inter">
-                <Hash className="h-4 w-4 text-slate-400" />
-                أقصى عدد استخدامات
-              </label>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">أقصى عدد استخدامات</label>
               <input
-                type="number"
-                min="1"
-                placeholder="اتركه فارغاً للاستخدام اللامحدود"
-                className="w-full h-12 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-900 focus:outline-none focus:ring-4 focus:ring-sky-50 focus:border-sky-400 transition-all font-inter"
+                type="number" placeholder="اتركه فارغاً للاستخدام اللامحدود"
+                className="w-full h-11 rounded-xl border-2 border-slate-50 bg-slate-50 px-4 text-xs font-black text-slate-900 focus:outline-none focus:bg-white focus:border-sky-500 transition-all"
                 value={formData.max_uses}
                 onChange={(e) => setFormData({ ...formData, max_uses: e.target.value })}
               />
             </div>
 
-            <div className="pt-2">
-              <label className="flex items-center justify-between cursor-pointer group p-4 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-slate-100 transition-colors">
-                <div className="flex items-center gap-3 text-sm font-bold text-slate-700 font-inter">
-                  <div className={`h-8 w-8 rounded-full flex items-center justify-center transition-colors ${formData.is_active ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-400'}`}>
-                    <CheckCircle className="h-5 w-5" />
-                  </div>
-                  حالة الكوبون
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
+              className={`w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all ${formData.is_active ? 'bg-emerald-50/50 border-emerald-100' : 'bg-slate-50 border-slate-100'}`}
+            >
+              <div className="flex items-center gap-3">
+                <div className={`h-8 w-8 rounded-lg flex items-center justify-center transition-all ${formData.is_active ? 'bg-emerald-500 text-white' : 'bg-slate-200 text-slate-400'}`}>
+                  <CheckCircle className="h-4 w-4" />
                 </div>
-                <div 
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.is_active ? 'bg-emerald-500' : 'bg-slate-300'}`}
-                  onClick={() => setFormData({ ...formData, is_active: !formData.is_active })}
-                >
-                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.is_active ? '-translate-x-6' : '-translate-x-1'}`} />
-                </div>
-              </label>
-            </div>
+                <span className={`text-xs font-black ${formData.is_active ? 'text-emerald-700' : 'text-slate-400'}`}>حالة الكوبون نشط</span>
+              </div>
+              <div className={`h-5 w-9 rounded-full p-1 transition-all ${formData.is_active ? 'bg-emerald-500' : 'bg-slate-300'}`}>
+                <div className={`h-3 w-3 rounded-full bg-white transition-all ${formData.is_active ? 'mr-4' : 'mr-0'}`} />
+              </div>
+            </button>
           </div>
         </form>
 
-        {/* Footer */}
-        <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center gap-3">
+        {/* Compact Fixed Footer */}
+        <div className="p-4 bg-white border-t border-slate-50 flex items-center gap-3">
+          <button onClick={onClose} className="h-11 px-6 rounded-xl font-black text-slate-400 hover:bg-slate-50 transition-all text-xs">إلغاء</button>
           <button
-            type="button"
-            onClick={onClose}
-            className="flex-1 h-12 rounded-2xl font-bold text-slate-500 hover:bg-slate-100 transition-colors font-inter"
+            onClick={handleSubmit} disabled={loading}
+            className="flex-1 h-11 rounded-xl bg-slate-900 text-white font-black text-xs hover:bg-sky-600 transition-all shadow-lg shadow-slate-100 disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            إلغاء
-          </button>
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="flex-[2] flex items-center justify-center gap-2 h-12 rounded-2xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 disabled:opacity-50 active:scale-95 font-inter"
-          >
-            {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : (
-              <>
-                <Save className="h-5 w-5" />
-                {isEditing ? 'تحديث الكوبون' : 'حفظ الكوبون'}
-              </>
-            )}
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+            <span>{isEditing ? 'تحديث الكوبون' : 'حفظ الكوبون'}</span>
           </button>
         </div>
       </div>

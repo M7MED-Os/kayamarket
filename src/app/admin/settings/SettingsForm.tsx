@@ -1285,7 +1285,6 @@ export default function SettingsForm({
                                              </div>
                                              <span className="text-xs font-black text-slate-700">حتى {planCfg.maxProducts} منتج فريد</span>
                                           </div>
-
                                           {[
                                              { label: planCfg.maxCoupons > 0 ? `حتى ${planCfg.maxCoupons} كوبونات خصم` : 'كوبونات خصم', allowed: planCfg.maxCoupons > 0, icon: Zap },
                                              { label: 'دومين مخصص', allowed: planCfg.hasCustomDomain, icon: Globe },
@@ -1337,6 +1336,7 @@ export default function SettingsForm({
             </>
          )}
 
+
          <UpgradeModal
             isOpen={upgradeModal.isOpen}
             onClose={() => setUpgradeModal(prev => ({ ...prev, isOpen: false }))}
@@ -1344,6 +1344,28 @@ export default function SettingsForm({
             description={upgradeModal.description}
             limitName={upgradeModal.name}
          />
+
+         {/* ── Ultra-Compact Floating Actions ────────────────── */}
+         {hasChanges && (
+            <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[50] animate-in slide-in-from-bottom-5 duration-500 w-fit">
+               <div className="bg-slate-900/95 backdrop-blur-xl px-2 py-2 rounded-full shadow-2xl flex items-center gap-1 border border-white/10">
+                  <button
+                     onClick={() => router.refresh()}
+                     className="px-6 h-10 rounded-full text-xs font-black text-slate-400 hover:text-white transition-colors"
+                  >
+                     تجاهل
+                  </button>
+                  <button
+                     onClick={handleSubmit}
+                     disabled={loading}
+                     className="bg-sky-500 hover:bg-sky-400 text-white px-8 h-10 rounded-full font-black text-xs transition-all shadow-lg shadow-sky-500/20 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                     حفظ التغييرات
+                  </button>
+               </div>
+            </div>
+         )}
       </div>
    )
 }
