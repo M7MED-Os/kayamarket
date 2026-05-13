@@ -72,7 +72,7 @@ export default function ElegantHome({
       )}
 
       {sections.faq && <ElegantFAQ branding={branding} />}
-      {sections.footer && <ElegantFooter store={store} branding={branding} showWatermark={showWatermark} />}
+      {sections.footer && <ElegantFooter store={store} branding={branding} slug={slug} showWatermark={showWatermark} categories={dbCategories || []} />}
       
       {showWatermark && (
         <div className="fixed bottom-6 right-6 z-[9999]">

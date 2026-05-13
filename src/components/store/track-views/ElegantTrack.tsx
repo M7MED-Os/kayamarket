@@ -43,8 +43,9 @@ export default function ElegantTrack({
         {!order ? (
           <div className="max-w-md mx-auto space-y-12">
             <div className="text-center space-y-4">
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-zinc-400">تتبع الطلب</span>
-              <h1 className="text-4xl font-light text-zinc-900 tracking-tighter">أين <span className="font-bold">طلبك؟</span></h1>
+              <div className="h-px w-12 bg-[var(--primary)]/30 mx-auto mb-2" />
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--primary)]">تتبع الطلب</span>
+              <h1 className="text-4xl md:text-5xl font-light text-zinc-900 tracking-tighter uppercase">أين <span className="font-bold italic text-[var(--primary)]">طلبك؟</span></h1>
             </div>
             <form onSubmit={handleSearch} className="space-y-6">
               <div className="space-y-1">

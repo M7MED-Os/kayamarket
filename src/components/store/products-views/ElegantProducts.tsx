@@ -38,7 +38,7 @@ export default function ElegantProducts({
         <div className="flex flex-col items-center text-center mb-20 space-y-4">
           <div className="h-px w-12 bg-[var(--primary)]/30 mb-2" />
           <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--primary)]">المتجر</span>
-          <h1 className="text-4xl md:text-5xl font-light text-zinc-900 tracking-tighter uppercase">כל <span className="font-bold italic text-[var(--primary)]">المنتجات</span></h1>
+          <h1 className="text-4xl md:text-5xl font-light text-zinc-900 tracking-tighter uppercase">كل <span className="font-bold italic text-[var(--primary)]">المنتجات</span></h1>
         </div>
 
         <ProductFilters categories={categories} currentCategory={currentCategory} slug={`${slug}/products`} searchQuery={searchQuery} />
