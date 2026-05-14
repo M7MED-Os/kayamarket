@@ -8,6 +8,7 @@ interface CartItem {
   cartItemId: string  // Unique ID for cart entry (e.g., prodId-variantHash)
   name: string
   price: number
+  slug?: string | null
   image_url?: string
   original_price?: number | null
   description?: string | null
