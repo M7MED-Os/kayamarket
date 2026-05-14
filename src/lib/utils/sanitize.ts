@@ -8,13 +8,12 @@ export function sanitizeHtml(input: string | null | undefined): string | null {
   if (input === null || input === undefined) return null;
   if (typeof input !== 'string') return String(input);
   
-  // Very basic HTML escaping to prevent script injection.
+  // Prevent script injection by escaping < and >
+  // Note: We don't escape &, ", or ' because React safely handles them, 
+  // and escaping them causes them to display literally as &amp; in the UI.
   return input
-    .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+    .replace(/>/g, '&gt;');
 }
 
 /**
