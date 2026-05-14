@@ -510,7 +510,11 @@ export function FloralTestimonials({ reviews }: { reviews: any[] }) {
                     <Star key={idx} className={`h-4 w-4 ${idx < (r.rating || 5) ? 'fill-[var(--primary)] text-[var(--primary)]' : 'text-zinc-200'}`} />
                   ))}
                 </div>
-                <p className="text-base font-medium text-zinc-600 leading-relaxed mb-6 italic min-h-[80px]">"{r.comment}"</p>
+                <p className="text-base font-medium text-zinc-600 leading-relaxed mb-6 min-h-[80px]" dir="rtl">
+                  <span className="font-sans font-bold text-xl text-zinc-400">"</span>
+                  <span className="italic mx-1">{r.comment}</span>
+                  <span className="font-sans font-bold text-xl text-zinc-400">"</span>
+                </p>
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-full bg-white border border-rose-100 flex items-center justify-center shadow-sm shrink-0">
                     <span className="text-base font-black text-[var(--primary)]">{r.customer_name?.charAt(0) || 'ع'}</span>

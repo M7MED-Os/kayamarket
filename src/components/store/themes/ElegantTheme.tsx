@@ -477,8 +477,10 @@ export const ElegantTestimonials = ({ reviews }: { reviews: any[] }) => {
                       />
                     ))}
                   </div>
-                  <p className="text-lg font-light text-zinc-600 leading-relaxed italic line-clamp-3 text-right">
-                    "{review.comment}"
+                  <p className="text-lg font-light text-zinc-600 leading-relaxed line-clamp-3 text-right" dir="rtl">
+                    <span className="font-sans font-bold text-xl text-zinc-400">"</span>
+                    <span className="italic mx-1">{review.comment}</span>
+                    <span className="font-sans font-bold text-xl text-zinc-400">"</span>
                   </p>
                   <div className="pt-6 border-t border-zinc-50 flex items-center justify-between">
                     <span className="text-[10px] font-black uppercase tracking-widest text-[var(--primary)]">
