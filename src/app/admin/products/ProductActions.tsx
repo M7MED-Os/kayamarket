@@ -4,17 +4,19 @@ import { useState } from 'react'
 import { deleteProduct } from '@/app/actions/product'
 import toast from 'react-hot-toast'
 import Link from 'next/link'
-import { Pencil, Trash2, ExternalLink, AlertTriangle, X } from 'lucide-react'
+import { Pencil, Trash2, ExternalLink, AlertTriangle, X, Copy, Check } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
 interface ProductActionsProps {
   productId: string
+  productSlug: string | null
   storeSlug: string | null
 }
 
-export default function ProductActions({ productId, storeSlug }: ProductActionsProps) {
+export default function ProductActions({ productId, productSlug, storeSlug }: ProductActionsProps) {
   const [isDeleting, setIsDeleting] = useState(false)
   const [openModal, setOpenModal] = useState(false)
+  const [copied, setCopied] = useState(false)
   const router = useRouter()
 
   // 1. Logic for Editing
@@ -49,6 +51,16 @@ export default function ProductActions({ productId, storeSlug }: ProductActionsP
     setOpenModal(true)
   }
 
+  const handleCopyLink = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const url = `${window.location.origin}/store/${storeSlug}/products/${productSlug || productId}`
+    navigator.clipboard.writeText(url)
+    setCopied(true)
+    toast.success('تم نسخ رابط المنتج')
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   return (
     <div className="relative">
       <div className="pt-2 flex items-center justify-between mt-auto">
@@ -75,14 +87,23 @@ export default function ProductActions({ productId, storeSlug }: ProductActionsP
         </div>
 
         {storeSlug && (
-          <Link
-            href={`/store/${storeSlug}/products/${productId}`}
-            target="_blank"
-            className="text-slate-400 hover:text-sky-600 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1.5 text-[11px] font-black font-inter"
-          >
-            معاينة
-            <ExternalLink className="h-4 w-4" />
-          </Link>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={handleCopyLink}
+              className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all active:scale-90 flex items-center gap-1 text-[11px] font-black"
+              title="نسخ الرابط"
+            >
+              {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+            </button>
+            <Link
+              href={`/store/${storeSlug}/products/${productSlug || productId}`}
+              target="_blank"
+              className="text-slate-400 hover:text-sky-600 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1.5 text-[11px] font-black font-inter"
+            >
+              معاينة
+              <ExternalLink className="h-4 w-4" />
+            </Link>
+          </div>
         )}
       </div>
 

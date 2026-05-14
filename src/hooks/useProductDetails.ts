@@ -15,12 +15,20 @@ export function useProductDetails(id: string) {
       if (!id) return
       setLoading(true)
       
-      // Fetch product
-      const { data: productData } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', id)
-        .single()
+      // Fetch product - support both ID (UUID) and Slug
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)
+      
+      let query = supabase.from('products').select('*')
+      if (isUUID) {
+        query = query.eq('id', id)
+      } else {
+        // If it's a slug, we normalize it (replace spaces with dashes etc) just in case
+        const normalizedSlug = id.includes('%') ? decodeURIComponent(id) : id
+        // We also check for the slug version of the input
+        query = query.or(`slug.eq."${normalizedSlug}",slug.eq."${normalizedSlug.replace(/\s+/g, '-')}"`)
+      }
+      
+      const { data: productData } = await query.single()
       
       if (productData) {
         setProduct(productData)
@@ -35,12 +43,21 @@ export function useProductDetails(id: string) {
         
         setReviews(reviewsData || [])
 
-        // Calculate rating summary
+        // Calculate rating summary - providing multiple keys for compatibility with different themes
         if (reviewsData && reviewsData.length > 0) {
           const avg = reviewsData.reduce((sum, r) => sum + r.rating, 0) / reviewsData.length
           setRatingSummary({
-            average: avg,
+            average_rating: avg,
+            avg: avg,
+            total_reviews: reviewsData.length,
             count: reviewsData.length
+          })
+        } else {
+          setRatingSummary({
+            average_rating: 5,
+            avg: 5,
+            total_reviews: 0,
+            count: 0
           })
         }
       }

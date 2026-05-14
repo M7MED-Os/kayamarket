@@ -115,7 +115,7 @@ export default async function AdminProductsPage() {
                   </div>
 
                   <div className="pt-1 mt-auto">
-                    <ProductActions productId={product.id} storeSlug={storeSlug} />
+                    <ProductActions productId={product.id} productSlug={product.slug} storeSlug={storeSlug} />
                   </div>
                 </div>
               </div>

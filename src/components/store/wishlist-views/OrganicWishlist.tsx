@@ -55,7 +55,7 @@ export default function OrganicWishlist({ store, branding, slug, showWatermark, 
                     className="bg-white rounded-[2rem] border border-zinc-100 shadow-sm hover:shadow-md hover:border-[var(--primary)]/20 transition-all duration-300 group overflow-hidden">
                     <div className="flex items-center">
                       {/* Image */}
-                      <Link href={`/store/${slug}/products/${product.id}`}
+                      <Link href={`/store/${slug}/products/${product.slug || product.id}`}
                         className="h-32 w-32 sm:h-36 sm:w-36 flex-shrink-0 overflow-hidden bg-zinc-50">
                         <img src={product.image_url} alt={product.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -66,7 +66,7 @@ export default function OrganicWishlist({ store, branding, slug, showWatermark, 
                         <p className="text-[10px] font-black text-[var(--primary)] uppercase tracking-widest mb-1 flex items-center gap-1">
                           <Leaf className="h-2.5 w-2.5" /> عضوي
                         </p>
-                        <Link href={`/store/${slug}/products/${product.id}`}>
+                        <Link href={`/store/${slug}/products/${product.slug || product.id}`}>
                           <h3 className="font-black text-zinc-900 text-lg hover:text-[var(--primary)] transition-colors line-clamp-1">{product.name}</h3>
                         </Link>
                         <div className="flex items-center gap-1 mt-1.5 mb-3">

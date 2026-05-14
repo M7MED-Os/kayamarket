@@ -259,7 +259,7 @@ export function FloralProductCard({ product, slug }: { product: any; slug: strin
     
     if (hasVariants) {
       toast('يرجى اختيار المقاس واللون أولاً ثم الضغط على زر "أضف للسلة"', { icon: '📝' })
-      router.push(`/store/${slug}/products/${product.id}`)
+      router.push(`/store/${slug}/products/${product.slug || product.id}`)
       return
     }
 
@@ -271,7 +271,8 @@ export function FloralProductCard({ product, slug }: { product: any; slug: strin
       id: product.id, 
       cartItemId: cartItemId,
       name: product.name, 
-      price: product.price, 
+      slug: product.slug,
+      price: product.price || 0,
       image_url: product.image_url, 
       quantity: 1,
       variant_info: {
@@ -287,7 +288,7 @@ export function FloralProductCard({ product, slug }: { product: any; slug: strin
     <div className="group relative flex flex-col bg-white rounded-[2rem] overflow-hidden border border-rose-50/60 hover:border-rose-200 transition-all duration-500 hover:shadow-2xl hover:shadow-rose-900/5 hover:-translate-y-1">
       {/* Image */}
       <div className="relative aspect-[4/5] overflow-hidden bg-zinc-50 border-b border-rose-50/50">
-        <Link href={`/store/${slug}/products/${product.id}`} className="block h-full w-full">
+        <Link href={`/store/${slug}/products/${product.slug || product.id}`} className="block h-full w-full">
             <Image
               src={product.image_url || '/placeholder.jpg'}
               alt={product.name}
@@ -324,7 +325,7 @@ export function FloralProductCard({ product, slug }: { product: any; slug: strin
 
       {/* Info */}
       <div className="px-3 md:px-4 pt-2 md:pt-3 pb-4 md:pb-6 text-center space-y-1 md:space-y-1.5">
-        <Link href={`/store/${slug}/products/${product.id}`}>
+        <Link href={`/store/${slug}/products/${product.slug || product.id}`}>
           <h3 className="font-sans text-[#2B2B2B] text-xs md:text-base font-bold line-clamp-1 hover:text-[var(--primary)] transition-colors">{product.name}</h3>
         </Link>
         <div className="flex items-center justify-center gap-1.5 md:gap-2">

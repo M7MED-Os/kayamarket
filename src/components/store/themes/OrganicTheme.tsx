@@ -99,7 +99,7 @@ export function OrganicProductCard({ product, slug }: any) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    addItem({ id: product.id, cartItemId: `${product.id}-none-none`, name: product.name, price: product.price, image_url: product.image_url, quantity: 1, variant_info: {} })
+    addItem({ id: product.id, slug: product.slug, cartItemId: `${product.id}-none-none`, name: product.name, price: product.price, image_url: product.image_url, quantity: 1, variant_info: {} })
     toast.success('تمت الإضافة للسلة')
   }
 
@@ -110,7 +110,7 @@ export function OrganicProductCard({ product, slug }: any) {
   return (
     <div className="group bg-white rounded-[1.5rem] overflow-hidden border border-zinc-100 hover:shadow-lg transition-all flex flex-col items-center">
       <div className="relative w-full aspect-square overflow-hidden bg-zinc-50">
-        <Link href={`/store/${slug}/products/${product.id}`} className="block w-full h-full">
+        <Link href={`/store/${slug}/products/${product.slug || product.id}`} className="block w-full h-full">
           <img src={product.image_url} alt={product.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
         </Link>
         
@@ -143,7 +143,7 @@ export function OrganicProductCard({ product, slug }: any) {
           ))}
         </div>
         
-        <Link href={`/store/${slug}/products/${product.id}`}>
+        <Link href={`/store/${slug}/products/${product.slug || product.id}`}>
           <h3 className="text-sm font-black text-zinc-900 line-clamp-1">{product.name}</h3>
         </Link>
         

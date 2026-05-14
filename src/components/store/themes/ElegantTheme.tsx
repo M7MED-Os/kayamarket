@@ -30,6 +30,7 @@ import {
 import { KayaBadge } from '@/components/store/KayaBadge'
 import { useCart } from '@/context/CartContext'
 import { useWishlist } from '@/context/WishlistContext'
+import { trackAddToCart } from '@/components/store/PixelManager'
 import toast from 'react-hot-toast'
 
 // ─── ELEGANT PRODUCT CARD ───────────────────────────────────────────────────
@@ -78,7 +79,7 @@ export const ElegantProductCard = ({ product, slug }: any) => {
 
     if (hasVariants) {
       toast('يرجى اختيار المقاس واللون أولاً ثم الضغط على زر "أضف للسلة"', { icon: '📝' })
-      router.push(`/store/${slug}/products/${product.id}`)
+      router.push(`/store/${slug}/products/${product.slug || product.id}`)
       return
     }
 
@@ -89,6 +90,7 @@ export const ElegantProductCard = ({ product, slug }: any) => {
       id: product.id,
       cartItemId: cartItemId,
       name: product.name,
+      slug: product.slug,
       price: product.price || 0,
       original_price: product.original_price,
       image_url: productImage,
@@ -99,11 +101,12 @@ export const ElegantProductCard = ({ product, slug }: any) => {
       }
     }
     addItem(newItem)
+    trackAddToCart(product)
     toast.success('تمت الإضافة للسلة')
   }
 
   return (
-    <Link href={`/store/${slug}/products/${product.id}`} className="group space-y-6">
+    <Link href={`/store/${slug}/products/${product.slug || product.id}`} className="group space-y-6">
       <div className="relative aspect-[3/4] overflow-hidden bg-zinc-50 border border-zinc-100/50 transition-all duration-700 group-hover:border-[var(--primary)]/30 group-hover:shadow-2xl group-hover:shadow-[var(--primary)]/5">
         <Image
           src={productImage}

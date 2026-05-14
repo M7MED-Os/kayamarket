@@ -16,8 +16,8 @@ export default function OrganicView({ product, store, branding, slug, galleryIma
   const primaryColor = branding?.primary_color || '#4A6741'
   const finalStyles = { ...commonStyles, '--primary': primaryColor, fontFamily: branding?.font_family || 'Outfit, Cairo, sans-serif' }
   const images = galleryImages?.length > 0 ? galleryImages : [product.image_url].filter(Boolean)
-  const rating = ratingSummary?.avg || product.avg_rating || 5
-  const reviewCount = ratingSummary?.count || reviews?.length || 0
+  const rating = ratingSummary?.average_rating || product.avg_rating || 5
+  const reviewCount = ratingSummary?.total_reviews || reviews?.length || 0
   const discount = product.old_price && product.old_price > product.price
     ? Math.round((1 - product.price / product.old_price) * 100)
     : null

@@ -95,7 +95,7 @@ export default function ProductCard({ product, slug }: ProductCardProps) {
 
     if (hasVariants) {
       toast('يرجى اختيار المقاس واللون أولاً ثم الضغط على زر "أضف للسلة"', { icon: '📝' })
-      router.push(`/store/${slug}/products/${product.id}`)
+      router.push(`/store/${slug}/products/${product.slug || product.id}`)
       return
     }
 
@@ -104,6 +104,7 @@ export default function ProductCard({ product, slug }: ProductCardProps) {
 
     addItem({
       id: product.id,
+      slug: product.slug,
       cartItemId: cartItemId,
       name: product.name,
       price: product.price,
@@ -140,7 +141,7 @@ export default function ProductCard({ product, slug }: ProductCardProps) {
 
       {/* Product Image */}
       <Link
-        href={`/store/${slug}/products/${product.id}`}
+        href={`/store/${slug}/products/${product.slug || product.id}`}
         className="relative aspect-[4/5] overflow-hidden bg-zinc-50 w-full"
       >
         {product.image_url ? (
@@ -182,7 +183,7 @@ export default function ProductCard({ product, slug }: ProductCardProps) {
           <StarRating rating={Number(rating)} />
         </div>
 
-        <Link href={`/store/${slug}/products/${product.id}`}>
+        <Link href={`/store/${slug}/products/${product.slug || product.id}`}>
           <h3
             className="text-[15px] md:text-base font-black text-zinc-900 mb-2 line-clamp-2 leading-tight group-hover:text-[var(--primary)] transition-colors"
             title={product.name}
@@ -226,7 +227,7 @@ export default function ProductCard({ product, slug }: ProductCardProps) {
         <div className="space-y-3">
           <div className="space-y-2">
             <Link
-              href={`/store/${slug}/products/${product.id}`}
+              href={`/store/${slug}/products/${product.slug || product.id}`}
               className="flex items-center justify-center w-full py-3 text-[14px] font-black text-zinc-900 bg-white border-2 border-zinc-100 rounded-2xl transition-all hover:bg-zinc-50 hover:scale-[1.02] active:scale-95 shadow-sm"
             >
               اطلب الآن

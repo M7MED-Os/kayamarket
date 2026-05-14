@@ -19,8 +19,16 @@ import {
   ElegantHeader,
   ElegantFooter
 } from '@/components/store/themes/ElegantTheme'
+import { trackPurchase } from '@/components/store/PixelManager'
+import { useEffect } from 'react'
 
 export default function TrackOrderClient({ order, store, branding, slug }: any) {
+  useEffect(() => {
+    if (order) {
+      trackPurchase(order)
+    }
+  }, [])
+
   const [storeRating, setStoreRating] = useState(5)
   const [storeComment, setStoreComment] = useState('')
   const [productRating, setProductRating] = useState(5)

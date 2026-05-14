@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createProduct, updateProduct } from '@/app/actions/product'
 import { uploadImage } from '@/app/actions/storage'
+import { generateSlug } from '@/lib/utils/slug'
 import toast from 'react-hot-toast'
 import { Save, Tag, Package, Calendar, Layers, X, Trash2, Plus, Info, Image as ImageIcon, Eye, EyeOff, Sparkles, Palette, Maximize2 } from 'lucide-react'
 import ImageUpload from '@/components/ImageUpload'
@@ -68,6 +69,7 @@ export default function ProductForm({ initialData, plan = 'starter', config }: {
     image_url: initialData?.image_url || '',
     images: initialData?.images || [],
     is_visible: initialData?.is_visible !== undefined ? initialData.is_visible : true,
+    slug: initialData?.slug || '',
     sale_end_date: initialData?.sale_end_date ? new Date(initialData.sale_end_date).toISOString().slice(0, 16) : '',
     variants: initialData?.variants || [] as any[],
   })
@@ -88,7 +90,16 @@ export default function ProductForm({ initialData, plan = 'starter', config }: {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
+    setFormData(prev => {
+      const newState = { ...prev, [name]: value };
+
+      // Auto-generate slug if name changes and slug was empty or matched previous name
+      if (name === 'name' && (!prev.slug || prev.slug === generateSlug(prev.name))) {
+        newState.slug = generateSlug(value);
+      }
+
+      return newState;
+    })
   }
 
   const handleToggle = () => {
@@ -134,6 +145,7 @@ export default function ProductForm({ initialData, plan = 'starter', config }: {
       form.append('images', JSON.stringify(finalGalleryUrls))
       if (formData.sale_end_date) form.append('sale_end_date', formData.sale_end_date)
       form.append('is_visible', String(formData.is_visible))
+      form.append('slug', generateSlug(formData.slug || formData.name))
       form.append('variants', JSON.stringify(formData.variants))
 
       let res
@@ -191,6 +203,29 @@ export default function ProductForm({ initialData, plan = 'starter', config }: {
                     className="w-full h-11 bg-slate-50/50 border border-slate-200 rounded-xl px-4 text-sm font-bold focus:bg-white focus:border-sky-500 focus:ring-4 focus:ring-sky-500/5 transition-all outline-none"
                     placeholder="مثال: ساعة ذكية أبل الجيل الثامن"
                   />
+                </div>
+
+                <div className="md:col-span-2 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mr-1">رابط المنتج (URL)</label>
+                    <span className="text-[9px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md font-bold">kayamarket.com/store/products/...</span>
+                  </div>
+                  <p className="text-[10px] text-slate-400 mr-1">هذا الرابط سيظهر في المتصفح. يمكنك مسح الاسم المولد تلقائيا وكتابة اسم المنتج بالإنجليزية ليكون الرابط نظيفاً عند المشاركة.</p>
+
+                  <div className="relative group">
+                    <input
+                      type="text"
+                      name="slug"
+                      value={formData.slug}
+                      onChange={(e) => {
+                        const val = e.target.value.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '').replace(/--+/g, '-');
+                        setFormData(prev => ({ ...prev, slug: val }));
+                      }}
+                      className="w-full h-11 bg-slate-50/50 border border-slate-200 rounded-xl pl-4 pr-10 text-sm font-bold text-sky-600 focus:bg-white focus:border-sky-500 transition-all outline-none"
+                      placeholder="مثال: apple-watch-series-8"
+                    />
+                    <Sparkles className="absolute right-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-sky-300" />
+                  </div>
                 </div>
 
                 <div className="md:col-span-2 space-y-2">

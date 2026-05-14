@@ -5,7 +5,7 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import { 
   LayoutDashboard, ShoppingCart, Package, Settings, ExternalLink, 
   Ticket, Layout, Palette, Globe, CreditCard, Shield, MessageSquare, Star,
-  Menu, X, LayoutGrid, LogOut
+  Menu, X, LayoutGrid, LogOut, Activity
 } from 'lucide-react'
 import LogoutButton from '@/components/LogoutButton'
 
@@ -33,6 +33,7 @@ export default function AdminNav({ storeSlug }: AdminNavProps) {
     { label: 'الألوان والخطوط', tab: 'branding', icon: Palette },
     { label: 'الشعار والبانر', tab: 'media', icon: Globe },
     { label: 'المعلومات', tab: 'identity', icon: MessageSquare },
+    { label: 'التتبع والتحليلات', tab: 'tracking', icon: Activity },
     { label: 'الدفع', tab: 'checkout', icon: CreditCard },
     { label: 'الخطة', tab: 'plan', icon: Shield },
   ]

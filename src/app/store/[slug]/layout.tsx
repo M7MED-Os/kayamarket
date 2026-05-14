@@ -20,6 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 import { incrementStoreViews } from '@/app/actions/analytics';
+import PixelManager from '@/components/store/PixelManager';
 
 export default async function StoreLayout({
   children,
@@ -29,7 +30,7 @@ export default async function StoreLayout({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const { store, branding } = await getStoreByIdentifier(slug);
+  const { store, branding, settings } = await getStoreByIdentifier(slug);
 
   if (!store) {
     notFound();
@@ -42,6 +43,11 @@ export default async function StoreLayout({
 
   return (
     <div className="min-h-screen">
+      <PixelManager 
+        fbPixelId={settings?.fb_pixel_id} 
+        tiktokPixelId={settings?.tiktok_pixel_id} 
+        googleAnalyticsId={settings?.google_analytics_id} 
+      />
       {/* Inject primary color CSS variable at layout level */}
       <style dangerouslySetInnerHTML={{ __html: `
         :root {

@@ -18,7 +18,7 @@ import {
 import ImageUpload from '@/components/ImageUpload'
 import { useSearchParams, useRouter } from 'next/navigation'
 
-type ViewType = 'hub' | 'builder' | 'branding' | 'media' | 'identity' | 'checkout' | 'plan' | 'upgrade-checkout' | 'themes'
+type ViewType = 'hub' | 'builder' | 'branding' | 'media' | 'identity' | 'checkout' | 'plan' | 'upgrade-checkout' | 'themes' | 'tracking'
 
 interface Section {
    id: string
@@ -161,6 +161,9 @@ export default function SettingsForm({
    const [codDepositRequired, setCodDepositRequired] = useState(initialSettings?.cod_deposit_required ?? false)
    const [depositPercentage, setDepositPercentage] = useState(initialSettings?.deposit_percentage || 50)
    const [policies, setPolicies] = useState(initialSettings?.policies || '')
+   const [fbPixelId, setFbPixelId] = useState(initialSettings?.fb_pixel_id || '')
+   const [tiktokPixelId, setTiktokPixelId] = useState(initialSettings?.tiktok_pixel_id || '')
+   const [googleAnalyticsId, setGoogleAnalyticsId] = useState(initialSettings?.google_analytics_id || '')
 
    // Shipping Config
    const [shippingConfig, setShippingConfig] = useState(initialBranding?.shipping_config || { type: 'flat', flat_rate: 0, governorates: {}, allow_pickup: false })
@@ -204,7 +207,8 @@ export default function SettingsForm({
       sections, headerSettings, showHeroMobile, heroTitle, heroDescription, announcementText, announcementEnabled,
       facebookUrl, instagramUrl, tiktokUrl, storeAddress, codEnabled, codDepositRequired, depositPercentage, policies,
       heroAlignment, heroImageUrl, heroCtaText, bannerOverlayOpacity, featuresData, footerDescription,
-      invoiceInstapay, invoiceWallet, faqData, selectedTheme, shippingConfig
+      invoiceInstapay, invoiceWallet, faqData, selectedTheme, shippingConfig,
+      fbPixelId, tiktokPixelId, googleAnalyticsId
    ])
 
    const toggleSection = (id: string) => {
@@ -252,6 +256,9 @@ export default function SettingsForm({
          formData.append('deposit_percentage', depositPercentage.toString())
          formData.append('policies', policies)
          formData.append('shipping_config', JSON.stringify(shippingConfig))
+         formData.append('fb_pixel_id', fbPixelId)
+         formData.append('tiktok_pixel_id', tiktokPixelId)
+         formData.append('google_analytics_id', googleAnalyticsId)
 
          const res = await updateStoreSettings(formData)
          if (res.success) {
@@ -281,6 +288,7 @@ export default function SettingsForm({
       { id: 'media', label: 'الشعار والبانر', icon: BannerIcon, color: 'text-amber-600', bg: 'bg-amber-50' },
       { id: 'identity', label: 'المعلومات', icon: Globe, color: 'text-emerald-600', bg: 'bg-emerald-50' },
       { id: 'checkout', label: 'الدفع والسياسات', icon: CreditCard, color: 'text-rose-600', bg: 'bg-rose-50' },
+      { id: 'tracking', label: 'التتبع والتحليلات', icon: Activity, color: 'text-cyan-600', bg: 'bg-cyan-50' },
       { id: 'plan', label: 'خطة الاشتراك', icon: Zap, color: 'text-orange-600', bg: 'bg-orange-50' },
    ]
 
@@ -1146,6 +1154,77 @@ export default function SettingsForm({
                                  </div>
                               </div>
                            )}
+                        </div>
+                     </div>
+                  )}
+
+
+                  {/* --- Tracking & Pixels View --- */}
+                  {currentView === 'tracking' && (
+                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm space-y-8">
+                           <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 bg-cyan-50 text-cyan-600 rounded-xl flex items-center justify-center">
+                                 <Activity className="h-5 w-5" />
+                              </div>
+                              <div className="text-right">
+                                 <h3 className="text-lg font-black text-slate-900">التتبع والتحليلات</h3>
+                                 <p className="text-[10px] font-bold text-slate-400">اربط متجرك بمنصات الإعلانات لتتبع المبيعات</p>
+                              </div>
+                           </div>
+
+                           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                              {/* Meta Pixel */}
+                              <div className="space-y-3 text-right">
+                                 <div className="flex items-center gap-2 px-1">
+                                    <div className="h-6 w-6 bg-[#1877F2] text-white rounded-lg flex items-center justify-center">
+                                       <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path></svg>
+                                    </div>
+                                    <h4 className="text-sm font-black text-slate-800">Meta Pixel ID (Facebook)</h4>
+                                 </div>
+                                 <input
+                                    value={fbPixelId}
+                                    onChange={e => setFbPixelId(e.target.value)}
+                                    placeholder="مثلاً: 1234567890..."
+                                    className="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl px-4 text-sm font-black outline-none focus:bg-white focus:border-[#1877F2] transition-all"
+                                 />
+                                 <p className="text-[10px] font-bold text-slate-400 px-1">يساعدك في تتبع مبيعات إعلانات فيسبوك وإنستجرام</p>
+                              </div>
+
+                              {/* TikTok Pixel */}
+                              <div className="space-y-3 text-right">
+                                 <div className="flex items-center gap-2 px-1">
+                                    <div className="h-6 w-6 bg-black text-white rounded-lg flex items-center justify-center">
+                                       <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47-.13-.08-.26-.17-.38-.25v7.39c.02 2.12-.66 4.31-2.22 5.76-1.78 1.68-4.51 2.13-6.79 1.34-2.58-.87-4.45-3.52-4.41-6.24.03-2.31 1.41-4.52 3.53-5.46.7-.31 1.47-.48 2.24-.52.01 1.41-.01 2.83 0 4.24-.54.04-1.1.18-1.55.5-.83.56-1.25 1.62-1.07 2.6.21 1.25 1.45 2.21 2.71 2.01 1.18-.12 2.12-1.17 2.12-2.36V0h.03z"></path></svg>
+                                    </div>
+                                    <h4 className="text-sm font-black text-slate-800">TikTok Pixel ID</h4>
+                                 </div>
+                                 <input
+                                    value={tiktokPixelId}
+                                    onChange={e => setTiktokPixelId(e.target.value)}
+                                    placeholder="مثلاً: C6... أو أرقام فقط"
+                                    className="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl px-4 text-sm font-black outline-none focus:bg-white focus:border-slate-900 transition-all"
+                                 />
+                                 <p className="text-[10px] font-bold text-slate-400 px-1">ضروري جداً إذا كنت تعلن على منصة تيك توك</p>
+                              </div>
+
+                              {/* Google Analytics */}
+                              <div className="space-y-3 text-right">
+                                 <div className="flex items-center gap-2 px-1">
+                                    <div className="h-6 w-6 bg-[#F9AB00] text-white rounded-lg flex items-center justify-center">
+                                       <Activity className="h-3.5 w-3.5" />
+                                    </div>
+                                    <h4 className="text-sm font-black text-slate-800">Google Analytics ID (G-...)</h4>
+                                 </div>
+                                 <input
+                                    value={googleAnalyticsId}
+                                    onChange={e => setGoogleAnalyticsId(e.target.value)}
+                                    placeholder="مثلاً: G-XXXXXXXXXX"
+                                    className="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl px-4 text-sm font-black outline-none focus:bg-white focus:border-[#F9AB00] transition-all"
+                                 />
+                                 <p className="text-[10px] font-bold text-slate-400 px-1">لمعرفة عدد زوار المتجر وتفاصيل تحركاتهم</p>
+                              </div>
+                           </div>
                         </div>
                      </div>
                   )}

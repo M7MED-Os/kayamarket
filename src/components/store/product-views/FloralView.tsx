@@ -87,11 +87,11 @@ export default function FloralView({
                 <div className="flex items-center gap-3">
                   <div className="flex gap-1">
                     {[...Array(5)].map((_, idx) => (
-                      <Star key={idx} className={`h-4 w-4 ${idx < Math.round(ratingSummary.average_rating || 5) ? 'fill-[var(--primary)] text-[var(--primary)]' : 'text-zinc-100'}`} />
+                      <Star key={idx} className={`h-4 w-4 ${idx < Math.round(ratingSummary?.average_rating || 5) ? 'fill-[var(--primary)] text-[var(--primary)]' : 'text-zinc-100'}`} />
                     ))}
                   </div>
                   <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">
-                    ({ratingSummary.total_reviews} تقييم)
+                    ({ratingSummary?.total_reviews || 0} تقييم)
                   </span>
                 </div>
 
@@ -117,8 +117,8 @@ export default function FloralView({
                 productId={product.id}
                 storeId={store.id}
                 initialReviews={reviews as any}
-                averageRating={ratingSummary.average_rating}
-                totalReviews={ratingSummary.total_reviews}
+                averageRating={ratingSummary?.average_rating || 5}
+                totalReviews={ratingSummary?.total_reviews || 0}
                 selectedTheme={selectedTheme}
               />
             </div>

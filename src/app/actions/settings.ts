@@ -72,6 +72,9 @@ export async function updateStoreSettings(formData: FormData) {
     const codDepositRequired = formData.get('cod_deposit_required') === 'true'
     const depositPercentage = parseInt(formData.get('deposit_percentage') as string) || 0
     const policies = sanitizeHtml(formData.get('policies') as string) as string
+    const fbPixelId = sanitizeHtml(formData.get('fb_pixel_id') as string) as string
+    const tiktokPixelId = sanitizeHtml(formData.get('tiktok_pixel_id') as string) as string
+    const googleAnalyticsId = sanitizeHtml(formData.get('google_analytics_id') as string) as string
 
     // --- Update Store Data (Name & Phone & Domain) ---
     const { data: store } = await supabase.from('stores').select('plan, slug').eq('id', storeId).single()
@@ -195,6 +198,9 @@ export async function updateStoreSettings(formData: FormData) {
         cod_deposit_required: codDepositRequired,
         deposit_percentage: depositPercentage,
         policies: policies || null,
+        fb_pixel_id: fbPixelId || null,
+        tiktok_pixel_id: tiktokPixelId || null,
+        google_analytics_id: googleAnalyticsId || null,
         updated_at: new Date().toISOString()
       }, { onConflict: 'store_id' })
 

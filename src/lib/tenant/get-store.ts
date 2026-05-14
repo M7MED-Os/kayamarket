@@ -8,26 +8,33 @@ import { Store, StoreBranding } from '@/types/store';
 
 async function _fetchStoreById(
   storeId: string,
-): Promise<{ store: Store | null; branding: StoreBranding | null }> {
+): Promise<{ store: any | null; branding: any | null; settings: any | null }> {
   const supabase = await createPublicClient();
   const { data: store } = await supabase
     .from('stores')
     .select('*')
     .eq('id', storeId)
     .single();
-  if (!store) return { store: null, branding: null };
+  if (!store) return { store: null, branding: null, settings: null };
 
   const { data: branding } = await supabase
     .from('store_branding')
     .select('*')
     .eq('store_id', storeId)
     .single();
-  return { store, branding };
+
+  const { data: settings } = await supabase
+    .from('store_settings')
+    .select('*')
+    .eq('store_id', storeId)
+    .single();
+
+  return { store, branding, settings };
 }
 
 async function _fetchStoreByIdentifier(
   identifier: string,
-): Promise<{ store: Store | null; branding: StoreBranding | null }> {
+): Promise<{ store: any | null; branding: any | null; settings: any | null }> {
   const supabase = await createPublicClient();
 
   // Try slug first (most common path)
@@ -49,14 +56,21 @@ async function _fetchStoreByIdentifier(
     store = byDomain;
   }
 
-  if (!store) return { store: null, branding: null };
+  if (!store) return { store: null, branding: null, settings: null };
 
   const { data: branding } = await supabase
     .from('store_branding')
     .select('*')
     .eq('store_id', store.id)
     .single();
-  return { store, branding };
+
+  const { data: settings } = await supabase
+    .from('store_settings')
+    .select('*')
+    .eq('store_id', store.id)
+    .single();
+
+  return { store, branding, settings };
 }
 
 // ─── Public helpers — cached at 5-minute TTL ──────────────────────────────────

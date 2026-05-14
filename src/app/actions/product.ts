@@ -6,6 +6,7 @@ import { revalidatePath, revalidateTag } from 'next/cache'
 import { z } from 'zod'
 import { PlanTier, getPlanConfig, getPlanName, getDynamicPlanConfigs } from '@/lib/subscription'
 import { sanitizeHtml, sanitizeObject } from '@/lib/utils/sanitize'
+import { generateSlug } from '@/lib/utils/slug'
 
 // 🔒 Safe JSON parser — prevents DoS from malformed/oversized payloads
 function safeJsonParse(raw: string | null, maxLength = 50000): any {
@@ -20,9 +21,10 @@ const productSchema = z.object({
   price: z.number().min(0, 'السعر مطلوب'),
   original_price: z.number().min(0).optional().nullable(),
   stock: z.number().min(0).optional().nullable(),
-  category: z.string().optional().nullable(),
-  image_url: z.string().optional().nullable(),
-  images: z.array(z.string()).optional().default([]),
+  category: z.string().min(1, 'التصنيف مطلوب'),
+  image_url: z.string().url('رابط الصورة غير صالح').optional().or(z.literal('')),
+  images: z.array(z.string().url()).optional().default([]),
+  slug: z.string().optional(),
   is_visible: z.boolean().default(true),
   sale_end_date: z.string().optional().nullable(),
   variants: z.any().optional().nullable(),
@@ -117,6 +119,7 @@ export async function createProduct(formData: FormData) {
         is_visible: parsed.data.is_visible,
         sale_end_date: parsed.data.sale_end_date,
         variants: parsed.data.variants,
+        slug: (formData.get('slug') as string) || generateSlug(parsed.data.name),
       })
 
     if (error) {
@@ -194,6 +197,7 @@ export async function updateProduct(id: string, formData: FormData) {
         is_visible: parsed.data.is_visible,
         sale_end_date: parsed.data.sale_end_date,
         variants: parsed.data.variants,
+        slug: (formData.get('slug') as string) || generateSlug(parsed.data.name),
       })
       .eq('id', id)
       .eq('store_id', storeId)

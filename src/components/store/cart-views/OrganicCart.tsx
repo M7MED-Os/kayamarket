@@ -50,7 +50,7 @@ export default function OrganicCart({ store, branding, slug, showWatermark, comm
                   >
                     <div className="flex items-center gap-5">
                       {/* Image */}
-                      <Link href={`/store/${slug}/products/${item.id}`}
+                      <Link href={`/store/${slug}/products/${item.slug || item.id}`}
                         className="h-24 w-24 rounded-2xl overflow-hidden bg-zinc-50 flex-shrink-0 group">
                         <img src={item.image_url} alt={item.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -61,7 +61,7 @@ export default function OrganicCart({ store, branding, slug, showWatermark, comm
                         <p className="text-[10px] font-black text-[var(--primary)] uppercase tracking-widest mb-0.5 flex items-center gap-1">
                           <Leaf className="h-2.5 w-2.5" /> عضوي
                         </p>
-                        <Link href={`/store/${slug}/products/${item.id}`}>
+                        <Link href={`/store/${slug}/products/${item.slug || item.id}`}>
                           <h3 className="font-black text-zinc-900 hover:text-[var(--primary)] transition-colors truncate text-base">{item.name}</h3>
                         </Link>
                         {item.variant_info?.color && (
