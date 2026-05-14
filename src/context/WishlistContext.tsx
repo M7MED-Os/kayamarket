@@ -7,6 +7,7 @@ interface WishlistItem {
   id: string
   name: string
   price: number
+  slug?: string | null
   image_url?: string
   original_price?: number | null
   description?: string | null
