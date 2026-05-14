@@ -8,10 +8,10 @@ import Loading from '@/app/loading'
 
 // Dynamic Imports for Invoice Views
 const InvoiceViews = {
-  elegant: dynamic(() => import('@/components/store/invoice-views/ElegantInvoice'), { loading: () => <Loading /> }),
-  floral: dynamic(() => import('@/components/store/invoice-views/FloralInvoice'), { loading: () => <Loading /> }),
-  organic: dynamic(() => import('@/components/store/invoice-views/OrganicInvoice'), { loading: () => <Loading /> }),
-  default: dynamic(() => import('@/components/store/invoice-views/DefaultInvoice'), { loading: () => <Loading /> }),
+   elegant: dynamic(() => import('@/components/store/invoice-views/ElegantInvoice'), { loading: () => <Loading /> }),
+   floral: dynamic(() => import('@/components/store/invoice-views/FloralInvoice'), { loading: () => <Loading /> }),
+   organic: dynamic(() => import('@/components/store/invoice-views/OrganicInvoice'), { loading: () => <Loading /> }),
+   default: dynamic(() => import('@/components/store/invoice-views/DefaultInvoice'), { loading: () => <Loading /> }),
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
@@ -164,8 +164,8 @@ export default async function InvoicePage({
          `رقم الطلب: #${shortId}`,
          `وقت الطلب: ${new Date(row.created_at).toLocaleString('ar-EG', { timeZone: 'Africa/Cairo', dateStyle: 'medium', timeStyle: 'short' })}`,
          `طريقة الدفع: ${row.payment_method}`,
-         row.coupon_code ? `🎟️ الكوبون: ${row.coupon_code}\n💰 السعر قبل الخصم: ${productPrice.toLocaleString()} ج.م\n🎁 قيمة الخصم: ${((productPrice * discountPct) / 100).toLocaleString()} ج.م` : '',
-         shippingCost > 0 ? `🚚 الشحن: ${shippingCost.toLocaleString()} ج.م` : '',
+         row.coupon_code ? `الكوبون: ${row.coupon_code}\nالسعر قبل الخصم: ${productPrice.toLocaleString()} ج.م\nقيمة الخصم: ${((productPrice * discountPct) / 100).toLocaleString()} ج.م` : '',
+         shippingCost > 0 ? `الشحن: ${shippingCost.toLocaleString()} ج.م` : '',
          '',
          `المنتجات:`,
          itemsList,
