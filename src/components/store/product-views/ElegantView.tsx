@@ -6,6 +6,7 @@ import { ElegantHeader, ElegantFooter } from '@/components/store/themes/ElegantT
 import ImageGallery from '@/components/ImageGallery';
 import CheckoutBox from '@/components/CheckoutBox';
 import ProductReviews from '@/components/product/ProductReviews';
+import CountdownTimer from '@/components/CountdownTimer';
 import { KayaBadge } from '@/components/store/KayaBadge';
 
 interface ProductViewProps {
@@ -106,7 +107,8 @@ export default function ElegantView({
               </div>
 
               {/* Checkout Integration */}
-              <div className="relative">
+              <div className="relative space-y-6">
+                {product.sale_end_date && <CountdownTimer endDate={product.sale_end_date} />}
                 <CheckoutBox product={product} storeId={store.id} storeSlug={slug} selectedTheme={selectedTheme} />
               </div>
             </div>

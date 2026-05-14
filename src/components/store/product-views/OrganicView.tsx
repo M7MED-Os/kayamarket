@@ -5,6 +5,7 @@ import { Star, ShoppingBag, Heart, ArrowRight, ShieldCheck, Truck, Leaf, Check, 
 import Link from 'next/link'
 import { OrganicHeader, OrganicFooter, OrganicProductCard } from '../themes/OrganicTheme'
 import CheckoutBox from '@/components/CheckoutBox'
+import CountdownTimer from '@/components/CountdownTimer'
 import { useWishlist } from '@/context/WishlistContext'
 import toast from 'react-hot-toast'
 
@@ -129,7 +130,8 @@ export default function OrganicView({ product, store, branding, slug, galleryIma
               )}
 
               {/* Checkout Box */}
-              <div className="bg-white rounded-[2rem] p-6 border border-zinc-100 shadow-lg shadow-zinc-200/30">
+              <div className="bg-white rounded-[2rem] p-6 border border-zinc-100 shadow-lg shadow-zinc-200/30 space-y-6">
+                {product.sale_end_date && <CountdownTimer endDate={product.sale_end_date} />}
                 <CheckoutBox product={product} storeId={store.id} storeSlug={slug} selectedTheme={branding?.theme_id} />
               </div>
 
