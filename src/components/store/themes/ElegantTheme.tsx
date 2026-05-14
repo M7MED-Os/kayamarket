@@ -264,8 +264,8 @@ export const ElegantCategories = ({ categories, slug }: any) => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {categories.map((cat: any) => (
-            <Link key={cat.id} href={`/store/${slug}/products?category=${cat.name}`} className="group relative aspect-square overflow-hidden bg-zinc-50">
+          {categories.map((cat: any, i: number) => (
+            <Link key={cat.id || i} href={`/store/${slug}/products?category=${encodeURIComponent(cat.name)}`} className="group relative aspect-square overflow-hidden bg-zinc-50">
               <Image
                 src={cat.image_url || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2670&auto=format&fit=crop'}
                 alt={cat.name}

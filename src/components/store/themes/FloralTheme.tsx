@@ -380,7 +380,7 @@ export function FloralCategories({ categories, slug }: { categories: any[]; slug
         {/* Grid — elegant arch cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
           {categories.slice(0, 4).map((cat, i) => (
-            <Link key={cat.id || i} href={`/store/${slug}/products?category=${cat.name}`}
+            <Link key={cat.id || i} href={`/store/${slug}/products?category=${encodeURIComponent(cat.name)}`}
               className="group flex flex-col items-center gap-4 md:gap-5">
               <div className="relative w-full aspect-[3/4] rounded-t-full rounded-b-3xl overflow-hidden border-[3px] md:border-4 border-white shadow-md ring-1 ring-zinc-100 group-hover:ring-[var(--primary)]/30 group-hover:shadow-2xl group-hover:-translate-y-2 transition-all duration-700">
                 <Image
