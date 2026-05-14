@@ -32,7 +32,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
 
   const { data: store } = await supabase
     .from('stores')
-    .select('plan')
+    .select('plan, slug')
     .eq('id', storeId)
     .single()
 
@@ -59,7 +59,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
         </div>
       </div>
       
-      <ProductForm initialData={product} plan={storePlan} config={currentConfig} />
+      <ProductForm initialData={product} plan={storePlan} config={currentConfig} storeSlug={store?.slug} />
     </div>
   )
 }

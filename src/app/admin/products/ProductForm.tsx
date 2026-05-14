@@ -6,16 +6,17 @@ import { createProduct, updateProduct } from '@/app/actions/product'
 import { uploadImage } from '@/app/actions/storage'
 import { generateSlug } from '@/lib/utils/slug'
 import toast from 'react-hot-toast'
-import { Save, Tag, Package, Calendar, Layers, X, Trash2, Plus, Info, Image as ImageIcon, Eye, EyeOff, Sparkles, Palette, Maximize2 } from 'lucide-react'
+import { Save, Tag, Package, Calendar, Layers, X, Trash2, Plus, Info, Image as ImageIcon, Eye, EyeOff, Sparkles, Palette, Maximize2, Copy, Check } from 'lucide-react'
 import ImageUpload from '@/components/ImageUpload'
 
 import { PlanTier, PLAN_CONFIG, PlanLimits } from '@/lib/subscription'
 import UpgradeModal from '@/components/UpgradeModal'
 
-export default function ProductForm({ initialData, plan = 'starter', config }: { initialData?: any, plan?: PlanTier, config?: PlanLimits }) {
+export default function ProductForm({ initialData, plan = 'starter', config, storeSlug }: { initialData?: any, plan?: PlanTier, config?: PlanLimits, storeSlug?: string | null }) {
   const currentConfig = config || PLAN_CONFIG[plan] || PLAN_CONFIG.starter
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [copied, setCopied] = useState(false)
   const [upgradeModal, setUpgradeModal] = useState({ isOpen: false, name: '', value: '' as any })
   const isEditing = !!initialData
 
@@ -224,7 +225,25 @@ export default function ProductForm({ initialData, plan = 'starter', config }: {
                       className="w-full h-11 bg-slate-50/50 border border-slate-200 rounded-xl pl-4 pr-10 text-sm font-bold text-sky-600 focus:bg-white focus:border-sky-500 transition-all outline-none"
                       placeholder="مثال: apple-watch-series-8"
                     />
-                    <Sparkles className="absolute right-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-sky-300" />
+                    {storeSlug && formData.slug ? (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          const url = `${window.location.origin}/store/${storeSlug}/products/${formData.slug}`
+                          navigator.clipboard.writeText(url)
+                          setCopied(true)
+                          toast.success('تم نسخ رابط المنتج')
+                          setTimeout(() => setCopied(false), 2000)
+                        }}
+                        className={`absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-all ${copied ? 'text-emerald-500 bg-emerald-50' : 'text-slate-400 hover:text-sky-600 hover:bg-sky-50'}`}
+                        title="نسخ الرابط"
+                      >
+                        {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                      </button>
+                    ) : (
+                      <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-sky-300" />
+                    )}
                   </div>
                 </div>
 
