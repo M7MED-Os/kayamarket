@@ -1365,6 +1365,8 @@ export default function SettingsForm({
                                              <span className="text-xs font-black text-slate-700">حتى {planCfg.maxProducts} منتج فريد</span>
                                           </div>
                                           {[
+                                             { label: `حتى ${planCfg.maxImagesPerProduct} صور لكل منتج`, allowed: true, icon: BannerIcon },
+                                             { label: 'إزالة شعار كايا ماركت', allowed: planCfg.canRemoveWatermark, icon: Shield },
                                              { label: planCfg.maxCoupons > 0 ? `حتى ${planCfg.maxCoupons} كوبونات خصم` : 'كوبونات خصم', allowed: planCfg.maxCoupons > 0, icon: Zap },
                                              { label: 'دومين مخصص', allowed: planCfg.hasCustomDomain, icon: Globe },
                                              { label: 'هوية بصرية كاملة', allowed: planCfg.hasCustomBranding, icon: Brush },
