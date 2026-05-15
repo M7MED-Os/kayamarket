@@ -33,7 +33,7 @@ const translations = {
       },
       {
         name: 'Pro',
-        price: '300',
+        price: '149',
         desc: 'Grow your business professionally.',
         features: ['Up to 10 Products', '5 Photos per product', '3 Discount Coupons', 'PDF Invoices', 'Brand Customization', 'Custom Domain Support', 'Advanced Analytics', 'Pro WhatsApp Integration', 'Advanced Support'],
         cta: 'Start Now',
@@ -41,7 +41,7 @@ const translations = {
       },
       {
         name: 'Pro Plus',
-        price: '500',
+        price: '299',
         desc: 'The ultimate choice for large stores.',
         features: ['Unlimited Products', '10 Photos per product', 'Unlimited Discount Coupons', 'Everything in Pro', 'Remove Platform Logo', 'Pro WhatsApp Integration', '24/7 Priority Support'],
         cta: 'Go Unlimited',
@@ -88,7 +88,7 @@ const translations = {
       },
       {
         name: 'برو',
-        price: '300',
+        price: '149',
         desc: 'نمِّ عملك الصغير باحترافية كاملة.',
         features: ['حتى 10 منتجات', '5 صور لكل منتج', '3 كوبونات خصم', 'إصدار فواتير PDF', 'تخصيص الهوية البصرية', 'دومين مخصص', 'تحليلات متقدمة', 'ربط واتساب احترافي', 'دعم فني متقدم'],
         cta: 'اشترك الآن',
@@ -96,7 +96,7 @@ const translations = {
       },
       {
         name: 'برو بلس',
-        price: '500',
+        price: '299',
         desc: 'الخيار الأقوى للتجار والمتاجر الكبيرة.',
         features: ['عدد لا نهائي من المنتجات', '10 صور لكل منتج', 'عدد لا نهائي من كوبونات الخصم', 'كل مميزات برو', 'إزالة شعار KayaMarket', 'ربط واتساب احترافي', 'دعم فني ذو أولوية 24/7'],
         cta: 'انطلق بلا حدود',
