@@ -1,4 +1,5 @@
 import React from 'react'
+import type { Metadata } from 'next'
 import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase/server'
 import { getStoreByIdentifier } from '@/lib/tenant/get-store'
