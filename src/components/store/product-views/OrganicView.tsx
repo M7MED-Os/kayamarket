@@ -10,8 +10,6 @@ import { useWishlist } from '@/context/WishlistContext'
 import toast from 'react-hot-toast'
 
 export default function OrganicView({ product, store, branding, slug, galleryImages, ratingSummary, reviews, showWatermark, commonStyles, dbCategories }: any) {
-  const [selectedImage, setSelectedImage] = useState(0)
-  const [lightboxOpen, setLightboxOpen] = useState(false)
   const { toggleItem, isInWishlist } = useWishlist()
 
   const primaryColor = branding?.primary_color || '#4A6741'
@@ -45,43 +43,25 @@ export default function OrganicView({ product, store, branding, slug, galleryIma
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 xl:gap-16 items-start">
 
             {/* ── Image Gallery ── */}
-            <div className="space-y-4 lg:sticky lg:top-28">
-              {/* Main image */}
-              <div className="relative aspect-square rounded-[3rem] overflow-hidden bg-white border border-zinc-100 shadow-sm group cursor-zoom-in"
-                onClick={() => setLightboxOpen(true)}>
-                <img src={images[selectedImage]} alt={product.name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+            <div className="lg:sticky lg:top-28">
+              <div className="relative rounded-[3rem] overflow-hidden bg-white border border-zinc-100 shadow-sm p-0">
+                <ImageGallery images={images} productName={product.name} />
+                
                 {discount && (
-                  <div className="absolute top-5 right-5 px-3 py-1.5 bg-rose-500 text-white text-xs font-black rounded-xl shadow-lg">
+                  <div className="absolute top-5 right-5 px-3 py-1.5 bg-rose-500 text-white text-xs font-black rounded-xl shadow-lg z-10">
                     -{discount}%
                   </div>
                 )}
+                
                 <button
                   onClick={e => { e.stopPropagation(); toggleItem(product); toast.success(isInWishlist(product.id) ? 'تمت الإزالة من المفضلة' : 'تمت الإضافة للمفضلة') }}
                   aria-label="المفضلة"
-                  className={`absolute top-5 left-5 h-12 w-12 rounded-2xl flex items-center justify-center transition-all shadow-md
+                  className={`absolute top-5 left-5 h-12 w-12 rounded-2xl flex items-center justify-center transition-all shadow-md z-10
                     ${isInWishlist(product.id) ? 'bg-[var(--primary)] text-white shadow-[var(--primary)]/30' : 'bg-white/90 backdrop-blur-sm text-zinc-700 hover:bg-white'}`}
                 >
                   <Heart className={`h-5 w-5 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
                 </button>
-                <div className="absolute bottom-5 right-5 flex items-center gap-2 bg-black/30 backdrop-blur-sm text-white px-3 py-1.5 rounded-xl text-xs font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                  <ZoomIn className="h-3.5 w-3.5" /> تكبير
-                </div>
               </div>
-
-              {/* Thumbnails */}
-              {images.length > 1 && (
-                <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
-                  {images.map((img: string, idx: number) => (
-                    <button key={idx} onClick={() => setSelectedImage(idx)}
-                      className={`h-20 w-20 rounded-2xl overflow-hidden border-2 flex-shrink-0 transition-all duration-300
-                        ${selectedImage === idx ? 'border-[var(--primary)] shadow-md shadow-[var(--primary)]/20 scale-105' : 'border-transparent opacity-60 hover:opacity-90 hover:scale-105'}`}
-                    >
-                      <img src={img} alt="" className="w-full h-full object-cover" />
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
 
             {/* ── Product Info ── */}
@@ -124,9 +104,10 @@ export default function OrganicView({ product, store, branding, slug, galleryIma
 
               {/* Description */}
               {product.description && (
-                <p className="text-zinc-500 font-medium leading-relaxed text-base border-t border-zinc-100 pt-6">
-                  {product.description}
-                </p>
+                <div 
+                  className="text-zinc-500 font-medium leading-relaxed text-base border-t border-zinc-100 pt-6"
+                  dangerouslySetInnerHTML={{ __html: product.description.replace(/\n/g, '<br/>') }}
+                />
               )}
 
               {/* Checkout Box */}
@@ -235,28 +216,6 @@ export default function OrganicView({ product, store, branding, slug, galleryIma
           )}
         </div>
       </main>
-
-      {/* Lightbox */}
-      {lightboxOpen && (
-        <div className="fixed inset-0 z-[200] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setLightboxOpen(false)}>
-          <button onClick={() => setLightboxOpen(false)} className="absolute top-6 right-6 h-10 w-10 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-white/20 transition-colors">
-            <X className="h-5 w-5" />
-          </button>
-          {images.length > 1 && (
-            <>
-              <button onClick={e => { e.stopPropagation(); setSelectedImage((selectedImage - 1 + images.length) % images.length) }}
-                className="absolute left-6 top-1/2 -translate-y-1/2 h-12 w-12 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-white/20 transition-colors">
-                <ChevronLeft className="h-6 w-6" />
-              </button>
-              <button onClick={e => { e.stopPropagation(); setSelectedImage((selectedImage + 1) % images.length) }}
-                className="absolute right-6 top-1/2 -translate-y-1/2 h-12 w-12 bg-white/10 rounded-xl flex items-center justify-center text-white hover:bg-white/20 transition-colors">
-                <ChevronRight className="h-6 w-6" />
-              </button>
-            </>
-          )}
-          <img src={images[selectedImage]} alt={product.name} className="max-w-full max-h-[90vh] object-contain rounded-2xl" onClick={e => e.stopPropagation()} />
-        </div>
-      )}
 
       <OrganicFooter store={store} branding={branding} slug={slug} showWatermark={showWatermark} categories={dbCategories} />
     </div>

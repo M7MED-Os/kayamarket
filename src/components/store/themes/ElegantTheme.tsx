@@ -207,9 +207,10 @@ export const ElegantHero = ({ branding, store, slug, showWatermark }: any) => {
               <h1 className="text-5xl md:text-7xl lg:text-[5rem] font-black text-zinc-900 leading-[1.1] tracking-tighter">
                 {renderedTitle}
               </h1>
-              <p className={`text-lg text-zinc-400 font-light leading-relaxed ${hasImage ? 'max-w-md' : 'max-w-xl mx-auto'}`}>
-                {heroDescription}
-              </p>
+              <div 
+                className={`text-lg text-zinc-400 font-light leading-relaxed ${hasImage ? 'max-w-md' : 'max-w-xl mx-auto'}`}
+                dangerouslySetInnerHTML={{ __html: heroDescription.replace(/\n/g, '<br/>') }}
+              />
             </div>
 
             <div className={`flex flex-col sm:flex-row items-center gap-6 w-full lg:w-auto justify-center ${hasImage ? 'lg:justify-start' : ''}`}>
@@ -477,11 +478,14 @@ export const ElegantTestimonials = ({ reviews }: { reviews: any[] }) => {
                       />
                     ))}
                   </div>
-                  <p className="text-lg font-light text-zinc-600 leading-relaxed line-clamp-3 text-right" dir="rtl">
+                  <div className="text-lg font-light text-zinc-600 leading-relaxed line-clamp-3 text-right" dir="rtl">
                     <span className="font-sans font-bold text-xl text-zinc-400">"</span>
-                    <span className="italic mx-1">{review.comment}</span>
+                    <span 
+                      className="italic mx-1 inline"
+                      dangerouslySetInnerHTML={{ __html: review.comment?.replace(/\n/g, '<br/>') || '' }}
+                    />
                     <span className="font-sans font-bold text-xl text-zinc-400">"</span>
-                  </p>
+                  </div>
                   <div className="pt-6 border-t border-zinc-50 flex items-center justify-between">
                     <span className="text-[10px] font-black uppercase tracking-widest text-[var(--primary)]">
                       {review.reviewer_name || review.customer_name || 'عميل مجهول'}
@@ -669,7 +673,10 @@ export const ElegantFAQ = ({ branding }: any) => {
                 <span className="text-[10px] font-black text-[var(--primary)]">0{i + 1}</span>
                 {faq.q || faq.question}
               </h3>
-              <p className="text-sm text-zinc-400 leading-relaxed pr-10">{faq.a || faq.answer}</p>
+              <div 
+                className="text-sm text-zinc-400 leading-relaxed pr-10"
+                dangerouslySetInnerHTML={{ __html: (faq.a || faq.answer || '').replace(/\n/g, '<br/>') }}
+              />
             </div>
           ))}
         </div>

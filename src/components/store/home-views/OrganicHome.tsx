@@ -63,9 +63,10 @@ export default function OrganicHome({ store, branding, slug, dbCategories, produ
                    {/* Decorative underline/highlight */}
                    <div className="absolute -bottom-2 right-0 w-[60%] h-6 bg-[var(--primary)]/10 -rotate-1 rounded-full -z-10" />
                 </div>
-                <p className="text-base sm:text-lg text-zinc-400 font-medium max-w-lg mx-auto lg:mr-0 leading-relaxed">
-                   {heroDesc}
-                </p>
+                <div 
+                   className="text-base sm:text-lg text-zinc-400 font-medium max-w-lg mx-auto lg:mr-0 leading-relaxed"
+                   dangerouslySetInnerHTML={{ __html: heroDesc.replace(/\n/g, '<br/>') }}
+                />
               </div>
               
               <div className="flex flex-col sm:flex-row items-center gap-4 justify-center lg:justify-start">
@@ -185,7 +186,10 @@ export default function OrganicHome({ store, branding, slug, dbCategories, produ
                            </div>
                         </div>
                      </div>
-                     <p className="text-xs text-zinc-500 font-medium leading-relaxed whitespace-normal italic">"{t.comment}"</p>
+                     <div 
+                        className="text-xs text-zinc-500 font-medium leading-relaxed whitespace-normal italic"
+                        dangerouslySetInnerHTML={{ __html: `"${t.comment?.replace(/\n/g, '<br/>') || ''}"` }}
+                     />
                   </div>
                 )) : null}
               </div>
@@ -203,7 +207,10 @@ export default function OrganicHome({ store, branding, slug, dbCategories, produ
                      {String(i + 1).padStart(2, '0')}
                    </span>
                    <h4 className="text-xl font-black text-zinc-900 mb-4 group-hover:text-[var(--primary)] transition-colors">{faq.q}</h4>
-                   <p className="text-zinc-500 text-sm font-medium leading-relaxed">{faq.a}</p>
+                   <div 
+                     className="text-zinc-500 text-sm font-medium leading-relaxed"
+                     dangerouslySetInnerHTML={{ __html: faq.a.replace(/\n/g, '<br/>') }}
+                   />
                 </div>
               ))}
             </div>

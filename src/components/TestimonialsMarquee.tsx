@@ -97,9 +97,10 @@ function ReviewCard({ review }: { review: Review }) {
         </div>
 
         {/* Prominent Comment */}
-        <p className="text-zinc-800 text-sm md:text-lg leading-relaxed font-bold line-clamp-4">
-          "{review.comment || 'تجربة رائعة جداً، شكراً لكم على الرقي وجودة المنتجات.'}"
-        </p>
+        <div 
+          className="text-zinc-800 text-sm md:text-lg leading-relaxed font-bold line-clamp-4"
+          dangerouslySetInnerHTML={{ __html: `"${review.comment?.replace(/\n/g, '<br/>') || 'تجربة رائعة جداً، شكراً لكم على الرقي وجودة المنتجات.'}"` }}
+        />
       </div>
 
       {/* User Footer */}

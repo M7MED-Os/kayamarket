@@ -187,7 +187,10 @@ export function OrganicFooter({ store, branding, slug, showWatermark, categories
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16 mb-20">
           <div className="space-y-6">
             <Link href={`/store/${slug}`} className="text-2xl font-black italic font-serif" style={{ color: primaryColor }}>{store.name}</Link>
-            <p className="text-zinc-500 text-sm leading-relaxed">{branding?.footer_description || store.description || 'نهتم بجمالك الطبيعي من خلال منتجات عضوية مختارة بعناية فائقة.'}</p>
+            <div 
+              className="text-zinc-500 text-sm leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: (branding?.footer_description || store.description || 'نهتم بجمالك الطبيعي من خلال منتجات عضوية مختارة بعناية فائقة.').replace(/\n/g, '<br/>') }}
+            />
           </div>
 
           <div>

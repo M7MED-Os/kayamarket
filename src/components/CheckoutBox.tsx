@@ -95,16 +95,17 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
     }
   }
 
-  const basePrice = (selectedSize && selectedSize.price_override) ? Number(selectedSize.price_override) : (product.price || 0)
+  const basePrice = Number((selectedSize && selectedSize.price_override) ? selectedSize.price_override : (product.price || 0)) || 0
+  const qty = Number(quantity) || 1
 
   // Calculate Shipping Cost
-  const shippingCost = (deliveryType === 'pickup' || !shippingConfig)
+  const shippingCost = Number((deliveryType === 'pickup' || !shippingConfig)
     ? 0
     : (shippingConfig.type === 'flat'
       ? Number(shippingConfig.flat_rate || 0)
-      : Number(shippingConfig.governorates?.[selectedGov] || 0))
+      : Number(shippingConfig.governorates?.[selectedGov] || 0))) || 0
 
-  const subtotal = (basePrice - (basePrice * discount / 100)) * quantity
+  const subtotal = (basePrice - (basePrice * (Number(discount) || 0) / 100)) * qty
   const finalPrice = subtotal + shippingCost
 
   const handleOrder = async () => {

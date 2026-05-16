@@ -38,13 +38,13 @@ export default function ElegantView({
     <div className="min-h-screen bg-white font-[family-name:var(--font-cairo)]" dir="rtl" style={commonStyles}>
       <ElegantHeader store={store} branding={branding} slug={slug} />
       <main className="mx-auto max-w-7xl px-4 md:px-6 py-10 md:py-20">
-        <div className="grid grid-cols-1 gap-10 md:gap-20 lg:grid-cols-2 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           
           {/* Gallery Section */}
-          <div className="lg:sticky lg:top-32">
-            <div className="relative rounded-3xl border border-zinc-100 bg-white p-0 overflow-hidden shadow-2xl shadow-zinc-200/50">
+          <div className="lg:col-span-7 lg:sticky lg:top-32 w-full">
+            <div className="relative rounded-[2.5rem] border border-zinc-100 bg-white p-0 overflow-hidden shadow-2xl shadow-zinc-200/50">
               <ImageGallery images={galleryImages} productName={product.name} />
-              
+
               {/* Stock Badge (Top Left) */}
               <div className="absolute top-4 md:top-6 left-4 md:left-6 z-10">
                 <div className="px-4 py-2 md:px-5 md:py-2.5 rounded-full text-[10px] font-black text-white shadow-xl flex items-center gap-2"
@@ -64,7 +64,7 @@ export default function ElegantView({
           </div>
 
           {/* Content Section */}
-          <div className="flex flex-col gap-10 md:gap-12">
+          <div className="lg:col-span-5 flex flex-col gap-10 md:gap-12">
             <div className="space-y-8">
               <div className="space-y-6">
                 {/* Category & Sales */}
@@ -99,9 +99,10 @@ export default function ElegantView({
                 {/* Description */}
                 {product.description && (
                   <div className="pt-2">
-                    <p className="text-lg text-zinc-500 font-light leading-relaxed border-r-2 border-[var(--primary)]/10 pr-4">
-                      {product.description}
-                    </p>
+                    <div
+                      className="text-lg text-zinc-500 font-light leading-relaxed border-r-2 border-[var(--primary)]/10 pr-4"
+                      dangerouslySetInnerHTML={{ __html: product.description.replace(/\n/g, '<br/>') }}
+                    />
                   </div>
                 )}
               </div>

@@ -185,17 +185,26 @@ export default function ProductCard({ product, slug }: ProductCardProps) {
 
         <Link href={`/store/${slug}/products/${product.slug || product.id}`}>
           <h3
-            className="text-[15px] md:text-base font-black text-zinc-900 mb-2 line-clamp-2 leading-tight group-hover:text-[var(--primary)] transition-colors"
+            className="text-[14px] md:text-base font-black text-zinc-900 mb-1 md:mb-2 line-clamp-2 leading-tight group-hover:text-[var(--primary)] transition-colors min-h-[1.5em]"
             title={product.name}
           >
             {product.name}
           </h3>
         </Link>
 
+        {product.sales_count > 0 && (
+          <div className="flex items-center gap-1.5 mb-3">
+            <span className="text-[10px] font-black text-zinc-400 uppercase tracking-widest bg-zinc-50 px-2 py-0.5 rounded-lg border border-zinc-100">
+              تم طلب {product.sales_count} مرة
+            </span>
+          </div>
+        )}
+
         {product.description && (
-          <p className="text-[12px] text-zinc-400 line-clamp-2 mb-4 leading-relaxed font-bold">
-            {product.description}
-          </p>
+          <div 
+            className="text-[12px] text-zinc-400 line-clamp-2 mb-4 leading-relaxed font-bold"
+            dangerouslySetInnerHTML={{ __html: product.description.replace(/\n/g, ' ') }}
+          />
         )}
 
 

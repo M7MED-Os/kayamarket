@@ -37,7 +37,11 @@ export default function ProductClientPage({
 
   const selectedTheme = (branding as any)?.selected_theme || 'default';
   const showWatermark = branding?.subscription_tier !== 'professional';
-  const galleryImages = [product.image_url, ...(product.gallery || [])].filter(Boolean);
+  const galleryImages = Array.from(new Set([
+    product.image_url, 
+    ...(product.images || []),
+    ...(product.gallery || [])
+  ])).filter(Boolean);
 
   // Select the appropriate view component
   const ProductView = (ThemeViews as any)[selectedTheme] || ThemeViews.default;

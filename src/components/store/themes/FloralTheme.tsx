@@ -164,9 +164,10 @@ export function FloralHero({ branding, store, slug, showWatermark }: { branding:
               )
             })()}
 
-            <p className="text-lg text-zinc-500 max-w-md mx-auto lg:mx-0 font-medium leading-relaxed">
-              {heroDesc}
-            </p>
+            <div 
+              className="text-lg text-zinc-500 max-w-md mx-auto lg:mx-0 font-medium leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: heroDesc.replace(/\n/g, '<br/>') }}
+            />
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
               <Link href={`/store/${slug}/products`} className="group w-full sm:w-auto flex items-center justify-center gap-2.5 px-10 py-4 bg-[var(--primary)] text-white rounded-full font-bold text-base shadow-xl shadow-[var(--primary)]/25 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 active:scale-95">
@@ -510,11 +511,14 @@ export function FloralTestimonials({ reviews }: { reviews: any[] }) {
                     <Star key={idx} className={`h-4 w-4 ${idx < (r.rating || 5) ? 'fill-[var(--primary)] text-[var(--primary)]' : 'text-zinc-200'}`} />
                   ))}
                 </div>
-                <p className="text-base font-medium text-zinc-600 leading-relaxed mb-6 min-h-[80px]" dir="rtl">
+                <div className="text-base font-medium text-zinc-600 leading-relaxed mb-6 min-h-[80px]" dir="rtl">
                   <span className="font-sans font-bold text-xl text-zinc-400">"</span>
-                  <span className="italic mx-1">{r.comment}</span>
+                  <span 
+                    className="italic mx-1 inline"
+                    dangerouslySetInnerHTML={{ __html: r.comment?.replace(/\n/g, '<br/>') || '' }}
+                  />
                   <span className="font-sans font-bold text-xl text-zinc-400">"</span>
-                </p>
+                </div>
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-full bg-white border border-rose-100 flex items-center justify-center shadow-sm shrink-0">
                     <span className="text-base font-black text-[var(--primary)]">{r.customer_name?.charAt(0) || 'ع'}</span>
@@ -565,9 +569,10 @@ export function FloralFAQ({ branding }: { branding: any }) {
                 </button>
                 <div className={`grid transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
                   <div className="overflow-hidden">
-                    <p className="px-6 md:px-8 pb-8 pt-0 text-base font-medium text-zinc-500 leading-relaxed pr-20 md:pr-20">
-                      {faq.a}
-                    </p>
+                    <div 
+                      className="px-6 md:px-8 pb-8 pt-0 text-base font-medium text-zinc-500 leading-relaxed pr-20 md:pr-20"
+                      dangerouslySetInnerHTML={{ __html: faq.a.replace(/\n/g, '<br/>') }}
+                    />
                   </div>
                 </div>
               </div>

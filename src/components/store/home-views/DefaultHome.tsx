@@ -79,9 +79,10 @@ function Hero({ branding, store, slug, showWatermark }: { branding: any; store: 
             </>
           )}
         </h1>
-        <p className={`mt-6 max-w-xl text-base sm:text-lg leading-relaxed ${isWhite ? 'text-white/90' : 'text-zinc-500'}`}>
-          {heroDescription}
-        </p>
+        <div 
+          className={`mt-6 max-w-xl text-base sm:text-lg leading-relaxed ${isWhite ? 'text-white/90' : 'text-zinc-500'}`}
+          dangerouslySetInnerHTML={{ __html: heroDescription.replace(/\n/g, '<br/>') }}
+        />
 
         <div className={`mt-10 flex flex-row items-center justify-center gap-3 sm:gap-4 w-full ${hasImage ? 'lg:justify-start' : ''}`}>
           <Link
@@ -273,9 +274,10 @@ function FAQ({ branding }: { branding: any }) {
                   <ChevronDown className="h-6 w-6 transition-transform duration-500 group-open:rotate-180" />
                 </div>
               </summary>
-              <div className="px-10 pb-10 text-base md:text-lg font-bold text-zinc-500 leading-relaxed border-t border-zinc-50 pt-8 mx-2 animate-in fade-in slide-in-from-top-2 duration-500">
-                {faq.a}
-              </div>
+              <div 
+                className="px-10 pb-10 text-base md:text-lg font-bold text-zinc-500 leading-relaxed border-t border-zinc-50 pt-8 mx-2 animate-in fade-in slide-in-from-top-2 duration-500"
+                dangerouslySetInnerHTML={{ __html: faq.a.replace(/\n/g, '<br/>') }}
+              />
             </details>
           ))}
         </div>
