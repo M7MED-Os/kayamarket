@@ -32,6 +32,7 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
   const [idempotencyKey, setIdempotencyKey] = useState<string>(() => crypto.randomUUID())
   const [shippingConfig, setShippingConfig] = useState<any>(null)
   const [selectedGov, setSelectedGov] = useState('')
+  const [isGovOpen, setIsGovOpen] = useState(false)
   const [deliveryType, setDeliveryType] = useState('delivery') // 'delivery' or 'pickup'
 
   const GOVERNORATES = [
@@ -278,15 +279,37 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
             <div className="space-y-1">
               <label className="text-[9px] font-black uppercase tracking-widest text-zinc-300 px-1">المحافظة</label>
               <div className="relative">
-                <select
-                  value={selectedGov}
-                  onChange={e => setSelectedGov(e.target.value)}
-                  className="w-full bg-zinc-50 border-none p-4 text-xs font-bold focus:ring-1 focus:ring-[var(--primary)] appearance-none rounded-none"
+                <button 
+                  type="button"
+                  onClick={() => setIsGovOpen(!isGovOpen)}
+                  className={`w-full bg-zinc-50 border p-4 text-xs font-bold transition-all flex justify-between items-center ${isGovOpen ? 'border-[var(--primary)] bg-white ring-1 ring-[var(--primary)]' : 'border-transparent'}`}
                 >
-                  <option value="">اختر المحافظة...</option>
-                  {GOVERNORATES.map(gov => <option key={gov} value={gov}>{gov}</option>)}
-                </select>
-                <ChevronDown className="absolute left-4 top-1/2 -translate-y-1/2 h-3 w-3 text-zinc-400 pointer-events-none" />
+                  <span className={`${selectedGov ? 'text-zinc-900' : 'text-zinc-400'}`}>
+                    {selectedGov || 'اختر المحافظة...'}
+                  </span>
+                  <ChevronDown className={`h-3 w-3 text-zinc-400 transition-transform duration-300 ${isGovOpen ? 'rotate-180 text-[var(--primary)]' : ''}`} />
+                </button>
+
+                {isGovOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsGovOpen(false)} />
+                    <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-zinc-100 shadow-2xl max-h-64 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-300 custom-scrollbar">
+                      {GOVERNORATES.map(gov => (
+                        <button
+                          key={gov}
+                          type="button"
+                          onClick={() => {
+                            setSelectedGov(gov)
+                            setIsGovOpen(false)
+                          }}
+                          className={`w-full text-right p-4 text-xs font-bold transition-colors hover:bg-[var(--primary)] hover:text-white ${selectedGov === gov ? 'bg-zinc-50 text-[var(--primary)]' : 'text-zinc-600'}`}
+                        >
+                          {gov}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
             <div className="space-y-1">
