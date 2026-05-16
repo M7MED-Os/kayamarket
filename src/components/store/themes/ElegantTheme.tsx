@@ -272,8 +272,8 @@ export const ElegantCategories = ({ categories, slug }: any) => {
                 fill
                 className="object-cover transition-all duration-1000 group-hover:scale-110"
               />
-              <div className="absolute inset-0 bg-[var(--primary)]/10 group-hover:bg-[var(--primary)]/40 transition-colors duration-500 flex items-center justify-center">
-                <h3 className="text-white text-sm font-black uppercase tracking-[0.2em]">{cat.name}</h3>
+              <div className="absolute inset-0 bg-[var(--primary)]/10 group-hover:bg-[var(--primary)]/40 transition-colors duration-500 flex items-center justify-center p-4">
+                <h3 className="text-white text-sm md:text-base font-black uppercase tracking-[0.2em] text-center leading-relaxed">{cat.name}</h3>
               </div>
             </Link>
           ))}

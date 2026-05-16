@@ -35,8 +35,16 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
   const [discount, setDiscount] = useState(0)
   const [isValidatingCoupon, setIsValidatingCoupon] = useState(false)
   const [settings, setSettings] = useState<any>(null)
-  const [errors, setErrors] = useState<{ name?: string, phone?: string, address?: string }>({})
+  const [errors, setErrors] = useState<{ name?: string, phone?: string, address?: string, governorate?: string }>({})
+  const [shippingType, setShippingType] = useState<'delivery' | 'pickup'>('delivery')
+  const [selectedGovernorate, setSelectedGovernorate] = useState('')
+  const [isGovOpen, setIsGovOpen] = useState(false)
+  const [shippingCost, setShippingCost] = useState(0)
   const [idempotencyKey] = useState(() => crypto.randomUUID())
+
+  const GOVERNORATES = [
+    "القاهرة", "الجيزة", "الإسكندرية", "الدقهلية", "البحر الأحمر", "البحيرة", "الفيوم", "الغربية", "الإسماعيلية", "المنوفية", "المنيا", "القليوبية", "الوادي الجديد", "السويس", "الشرقية", "دمياط", "بورسعيد", "جنوب سيناء", "كفر الشيخ", "مطروح", "الأقصر", "قنا", "شمال سيناء", "سوهاج", "بني سويف", "أسيوط", "أسوان"
+  ]
 
   const router = useRouter()
   const supabase = createClient()
@@ -63,7 +71,23 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
   const { store, branding } = storeData
   const primaryColor = branding?.primary_color || '#e11d48'
   const selectedTheme = (branding as any)?.selected_theme || 'default'
-  const finalPrice = totalPrice - (totalPrice * discount / 100)
+  const shippingConfig = branding?.shipping_config || { type: 'flat', flat_rate: 0, governorates: {}, allow_pickup: false }
+
+  // Calculate shipping whenever type or governorate changes
+  useEffect(() => {
+    if (shippingType === 'pickup') {
+      setShippingCost(0)
+    } else {
+      if (shippingConfig.type === 'flat') {
+        setShippingCost(Number(shippingConfig.flat_rate) || 0)
+      } else {
+        const cost = shippingConfig.governorates?.[selectedGovernorate] || 0
+        setShippingCost(Number(cost))
+      }
+    }
+  }, [shippingType, selectedGovernorate, shippingConfig])
+
+  const finalPrice = totalPrice - (totalPrice * discount / 100) + shippingCost
 
   const commonStyles = { '--primary': primaryColor } as any
 
@@ -87,7 +111,7 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
   }
 
   const handleCheckout = async () => {
-    const newErrors: { name?: string, phone?: string, address?: string } = {}
+    const newErrors: { name?: string, phone?: string, address?: string, governorate?: string } = {}
     const phoneRegex = /^01[0125][0-9]{8}$/
 
     if (customerName.trim().length < 3) {
@@ -96,7 +120,10 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
     if (!phoneRegex.test(customerPhone.trim())) {
       newErrors.phone = 'برجاء إدخال رقم هاتف مصري صحيح (01234567890)'
     }
-    if (customerAddress.trim().length < 10) {
+    if (shippingType === 'delivery' && !selectedGovernorate) {
+      newErrors.governorate = 'برجاء اختيار المحافظة'
+    }
+    if (shippingType === 'delivery' && customerAddress.trim().length < 10) {
       newErrors.address = 'برجاء إدخال العنوان بالتفصيل (10 أحرف على الأقل)'
     }
 
@@ -108,15 +135,20 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
     setErrors({})
     setSubmitting(true)
     try {
+      const fullAddress = shippingType === 'pickup'
+        ? 'استلام شخصي من مقر المتجر'
+        : `${selectedGovernorate} - ${customerAddress}`
+
       const res = await createOrderMulti(
         items,
         appliedCoupon,
         customerName,
-        customerAddress,
+        fullAddress,
         customerPhone,
         paymentMethod,
         store.id,
-        idempotencyKey
+        idempotencyKey,
+        shippingCost
       )
 
       if (res.success) {
@@ -165,16 +197,85 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
                     <input value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm focus:ring-1 focus:ring-[var(--primary)] transition-all rounded-none" placeholder="الاسم هنا..." />
                     {errors.name && <p className="text-[10px] font-bold text-rose-500 pt-1">{errors.name}</p>}
                   </div>
+
                   <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">رقم الهاتف</label>
                     <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm focus:ring-1 focus:ring-[var(--primary)] transition-all text-right rounded-none" dir="ltr" placeholder="01234567890" />
                     {errors.phone && <p className="text-[10px] font-bold text-rose-500 pt-1">{errors.phone}</p>}
                   </div>
+
                   <div className="space-y-2">
-                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">العنوان بالتفصيل</label>
-                    <textarea value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm h-32 focus:ring-1 focus:ring-[var(--primary)] transition-all resize-none rounded-none" placeholder="المدينة، الشارع، رقم المنزل..." />
-                    {errors.address && <p className="text-[10px] font-bold text-rose-500 pt-1">{errors.address}</p>}
+                    <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">طريقة التوصيل</label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <button
+                        onClick={() => setShippingType('delivery')}
+                        className={`p-4 border text-[10px] font-black uppercase tracking-widest transition-all ${shippingType === 'delivery' ? 'border-[var(--primary)] bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20' : 'border-zinc-100 text-zinc-400 hover:border-zinc-200'}`}
+                      >
+                        شحن للمنزل
+                      </button>
+                      {shippingConfig.allow_pickup && (
+                        <button
+                          onClick={() => setShippingType('pickup')}
+                          className={`p-4 border text-[10px] font-black uppercase tracking-widest transition-all ${shippingType === 'pickup' ? 'border-[var(--primary)] bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20' : 'border-zinc-100 text-zinc-400 hover:border-zinc-200'}`}
+                        >
+                          استلام شخصي
+                        </button>
+                      )}
+                    </div>
                   </div>
+
+                  {shippingType === 'delivery' ? (
+                    <>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">المحافظة</label>
+                        <div className="relative">
+                          <button 
+                            type="button"
+                            onClick={() => setIsGovOpen(!isGovOpen)}
+                            className={`w-full bg-zinc-50 border p-5 text-sm transition-all flex justify-between items-center ${isGovOpen ? 'border-[var(--primary)] bg-white ring-2 ring-[var(--primary)]/10' : 'border-zinc-100'}`}
+                          >
+                            <span className={`font-bold ${selectedGovernorate ? 'text-zinc-900' : 'text-zinc-400'}`}>
+                              {selectedGovernorate || 'اختر المحافظة...'}
+                            </span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform duration-300 ${isGovOpen ? 'rotate-180 text-[var(--primary)]' : 'text-zinc-400'}`}><path d="m6 9 6 6 6-6"/></svg>
+                          </button>
+                          
+                          {isGovOpen && (
+                            <>
+                              <div className="fixed inset-0 z-40" onClick={() => setIsGovOpen(false)} />
+                              <div className="absolute top-full left-0 right-0 z-50 mt-2 bg-white border border-zinc-100 shadow-2xl max-h-64 overflow-y-auto animate-in fade-in slide-in-from-top-2 duration-300 custom-scrollbar">
+                                {GOVERNORATES.map(gov => (
+                                  <button
+                                    key={gov}
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedGovernorate(gov)
+                                      setIsGovOpen(false)
+                                    }}
+                                    className={`w-full text-right p-4 text-sm font-bold transition-colors hover:bg-[var(--primary)] hover:text-white ${selectedGovernorate === gov ? 'bg-zinc-50 text-[var(--primary)]' : 'text-zinc-600'}`}
+                                  >
+                                    {gov}
+                                  </button>
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                        {errors.governorate && <p className="text-[10px] font-bold text-rose-500 pt-1">{errors.governorate}</p>}
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">العنوان بالتفصيل</label>
+                        <textarea value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="w-full bg-zinc-50 border-none p-5 text-sm h-32 focus:ring-1 focus:ring-[var(--primary)] transition-all resize-none rounded-none" placeholder="المدينة، الشارع، رقم المنزل..." />
+                        {errors.address && <p className="text-[10px] font-bold text-rose-500 pt-1">{errors.address}</p>}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="p-6 bg-zinc-50 border border-dashed border-zinc-200 text-center space-y-2 animate-in zoom-in-95 duration-700">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-store h-5 w-5 mx-auto text-zinc-400" aria-hidden="true"><path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"></path><path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244"></path><path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"></path></svg>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">سيتم التواصل معك لتحديد موعد ومكان الاستلام</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -244,6 +345,10 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
                       <span className="text-sm font-bold">-{(totalPrice * discount / 100).toLocaleString()} ج.م</span>
                     </div>
                   )}
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">الشحن ({shippingType === 'delivery' ? (selectedGovernorate || 'توصيل للمنزل') : 'استلام شخصي'})</span>
+                    <span className="text-sm font-bold text-zinc-900">{shippingCost > 0 ? `${shippingCost.toLocaleString()} ج.م` : 'مجاني'}</span>
+                  </div>
                   <div className="flex justify-between items-end pt-6">
                     <span className="text-[10px] font-black uppercase tracking-widest text-zinc-900">الإجمالي الكلي</span>
                     <span className="text-4xl font-bold text-[var(--primary)] tracking-tighter">{finalPrice.toLocaleString()} ج.م</span>
@@ -334,16 +439,88 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
                     <input value={customerName} onChange={e => setCustomerName(e.target.value)} className="w-full bg-[#FAF3F0]/40 border border-rose-50 rounded-2xl p-4 text-sm focus:ring-1 focus:ring-[var(--primary)] focus:border-[var(--primary)] transition-all placeholder:text-zinc-400" placeholder="الاسم هنا..." />
                     {errors.name && <p className="text-xs font-bold text-rose-500 pt-1">{errors.name}</p>}
                   </div>
+
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-zinc-600">رقم الهاتف</label>
                     <input value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} className="w-full bg-[#FAF3F0]/40 border border-rose-50 rounded-2xl p-4 text-sm focus:ring-1 focus:ring-[var(--primary)] focus:border-[var(--primary)] transition-all text-right placeholder:text-zinc-400" dir="ltr" placeholder="01234567890" />
                     {errors.phone && <p className="text-xs font-bold text-rose-500 pt-1">{errors.phone}</p>}
                   </div>
+
                   <div className="space-y-2">
-                    <label className="text-sm font-bold text-zinc-600">العنوان بالتفصيل</label>
-                    <textarea value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="w-full bg-[#FAF3F0]/40 border border-rose-50 rounded-2xl p-4 text-sm h-32 focus:ring-1 focus:ring-[var(--primary)] focus:border-[var(--primary)] transition-all resize-none placeholder:text-zinc-400" placeholder="المدينة، الشارع، رقم المنزل..." />
-                    {errors.address && <p className="text-xs font-bold text-rose-500 pt-1">{errors.address}</p>}
+                    <label className="text-sm font-bold text-zinc-600">طريقة التوصيل</label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <button
+                        onClick={() => setShippingType('delivery')}
+                        className={`p-4 rounded-2xl border text-sm font-bold transition-all ${shippingType === 'delivery' ? 'border-[var(--primary)] bg-[var(--primary)] text-white shadow-lg' : 'border-zinc-100 bg-zinc-50/30 text-zinc-400'}`}
+                      >
+                        شحن للمنزل
+                      </button>
+                      {shippingConfig.allow_pickup && (
+                        <button
+                          onClick={() => setShippingType('pickup')}
+                          className={`p-4 rounded-2xl border text-sm font-bold transition-all ${shippingType === 'pickup' ? 'border-[var(--primary)] bg-[var(--primary)] text-white shadow-lg' : 'border-zinc-100 bg-zinc-50/30 text-zinc-400'}`}
+                        >
+                          استلام شخصي
+                        </button>
+                      )}
+                    </div>
                   </div>
+
+                  {shippingType === 'delivery' ? (
+                    <>
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-zinc-600">المحافظة</label>
+                        <div className="relative">
+                          <button 
+                            type="button"
+                            onClick={() => setIsGovOpen(!isGovOpen)}
+                            className={`w-full bg-[#FAF3F0]/40 border rounded-2xl p-4 text-sm transition-all flex justify-between items-center ${isGovOpen ? 'border-[var(--primary)] bg-white ring-4 ring-[var(--primary)]/5' : 'border-rose-50'}`}
+                          >
+                            <span className={`font-bold ${selectedGovernorate ? 'text-[#2B2B2B]' : 'text-zinc-400'}`}>
+                              {selectedGovernorate || 'اختر المحافظة...'}
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`${isGovOpen ? 'text-[var(--primary)]' : 'text-rose-200'}`}><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform duration-300 ${isGovOpen ? 'rotate-180' : ''}`}><path d="m6 9 6 6 6-6"/></svg>
+                            </div>
+                          </button>
+                          
+                          {isGovOpen && (
+                            <>
+                              <div className="fixed inset-0 z-40" onClick={() => setIsGovOpen(false)} />
+                              <div className="absolute top-full left-0 right-0 z-50 mt-3 bg-white border border-rose-50 rounded-[2rem] shadow-2xl p-2 max-h-72 overflow-y-auto animate-in zoom-in-95 duration-300 custom-scrollbar">
+                                {GOVERNORATES.map(gov => (
+                                  <button
+                                    key={gov}
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedGovernorate(gov)
+                                      setIsGovOpen(false)
+                                    }}
+                                    className={`w-full text-right px-6 py-4 text-sm font-bold rounded-2xl transition-all hover:bg-rose-50 hover:text-[var(--primary)] ${selectedGovernorate === gov ? 'bg-rose-50 text-[var(--primary)]' : 'text-zinc-600'}`}
+                                  >
+                                    {gov}
+                                  </button>
+                                ))}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                        {errors.governorate && <p className="text-xs font-bold text-rose-500 pt-1">{errors.governorate}</p>}
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-zinc-600">العنوان بالتفصيل</label>
+                        <textarea value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} className="w-full bg-[#FAF3F0]/40 border border-rose-50 rounded-2xl p-4 text-sm h-32 focus:ring-1 focus:ring-[var(--primary)] focus:border-[var(--primary)] transition-all resize-none placeholder:text-zinc-400" placeholder="المدينة، الشارع، رقم المنزل..." />
+                        {errors.address && <p className="text-xs font-bold text-rose-500 pt-1">{errors.address}</p>}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="p-6 bg-zinc-50 border border-dashed border-zinc-200 text-center space-y-2 animate-in zoom-in-95 duration-700 rounded-2xl">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-store h-5 w-5 mx-auto text-zinc-400" aria-hidden="true"><path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"></path><path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244"></path><path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"></path></svg>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">سيتم التواصل معك لتحديد موعد ومكان الاستلام</p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -409,6 +586,10 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
                       <span className="font-bold">-{(totalPrice * discount / 100).toLocaleString()} ج.م</span>
                     </div>
                   )}
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="font-bold text-zinc-500">الشحن ({shippingType === 'delivery' ? (selectedGovernorate || 'توصيل') : 'استلام'})</span>
+                    <span className="font-bold text-[#2B2B2B]">{shippingCost > 0 ? `${shippingCost.toLocaleString()} ج.م` : 'مجاني'}</span>
+                  </div>
                   <div className="flex justify-between items-end pt-4">
                     <span className="text-base font-bold text-zinc-600">الإجمالي الكلي</span>
                     <span className="text-3xl font-black text-[var(--primary)]">{finalPrice.toLocaleString()} ج.م</span>
@@ -487,16 +668,83 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
                   />
                   {errors.phone && <p className="text-[10px] font-bold text-rose-500 mt-1.5 pr-2">{errors.phone}</p>}
                 </div>
+
                 <div>
-                  <label className="block text-xs md:text-sm font-bold text-zinc-700 mb-2">عنوان التوصيل <span className="text-rose-500">*</span></label>
-                  <textarea
-                    value={customerAddress}
-                    onChange={e => setCustomerAddress(e.target.value)}
-                    className={`w-full h-24 md:h-32 bg-zinc-50 border rounded-xl md:rounded-2xl p-5 md:p-6 text-sm font-bold outline-none resize-none transition-all ${errors.address ? 'border-rose-500 bg-rose-50' : 'border-zinc-100 focus:bg-white focus:border-[var(--primary)]'}`}
-                    placeholder="المدينة، المنطقة، الشارع، رقم العمارة"
-                  />
-                  {errors.address && <p className="text-[10px] font-bold text-rose-500 mt-1.5 pr-2">{errors.address}</p>}
+                  <label className="block text-xs md:text-sm font-bold text-zinc-700 mb-2">طريقة التوصيل <span className="text-rose-500">*</span></label>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => setShippingType('delivery')}
+                      className={`h-12 rounded-xl font-bold text-xs transition-all border ${shippingType === 'delivery' ? 'bg-[var(--primary)] text-white border-[var(--primary)]' : 'bg-zinc-50 text-zinc-500 border-zinc-100'}`}
+                    >
+                      شحن للمنزل
+                    </button>
+                    {shippingConfig.allow_pickup && (
+                      <button
+                        onClick={() => setShippingType('pickup')}
+                        className={`h-12 rounded-xl font-bold text-xs transition-all border ${shippingType === 'pickup' ? 'bg-[var(--primary)] text-white border-[var(--primary)]' : 'bg-zinc-50 text-zinc-500 border-zinc-100'}`}
+                      >
+                        استلام شخصي
+                      </button>
+                    )}
+                  </div>
                 </div>
+
+                {shippingType === 'delivery' ? (
+                  <>
+                    <div>
+                      <label className="block text-xs md:text-sm font-bold text-zinc-700 mb-2">المحافظة <span className="text-rose-500">*</span></label>
+                      <div className="relative">
+                        <button 
+                          type="button"
+                          onClick={() => setIsGovOpen(!isGovOpen)}
+                          className={`w-full h-12 md:h-14 bg-zinc-50 border rounded-xl md:rounded-2xl px-5 flex justify-between items-center transition-all ${isGovOpen ? 'border-[var(--primary)] bg-white ring-4 ring-[var(--primary)]/10' : 'border-zinc-100'}`}
+                        >
+                          <span className={`text-sm font-black ${selectedGovernorate ? 'text-zinc-900' : 'text-zinc-400'}`}>
+                            {selectedGovernorate || 'اختر المحافظة...'}
+                          </span>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform duration-300 ${isGovOpen ? 'rotate-180 text-[var(--primary)]' : 'text-zinc-400'}`}><path d="m6 9 6 6 6-6"/></svg>
+                        </button>
+
+                        {isGovOpen && (
+                          <>
+                            <div className="fixed inset-0 z-40" onClick={() => setIsGovOpen(false)} />
+                            <div className="absolute top-full left-0 right-0 z-50 mt-3 bg-white border border-zinc-100 rounded-2xl md:rounded-[2rem] shadow-2xl p-3 max-h-80 overflow-y-auto animate-in slide-in-from-top-4 duration-500 custom-scrollbar">
+                              {GOVERNORATES.map(gov => (
+                                <button
+                                  key={gov}
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedGovernorate(gov)
+                                    setIsGovOpen(false)
+                                  }}
+                                  className={`w-full text-right px-6 py-4 text-sm font-black rounded-xl md:rounded-2xl transition-all hover:bg-zinc-50 hover:text-[var(--primary)] ${selectedGovernorate === gov ? 'bg-zinc-50 text-[var(--primary)]' : 'text-zinc-600'}`}
+                                >
+                                  {gov}
+                                </button>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                      {errors.governorate && <p className="text-[10px] font-bold text-rose-500 mt-1.5 pr-2">{errors.governorate}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-xs md:text-sm font-bold text-zinc-700 mb-2">عنوان التوصيل <span className="text-rose-500">*</span></label>
+                      <textarea
+                        value={customerAddress}
+                        onChange={e => setCustomerAddress(e.target.value)}
+                        className={`w-full h-24 md:h-32 bg-zinc-50 border rounded-xl md:rounded-2xl p-5 md:p-6 text-sm font-bold outline-none resize-none transition-all ${errors.address ? 'border-rose-500 bg-rose-50' : 'border-zinc-100 focus:bg-white focus:border-[var(--primary)]'}`}
+                        placeholder="المدينة، المنطقة، الشارع، رقم العمارة"
+                      />
+                      {errors.address && <p className="text-[10px] font-bold text-rose-500 mt-1.5 pr-2">{errors.address}</p>}
+                    </div>
+                  </>
+                ) : (
+                  <div className="p-6 bg-zinc-50 border border-dashed border-zinc-200 text-center space-y-2 animate-in zoom-in-95 duration-700 rounded-2xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-store h-5 w-5 mx-auto text-zinc-400" aria-hidden="true"><path d="M15 21v-5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v5"></path><path d="M17.774 10.31a1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.451 0 1.12 1.12 0 0 0-1.548 0 2.5 2.5 0 0 1-3.452 0 1.12 1.12 0 0 0-1.549 0 2.5 2.5 0 0 1-3.77-3.248l2.889-4.184A2 2 0 0 1 7 2h10a2 2 0 0 1 1.653.873l2.895 4.192a2.5 2.5 0 0 1-3.774 3.244"></path><path d="M4 10.95V19a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8.05"></path></svg>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">سيتم التواصل معك لتحديد موعد ومكان الاستلام</p>
+                  </div>
+                )}
               </div>
 
               {/* Coupon Section */}
@@ -614,6 +862,10 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
                     <span>-{(totalPrice * discount / 100).toLocaleString()} ج.م</span>
                   </div>
                 )}
+                <div className="flex justify-between text-zinc-400 font-bold text-xs md:text-sm">
+                  <span>الشحن ({shippingType === 'delivery' ? (selectedGovernorate || 'توصيل للمنزل') : 'استلام شخصي'})</span>
+                  <span>{shippingCost > 0 ? `${shippingCost.toLocaleString()} ج.م` : 'مجاني'}</span>
+                </div>
                 <div className="flex justify-between text-xl md:text-2xl font-black text-zinc-900 pt-2">
                   <span>الإجمالي الكلي</span>
                   <span className="text-[var(--primary)]">{finalPrice.toLocaleString()} ج.م</span>
