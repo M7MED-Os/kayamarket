@@ -19,7 +19,7 @@ export default function SmartInventoryAlerts({ products }: { products: any[] }) 
     setLoadingId(id)
     const newStock = Math.max(0, currentStock + delta)
     const res = await updateStock(id, newStock)
-    if (res.error) {
+    if (res?.error) {
       toast.error(res.error)
     } else {
       toast.success('تم تحديث المخزون')
@@ -30,7 +30,7 @@ export default function SmartInventoryAlerts({ products }: { products: any[] }) 
   const handleToggleVisibility = async (id: string, currentVisibility: boolean) => {
     setLoadingId(id)
     const res = await toggleProductVisibility(id, !currentVisibility)
-    if (res.error) {
+    if (res?.error) {
       toast.error(res.error)
     } else {
       toast.success(currentVisibility ? 'تم إخفاء المنتج' : 'تم إظهار المنتج')

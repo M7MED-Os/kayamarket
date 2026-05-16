@@ -123,6 +123,7 @@ export async function deleteProduct(id: string) {
   }
   revalidatePath('/admin/dashboard')
   revalidatePath('/')
+  return { success: true }
 }
 
 export async function toggleProductVisibility(id: string, is_visible: boolean) {
@@ -142,6 +143,7 @@ export async function toggleProductVisibility(id: string, is_visible: boolean) {
 
   revalidatePath('/admin/dashboard')
   revalidatePath('/')
+  return { success: true }
 }
 
 export async function updateStock(id: string, stock: number) {
