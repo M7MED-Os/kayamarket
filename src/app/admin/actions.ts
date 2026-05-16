@@ -143,3 +143,23 @@ export async function toggleProductVisibility(id: string, is_visible: boolean) {
   revalidatePath('/admin/dashboard')
   revalidatePath('/')
 }
+
+export async function updateStock(id: string, stock: number) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'غير مصرح لك بالقيام بهذا الإجراء' }
+
+  const { error } = await supabase
+    .from('products')
+    .update({ stock })
+    .eq('id', id)
+
+  if (error) {
+    console.error('Error updating stock:', error)
+    return { error: error.message }
+  }
+
+  revalidatePath('/admin/dashboard')
+  revalidatePath('/')
+  return { success: true }
+}

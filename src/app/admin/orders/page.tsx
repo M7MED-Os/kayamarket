@@ -32,10 +32,11 @@ export default async function AdminOrdersPage({
 
   const { data: storeData } = await supabase
     .from('stores')
-    .select('plan')
+    .select('name, plan')
     .eq('id', storeId!)
     .single()
 
+  const storeName = storeData?.name || 'KayaMarket'
   const storePlan = (storeData?.plan as PlanTier) || 'starter'
 
   const { data: orders, error, count } = await supabase
@@ -76,6 +77,7 @@ export default async function AdminOrdersPage({
         totalPages={totalPages}
         totalCount={count || 0}
         storeId={storeId!}
+        storeName={storeName}
         plan={storePlan}
       />
     </div>

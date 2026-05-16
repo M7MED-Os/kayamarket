@@ -1,4 +1,5 @@
 import React from 'react'
+import { Metadata } from 'next'
 import dynamic from 'next/dynamic'
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
@@ -16,6 +17,41 @@ const HomeViews = {
 interface PageProps {
   params: Promise<{ slug: string }>
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+// 🌐 SEO: Generate Dynamic Metadata for the Store
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { slug } = await params
+  const { store, branding } = await getStoreByIdentifier(decodeURIComponent(slug))
+  
+  if (!store) return { title: 'المتجر غير موجود' }
+
+  const storeName = store.name || 'KayaMarket Store'
+  const title = `${storeName} | تسوق الآن`
+  const description = branding?.hero_subtitle || branding?.footer_description || `مرحباً بك في متجر ${storeName}. اكتشف أفضل المنتجات بأفضل الأسعار.`;
+  const logo = branding?.logo_url;
+  const banner = branding?.banner_url || branding?.hero_image_url;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: banner ? [{ url: banner }] : (logo ? [{ url: logo }] : []),
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: banner ? [banner] : (logo ? [logo] : []),
+    },
+    alternates: {
+      canonical: `/store/${slug}`,
+    },
+    keywords: `${storeName}, تسوق اونلاين, تجارة إلكترونية, ${store.slug}, مصر`,
+  }
 }
 
 function isSectionEnabled(branding: any, sectionId: string): boolean {
@@ -93,17 +129,43 @@ export default async function StorePage({ params }: PageProps) {
   // Select the appropriate view component
   const HomeView = (HomeViews as any)[selectedTheme] || HomeViews.default
 
+  // 🛠️ SEO: Structured Data (JSON-LD)
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Store',
+    name: store.name,
+    url: `https://kayamarket.vercel.app/store/${slug}`,
+    logo: branding?.logo_url,
+    description: branding?.footer_description || branding?.hero_subtitle,
+    image: branding?.banner_url || branding?.hero_image_url,
+    address: {
+      '@type': 'PostalAddress',
+      addressCountry: 'EG',
+    },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `https://kayamarket.vercel.app/store/${slug}/products?q={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+  }
+
   return (
-    <HomeView
-      store={store}
-      branding={branding}
-      slug={slug}
-      dbCategories={dbCategories || []}
-      productsWithRatings={productsWithRatings}
-      storeReviews={storeReviews || []}
-      showWatermark={showWatermark}
-      commonStyles={commonStyles}
-      sections={sections}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <HomeView
+        store={store}
+        branding={branding}
+        slug={slug}
+        dbCategories={dbCategories || []}
+        productsWithRatings={productsWithRatings}
+        storeReviews={storeReviews || []}
+        showWatermark={showWatermark}
+        commonStyles={commonStyles}
+        sections={sections}
+      />
+    </>
   )
 }

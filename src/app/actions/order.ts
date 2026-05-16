@@ -68,6 +68,15 @@ export async function createOrderMulti(
     const supabase = await createClient()
     const { sanitizeHtml } = await import('@/lib/utils/sanitize')
 
+    // 🧹 Urgent Cleanup: If a draft (abandoned) order exists for this session, remove it
+    if (idempotencyKey) {
+      await supabase
+        .from('orders')
+        .delete()
+        .eq('idempotency_key', idempotencyKey)
+        .eq('status', 'abandoned')
+    }
+
     // Format items for PostgreSQL JSONB
     const formattedItems = items.map(item => ({
       product_id: item.id || item.product_id,
@@ -143,4 +152,56 @@ export async function deleteOrder(orderId: string) {
 
   revalidatePath('/admin/orders')
   return { success: true }
+}
+
+/**
+ * Saves a draft order (abandoned cart) when a user starts filling their info.
+ */
+export async function saveDraftOrder(
+  storeId: string,
+  customerName: string,
+  customerPhone: string,
+  items: any[],
+  idempotencyKey: string
+) {
+  try {
+    const { checkRateLimit } = await import('@/lib/utils/rate-limit')
+    const limitCheck = await checkRateLimit('save_draft', 10, 60)
+    if (!limitCheck.success) return { success: false }
+
+    const supabase = await createClient()
+    const { sanitizeHtml } = await import('@/lib/utils/sanitize')
+
+    const formattedItems = items.map(item => ({
+      product_id: item.id || item.product_id,
+      quantity: item.quantity,
+      name: item.name,
+      price: item.price,
+      variant_info: item.variant_info || {}
+    }))
+
+    // Use upsert on idempotency_key to update the same draft if the user continues typing
+    const { error } = await supabase.from('orders').upsert({
+      store_id: storeId,
+      customer_name: sanitizeHtml(customerName),
+      customer_phone: sanitizeHtml(customerPhone),
+      customer_address: 'بدأ عملية الدفع - لم يكمل بعد',
+      status: 'abandoned',
+      payment_method: 'غير محدد',
+      final_price: items.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+      idempotency_key: idempotencyKey,
+      order_items: formattedItems
+    }, { onConflict: 'idempotency_key' })
+
+    if (error) {
+      console.error('Draft save error:', error)
+      return { success: false }
+    }
+
+    revalidatePath('/admin/orders')
+    return { success: true }
+  } catch (error) {
+    console.error('Draft save exception:', error)
+    return { success: false }
+  }
 }

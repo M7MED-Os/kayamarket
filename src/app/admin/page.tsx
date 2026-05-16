@@ -1,11 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { assertMerchant } from '@/lib/auth'
 import { redirect } from 'next/navigation'
-import { ShoppingBag, DollarSign, Clock, AlertTriangle, PackageX, Package, ArrowUpRight, TrendingUp, Eye, Lock } from 'lucide-react'
+import { ShoppingBag, DollarSign, Clock, PackageX, Eye, Lock } from 'lucide-react'
 import Link from 'next/link'
 import { getDashboardStats } from '@/app/actions/analytics'
 import SalesChart from './SalesChart'
 import TopProducts from './TopProducts'
+import DashboardGamification from './DashboardGamification'
+import SmartInventoryAlerts from './SmartInventoryAlerts'
 import { getDynamicPlanConfigs, PlanTier } from '@/lib/subscription'
 
 export const metadata = {
@@ -23,10 +25,8 @@ export default async function AdminDashboardPage() {
     redirect('/login')
   }
 
-  // Fetch Fast Analytics Data
-  const analytics = await getDashboardStats(14) // Last 14 days
+  const analytics = await getDashboardStats(14)
 
-  // Fetch store plan and products/orders for basic alerts
   const { data: storeData } = await supabase
     .from('stores')
     .select('plan')
@@ -46,22 +46,12 @@ export default async function AdminDashboardPage() {
     .eq('store_id', storeId)
     .eq('status', 'pending')
 
-  const { data: products, error: productsError } = await supabase
+  const { data: products } = await supabase
     .from('products')
-    .select('id, name, stock, image_url')
+    .select('id, name, stock, image_url, is_visible')
     .eq('store_id', storeId)
 
-  if (productsError) {
-    return (
-      <div className="p-8 bg-rose-50 text-rose-600 rounded-2xl font-black flex items-center gap-4 border border-rose-100">
-        <AlertTriangle className="h-6 w-6" />
-        <p>حدث خطأ أثناء تحميل البيانات.</p>
-      </div>
-    )
-  }
-
-  const totalProducts = products.length
-  const outOfStock = products.filter((p) => p.stock !== null && p.stock <= 0).length
+  const outOfStock = products?.filter((p) => p.stock !== null && p.stock <= 0).length || 0
 
   const stats = [
     { label: 'إجمالي الأرباح', value: `${analytics.kpis.revenue.toLocaleString()} ج.م`, icon: DollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50', sub: 'طوال الوقت' },
@@ -112,11 +102,9 @@ export default async function AdminDashboardPage() {
 
               <div className="space-y-1 w-full">
                 <p className="text-[10px] md:text-[11px] font-black text-slate-300 font-inter uppercase tracking-widest">{stat.label}</p>
-                <div className="flex flex-col items-center gap-1">
-                  <p className="font-black text-slate-900 font-poppins tracking-tighter text-2xl md:text-3xl">
-                    {stat.value}
-                  </p>
-                </div>
+                <p className="font-black text-slate-900 font-poppins tracking-tighter text-2xl md:text-3xl">
+                  {stat.value}
+                </p>
                 <p className="text-[10px] md:text-[11px] font-bold text-slate-400 font-inter mt-3">{stat.sub}</p>
               </div>
             </div>
@@ -124,63 +112,17 @@ export default async function AdminDashboardPage() {
         })}
       </div>
 
-      {/* ── Inventory Alerts ───────────────────────────────────────────── */}
-      {products.filter(p => p.stock !== null && p.stock < 5).length > 0 && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-600 border border-rose-100">
-              <AlertTriangle className="h-6 w-6" strokeWidth={2.5} />
-            </div>
-            <div className="text-right">
-              <h3 className="text-xl font-black text-slate-900 tracking-tight">تنبيهات المخزون</h3>
-              <p className="text-slate-500 font-bold text-xs mt-0.5">منتجات قاربت على نفاذ الكمية وتحتاج إلى إعادة توريد.</p>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {products
-              .filter(p => p.stock !== null && p.stock < 5)
-              .sort((a, b) => (a.stock || 0) - (b.stock || 0))
-              .map(product => (
-              <div key={product.id} className="bg-white rounded-2xl border border-slate-200/60 p-4 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between gap-4">
-                
-                <div className="flex items-center gap-4 min-w-0">
-                  <div className="h-14 w-14 rounded-xl bg-slate-50 border border-slate-100 overflow-hidden shrink-0">
-                    {product.image_url ? (
-                      <img src={product.image_url} alt={product.name} className="h-full w-full object-cover" />
-                    ) : (
-                      <div className="h-full w-full flex items-center justify-center bg-slate-50">
-                        <PackageX className="h-6 w-6 text-slate-400" />
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-sm font-black text-slate-900 truncate">{product.name}</span>
-                    <span className={`text-[11px] font-bold mt-1 flex items-center gap-1.5 ${
-                      product.stock === 0 ? 'text-rose-600' : 'text-amber-600'
-                    }`}>
-                      <span className={`h-1.5 w-1.5 rounded-full ${product.stock === 0 ? 'bg-rose-600' : 'bg-amber-500 animate-pulse'}`}></span>
-                      {product.stock === 0 ? 'نفدت الكمية' : `متبقي ${product.stock} فقط`}
-                    </span>
-                  </div>
-                </div>
+      {/* ── Gamification & Performance ─────────────────────────────────── */}
+      <DashboardGamification 
+        salesData={analytics.salesChart} 
+        totalOrders={analytics.kpis.orders} 
+      />
 
-                <Link 
-                  href={`/admin/products/${product.id}/edit`}
-                  className="shrink-0 px-4 py-2 bg-slate-50 hover:bg-slate-900 border border-slate-200 text-slate-700 hover:text-white text-xs font-black rounded-lg transition-all"
-                >
-                  تحديث
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* ── Smart Inventory Alerts ────────────────────────────────────────── */}
+      <SmartInventoryAlerts products={products || []} />
 
       {/* ── Visual Analytics Section ─────────────────────────────────── */}
       {hasAdvancedAnalytics ? (
-
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 md:gap-8">
           <div className="xl:col-span-2">
             <SalesChart data={analytics.salesChart} />
@@ -191,13 +133,11 @@ export default async function AdminDashboardPage() {
         </div>
       ) : (
         <div className="relative rounded-[2rem] overflow-hidden border border-slate-200 bg-slate-50 w-full">
-          {/* Blurred Placeholder */}
           <div className="absolute inset-0 opacity-40 blur-sm pointer-events-none grid grid-cols-1 xl:grid-cols-3 gap-8 p-8 grayscale">
             <div className="xl:col-span-2 h-64 bg-slate-200 rounded-xl" />
             <div className="xl:col-span-1 h-64 bg-slate-200 rounded-xl" />
           </div>
           
-          {/* Lock Overlay */}
           <div className="relative z-10 flex flex-col items-center justify-center p-12 md:p-24 text-center w-full">
             <div className="h-16 w-16 bg-white rounded-full flex items-center justify-center mb-6 shadow-xl shadow-slate-200/50">
               <Lock className="h-8 w-8 text-slate-400" />

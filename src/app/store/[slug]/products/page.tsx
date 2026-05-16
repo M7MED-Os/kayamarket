@@ -24,10 +24,37 @@ function isSectionEnabled(branding: any, sectionId: string): boolean {
   return found ? found.enabled !== false : true
 }
 
-export async function generateMetadata({ params }: PageProps) {
+// 🌐 SEO: Dynamic Metadata for All Products / Category Page
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
   const { slug } = await params
-  const { store } = await getStoreByIdentifier(decodeURIComponent(slug))
-  return { title: `${store?.name || 'المتجر'} - جميع المنتجات` }
+  const { category: currentCategory, search: searchQuery } = await searchParams
+  const { store, branding } = await getStoreByIdentifier(decodeURIComponent(slug))
+  
+  if (!store) return { title: 'المتجر غير موجود' }
+
+  const storeName = store.name || 'KayaMarket'
+  let title = `جميع المنتجات | ${storeName}`
+  let description = `تصفح جميع المنتجات المتاحة في متجر ${storeName}. أفضل التشكيلات والأسعار.`
+
+  if (currentCategory) {
+    title = `${currentCategory} | ${storeName}`
+    description = `تسوق أحدث منتجات قسم ${currentCategory} من متجر ${storeName}.`
+  } else if (searchQuery) {
+    title = `نتائج البحث عن "${searchQuery}" | ${storeName}`
+  }
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: branding?.logo_url ? [{ url: branding.logo_url }] : [],
+    },
+    alternates: {
+      canonical: `/store/${slug}/products`,
+    }
+  }
 }
 
 export default async function AllProductsPage({ params, searchParams }: PageProps) {

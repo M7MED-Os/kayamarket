@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
-import { createOrderMulti } from '@/app/actions/order'
+import { createOrderMulti, saveDraftOrder } from '@/app/actions/order'
 import { validateCoupon } from '@/app/actions/coupons'
 import StoreHeader from '@/components/StoreHeader'
 import StoreFooter from '@/components/StoreFooter'
@@ -40,7 +40,17 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
   const [selectedGovernorate, setSelectedGovernorate] = useState('')
   const [isGovOpen, setIsGovOpen] = useState(false)
   const [shippingCost, setShippingCost] = useState(0)
-  const [idempotencyKey] = useState(() => crypto.randomUUID())
+  const [idempotencyKey, setIdempotencyKey] = useState<string>(() => crypto.randomUUID())
+
+  // 🛒 Abandoned Cart Tracking Logic
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (customerName.length > 2 && customerPhone.length >= 10 && items.length > 0 && storeData?.store?.id) {
+        saveDraftOrder(storeData.store.id, customerName, customerPhone, items, idempotencyKey)
+      }
+    }, 2000) // Debounce for 2 seconds to avoid excessive DB writes
+    return () => clearTimeout(timer)
+  }, [customerName, customerPhone, items, storeData?.store?.id, idempotencyKey])
 
   const GOVERNORATES = [
     "القاهرة", "الجيزة", "الإسكندرية", "الدقهلية", "البحر الأحمر", "البحيرة", "الفيوم", "الغربية", "الإسماعيلية", "المنوفية", "المنيا", "القليوبية", "الوادي الجديد", "السويس", "الشرقية", "دمياط", "بورسعيد", "جنوب سيناء", "كفر الشيخ", "مطروح", "الأقصر", "قنا", "شمال سيناء", "سوهاج", "بني سويف", "أسيوط", "أسوان"

@@ -7,7 +7,7 @@ import {
   Minus, Plus, Store, ChevronDown
 } from 'lucide-react'
 import WishlistButton from './WishlistButton'
-import { createOrder } from '@/app/actions/order'
+import { createOrder, saveDraftOrder } from '@/app/actions/order'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { useCart } from '@/context/CartContext'
@@ -147,11 +147,27 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
         toast.error(result.error || 'حدث خطأ')
         setLoading(false)
       }
-    } catch {
-      toast.error('حدث خطأ')
+    } finally {
       setLoading(false)
     }
   }
+
+  // 🛒 Abandoned Cart Tracking Logic
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (customerName.length > 2 && customerPhone.length >= 10 && storeId) {
+        const item = [{
+          id: product.id,
+          quantity,
+          name: product.name,
+          price: basePrice,
+          variant_info: hasVariants ? { color: selectedVariant.color, size: selectedSize?.size } : {}
+        }]
+        saveDraftOrder(storeId, customerName, customerPhone, item, idempotencyKey)
+      }
+    }, 2000)
+    return () => clearTimeout(timer)
+  }, [customerName, customerPhone, quantity, storeId, idempotencyKey, product, basePrice, hasVariants, selectedVariant, selectedSize])
 
   const { addItem } = useCart()
   const handleAddToCart = () => {

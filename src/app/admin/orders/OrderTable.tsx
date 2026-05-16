@@ -20,6 +20,7 @@ const STATUS_MAP: Record<string, { label: string; icon: any; bg: string; text: s
   delivered: { label: 'تم التوصيل', icon: PackageCheck, bg: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-100' },
   paid: { label: 'تم الدفع', icon: CreditCard, bg: 'bg-teal-50', text: 'text-teal-600', border: 'border-teal-100' },
   cancelled: { label: 'ملغي', icon: XCircle, bg: 'bg-rose-50', text: 'text-rose-600', border: 'border-rose-100' },
+  abandoned: { label: 'سلة مهجورة', icon: AlertTriangle, bg: 'bg-slate-50', text: 'text-slate-400', border: 'border-slate-200' },
 }
 
 const PAYMENT_MAP: Record<string, string> = {
@@ -37,10 +38,11 @@ interface OrderTableProps {
   totalPages: number
   totalCount: number
   storeId: string
+  storeName: string
   plan?: PlanTier
 }
 
-export default function OrderTable({ orders, currentPage, totalPages, totalCount, storeId, plan = 'starter' }: OrderTableProps) {
+export default function OrderTable({ orders, currentPage, totalPages, totalCount, storeId, storeName, plan = 'starter' }: OrderTableProps) {
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [deleteCandidateId, setDeleteCandidateId] = useState<string | null>(null)
   const [isRefreshing, setIsRefreshing] = useState(false)
@@ -307,14 +309,28 @@ export default function OrderTable({ orders, currentPage, totalPages, totalCount
               </div>
 
               <div className="px-7 pb-7 flex items-center gap-4">
-                <Link
-                  href={`/invoice/${order.id}?token=${order.public_token}`}
-                  target="_blank"
-                  className="flex-1 flex items-center justify-center gap-3 h-14 bg-slate-900 text-white rounded-2xl text-sm font-black shadow-lg shadow-slate-100 hover:bg-sky-600 transition-all active:scale-95"
-                >
-                  <Receipt className="h-5 w-5" />
-                  عرض الفاتورة
-                </Link>
+                {order.status === 'abandoned' ? (
+                  <button
+                    onClick={() => {
+                      const msg = `أهلاً بك يا ${order.customer_name}، لاحظنا أنك بدأت طلبك من متجر ${storeName} ولكن لم تكمله. هل واجهتك أي مشكلة؟ نحن هنا للمساعدة!`;
+                      const phone = order.customer_phone.startsWith('0') ? `2${order.customer_phone}` : order.customer_phone;
+                      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+                    }}
+                    className="flex-1 flex items-center justify-center gap-3 h-14 bg-emerald-500 text-white rounded-2xl text-sm font-black shadow-lg shadow-emerald-100 hover:bg-emerald-600 transition-all active:scale-95"
+                  >
+                    <Phone className="h-5 w-5" />
+                    استعادة عبر واتساب
+                  </button>
+                ) : (
+                  <Link
+                    href={`/invoice/${order.id}?token=${order.public_token}`}
+                    target="_blank"
+                    className="flex-1 flex items-center justify-center gap-3 h-14 bg-slate-900 text-white rounded-2xl text-sm font-black shadow-lg shadow-slate-100 hover:bg-sky-600 transition-all active:scale-95"
+                  >
+                    <Receipt className="h-5 w-5" />
+                    عرض الفاتورة
+                  </Link>
+                )}
                 <button
                   onClick={() => setDeleteCandidateId(order.id)}
                   className="h-14 w-14 flex items-center justify-center bg-rose-50 text-rose-500 rounded-2xl border border-rose-100 hover:bg-rose-500 hover:text-white transition-all shadow-sm"

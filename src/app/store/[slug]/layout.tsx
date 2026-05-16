@@ -3,6 +3,9 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { ReactNode } from 'react';
 import Providers from '@/components/Providers';
+import { incrementStoreViews } from '@/app/actions/analytics';
+import PixelManager from '@/components/store/PixelManager';
+import { SalesPopup } from '@/components/store/SalesPopup';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -18,9 +21,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     },
   };
 }
-
-import { incrementStoreViews } from '@/app/actions/analytics';
-import PixelManager from '@/components/store/PixelManager';
 
 export default async function StoreLayout({
   children,
@@ -57,6 +57,7 @@ export default async function StoreLayout({
       <div style={{ '--store-primary': primaryColor } as React.CSSProperties}>
         <Providers>
           {children}
+          <SalesPopup storeId={store.id} />
         </Providers>
       </div>
     </div>
