@@ -158,7 +158,7 @@ export async function validateCoupon(code: string, storeId: string) {
   // 🔒 Use secure RPC instead of direct query because coupons table has RLS that blocks public reads
   const { data, error } = await supabase.rpc('validate_coupon', {
     p_store_id: storeId,
-    p_code: code
+    p_code: code.trim().toUpperCase()
   })
 
   if (error) {

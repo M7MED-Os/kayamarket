@@ -106,14 +106,27 @@ export default function ElegantCart({
 
             <div className="lg:col-span-1">
               <div className="bg-zinc-50 p-10 space-y-8 sticky top-28 rounded-none border border-zinc-100 shadow-sm">
-                <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">ملخص الطلب</h3>
-                <div className="flex justify-between items-end border-b border-zinc-200 pb-4">
-                  <span className="text-xs font-bold text-zinc-400 uppercase">الإجمالي</span>
-                  <span className="text-3xl font-bold text-[var(--primary)] tracking-tighter">{totalPrice.toLocaleString()} ج.م</span>
+                <h3 className="text-xs font-black uppercase tracking-widest text-zinc-900">ملخص الحساب</h3>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-widest text-zinc-400">
+                    <span>المنتجات ({items.reduce((acc: number, item: any) => acc + item.quantity, 0)})</span>
+                    <span>{totalPrice.toLocaleString()} ج.م</span>
+                  </div>
+                  <div className="flex justify-between items-center text-[11px] font-black uppercase tracking-widest text-zinc-400">
+                    <span>مصاريف الشحن</span>
+                    <span className="text-[9px] italic">تحسب لاحقاً</span>
+                  </div>
+                  <div className="flex justify-between items-end border-t border-zinc-200 pt-6">
+                    <span className="text-xs font-black uppercase tracking-widest text-zinc-900">الإجمالي المتوقع</span>
+                    <span className="text-3xl font-bold text-[var(--primary)] tracking-tighter">{totalPrice.toLocaleString()} ج.م</span>
+                  </div>
                 </div>
                 <Link href={`/store/${slug}/checkout`} className="w-full h-16 bg-[var(--primary)] text-white flex items-center justify-center text-xs font-black uppercase tracking-[0.2em] hover:brightness-125 transition-all shadow-lg rounded-none">
-                  إتمام الطلب
+                  الاستمرار للدفع
                 </Link>
+                <p className="text-[9px] text-zinc-300 text-center font-bold uppercase tracking-wider">
+                  * الشحن والخصومات تضاف في الخطوة التالية
+                </p>
               </div>
             </div>
           </div>

@@ -112,43 +112,44 @@ export default function OrganicCart({ store, branding, slug, showWatermark, comm
                 <div className="bg-zinc-900 text-white rounded-[2.5rem] p-8 relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-48 h-48 bg-[var(--primary)]/10 rounded-full blur-3xl -translate-y-1/2 -translate-x-1/2 pointer-events-none" />
                   <div className="relative z-10">
-                    <h2 className="text-xl font-black mb-8">ملخص الطلب</h2>
-
-                    <div className="space-y-4">
-                      <div className="flex justify-between text-zinc-400 font-medium text-sm">
-                        <span>المجموع الفرعي</span>
+                         <div className="space-y-4">
+                      <div className="flex justify-between items-center text-zinc-400 font-medium text-sm">
+                        <span>إجمالي المنتجات</span>
                         <span className="font-black text-white">{totalPrice.toLocaleString()} ج.م</span>
                       </div>
-                      <div className="flex justify-between text-zinc-400 font-medium text-sm">
-                        <span>الشحن</span>
-                        <span className="font-black text-emerald-400 text-xs uppercase tracking-wide">مجاني</span>
+                      <div className="flex justify-between items-center text-zinc-400 font-medium text-sm">
+                        <span>مصاريف الشحن</span>
+                        <span className="font-black text-[var(--primary)] text-[10px] uppercase tracking-wide italic">تحدد في الخطوة التالية</span>
                       </div>
 
                       {/* Coupon */}
-                      <div>
+                      <div className="pt-2">
                         <button onClick={() => setCouponOpen(!couponOpen)}
-                          className="flex items-center gap-2 text-xs font-black text-zinc-400 hover:text-white transition-colors">
-                          <Tag className="h-3.5 w-3.5" />
-                          {couponOpen ? 'إلغاء' : 'لديك كوبون خصم؟'}
+                          className="flex items-center gap-2 text-[10px] font-black text-zinc-500 hover:text-white transition-colors uppercase tracking-widest">
+                          <Tag className="h-3 w-3" />
+                          {couponOpen ? 'إغاء' : 'إضافة كوبون خصم؟'}
                         </button>
                         {couponOpen && (
                           <div className="mt-3 flex gap-2">
                             <input value={coupon} onChange={e => setCoupon(e.target.value)}
                               placeholder="كود الخصم"
-                              className="flex-1 bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-zinc-500 outline-none focus:border-[var(--primary)]/50"
+                              className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-xs text-white placeholder:text-zinc-600 outline-none focus:border-[var(--primary)]/50"
                             />
-                            <button className="px-4 py-2.5 bg-[var(--primary)] rounded-xl text-xs font-black hover:bg-[var(--primary)]/80 transition-colors">
+                            <button className="px-4 py-2 bg-[var(--primary)] rounded-xl text-[10px] font-black hover:bg-[var(--primary)]/80 transition-colors">
                               تطبيق
                             </button>
                           </div>
                         )}
                       </div>
 
-                      <div className="h-px bg-white/10" />
+                      <div className="h-px bg-white/10 mt-6" />
                       <div className="flex justify-between items-end">
-                        <span className="text-xs font-black text-zinc-400 uppercase tracking-widest">الإجمالي</span>
-                        <span className="text-3xl font-black">{totalPrice.toLocaleString()} <span className="text-sm text-zinc-400">ج.م</span></span>
+                        <span className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">الإجمالي المتوقع</span>
+                        <span className="text-3xl font-black tabular-nums">{totalPrice.toLocaleString()} <span className="text-sm text-zinc-500">ج.م</span></span>
                       </div>
+                      <p className="text-[9px] text-zinc-500 font-bold text-center italic mt-2 opacity-60">
+                        * يتم حساب الشحن والخصومات في الخطوة التالية.
+                      </p>
                     </div>
 
                     <Link href={`/store/${slug}/checkout`}

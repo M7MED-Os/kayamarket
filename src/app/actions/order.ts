@@ -88,7 +88,7 @@ export async function createOrderMulti(
 
     const { data, error } = await supabase.rpc('create_order_multi_v2', {
       p_items: formattedItems,
-      p_coupon_code: couponCode?.trim() || null,
+      p_coupon_code: couponCode?.trim().toUpperCase() || null,
       p_customer_name: sanitizeHtml(customerName),
       p_customer_address: sanitizeHtml(customerAddress),
       p_customer_phone: sanitizeHtml(customerPhone),

@@ -117,28 +117,29 @@ export default function FloralCart({
 
             <div className="lg:col-span-1">
               <div className="bg-white p-6 md:p-8 rounded-[2.5rem] border border-[var(--primary)]/10 shadow-sm sticky top-32 space-y-6 md:space-y-8">
-                <h3 className="text-lg font-sans font-bold text-[#2B2B2B] pb-4 border-b border-[var(--primary)]/5">ملخص الطلب</h3>
+                <h3 className="text-lg font-sans font-bold text-[#2B2B2B] pb-4 border-b border-[var(--primary)]/5">ملخص الحساب</h3>
                 <div className="space-y-4">
-                  <div className="flex justify-between text-zinc-500">
-                    <span className="text-sm font-bold opacity-60">عدد المنتجات</span>
-                    <span className="font-bold text-[#2B2B2B]">{items.reduce((acc: number, item: any) => acc + item.quantity, 0)}</span>
+                  <div className="flex justify-between items-center text-sm font-bold">
+                    <span className="text-zinc-400">إجمالي المنتجات ({items.reduce((acc: number, item: any) => acc + item.quantity, 0)} قطعة)</span>
+                    <span className="text-[#2B2B2B]">{totalPrice.toLocaleString()} ج.م</span>
                   </div>
-                  <div className="flex justify-between text-zinc-500">
-                    <span className="text-sm font-bold opacity-60">قيمة المنتجات</span>
-                    <span className="font-bold text-[#2B2B2B]">{totalPrice.toLocaleString()} ج.م</span>
+                  
+                  <div className="flex justify-between items-center text-sm font-bold">
+                    <span className="text-zinc-400">مصاريف الشحن</span>
+                    <span className="text-rose-300 text-[10px]">تحدد في الخطوة التالية</span>
                   </div>
-                  <div className="flex justify-between text-zinc-500">
-                    <span className="text-sm font-bold opacity-60">الشحن</span>
-                    <span className="text-green-500 font-bold">مجاني</span>
-                  </div>
-                  <div className="pt-4 border-t border-[var(--primary)]/5 flex justify-between items-center">
-                    <span className="text-lg font-bold text-[#2B2B2B]">الإجمالي</span>
+
+                  <div className="pt-6 border-t border-[var(--primary)]/10 flex justify-between items-center">
+                    <span className="text-lg font-black text-[#2B2B2B]">الإجمالي المتوقع</span>
                     <span className="text-2xl font-black text-[var(--primary)]">{totalPrice.toLocaleString()} ج.م</span>
                   </div>
                 </div>
-                <Link href={`/store/${slug}/checkout`} className="w-full h-14 bg-[var(--primary)] text-white rounded-full flex items-center justify-center text-sm font-bold hover:bg-[var(--primary)]/90 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5">
-                  إتمام الطلب
+                <Link href={`/store/${slug}/checkout`} className="w-full h-16 bg-[var(--primary)] text-white rounded-3xl flex items-center justify-center text-base font-black hover:brightness-110 transition-all shadow-xl shadow-[var(--primary)]/20 active:scale-95">
+                  الاستمرار لتأكيد الطلب
                 </Link>
+                <p className="text-[10px] text-zinc-400 text-center font-bold">
+                  * سيتم إضافة مصاريف الشحن وتطبيق الكوبونات في الخطوة التالية.
+                </p>
               </div>
             </div>
           </div>

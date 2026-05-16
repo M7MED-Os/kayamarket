@@ -495,6 +495,17 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
                             </div>
                           </button>
                           
+                          {selectedGovernorate && shippingCost > 0 && (
+                            <p className="text-[10px] font-black text-emerald-600 mt-2 px-1 animate-in fade-in slide-in-from-top-1">
+                              + {shippingCost} ج.م مصاريف شحن لهذه المحافظة
+                            </p>
+                          )}
+                          {selectedGovernorate && shippingCost === 0 && (
+                            <p className="text-[10px] font-black text-sky-600 mt-2 px-1 animate-in fade-in slide-in-from-top-1">
+                              شحن مجاني لهذه المحافظة
+                            </p>
+                          )}
+
                           {isGovOpen && (
                             <>
                               <div className="fixed inset-0 z-40" onClick={() => setIsGovOpen(false)} />
@@ -600,10 +611,23 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
                     <span className="font-bold text-zinc-500">الشحن ({shippingType === 'delivery' ? (selectedGovernorate || 'توصيل') : 'استلام'})</span>
                     <span className="font-bold text-[#2B2B2B]">{shippingCost > 0 ? `${shippingCost.toLocaleString()} ج.م` : 'مجاني'}</span>
                   </div>
-                  <div className="flex justify-between items-end pt-4">
-                    <span className="text-base font-bold text-zinc-600">الإجمالي الكلي</span>
-                    <span className="text-3xl font-black text-[var(--primary)]">{finalPrice.toLocaleString()} ج.م</span>
+
+                  <div className="pt-6 border-t border-rose-50 flex justify-between items-center">
+                    <span className="text-lg font-black text-[#2B2B2B]">الإجمالي النهائي</span>
+                    <span className="text-2xl font-black text-[var(--primary)]">{finalPrice.toLocaleString()} ج.م</span>
                   </div>
+
+                  {paymentMethod === 'الدفع عند الاستلام' && settings?.cod_deposit_required && (
+                    <div className="mt-4 p-5 bg-amber-50 border border-amber-100 rounded-3xl space-y-2 animate-in zoom-in-95">
+                      <div className="flex justify-between items-center text-xs font-black text-amber-700">
+                        <span>المقدم المطلوب ({settings.deposit_percentage}%)</span>
+                        <span>{((finalPrice * settings.deposit_percentage) / 100).toLocaleString()} ج.م</span>
+                      </div>
+                      <p className="text-[10px] text-amber-600 font-bold leading-relaxed">
+                        * سيتم دفع هذا المبلغ كعربون لتأكيد الجدية، والباقي عند الاستلام.
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Coupon Section */}
@@ -714,6 +738,16 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
                           </span>
                           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={`transition-transform duration-300 ${isGovOpen ? 'rotate-180 text-[var(--primary)]' : 'text-zinc-400'}`}><path d="m6 9 6 6 6-6"/></svg>
                         </button>
+                        {selectedGovernorate && shippingCost > 0 && (
+                          <p className="text-[10px] font-black text-emerald-600 mt-2 px-1 animate-in fade-in slide-in-from-top-1">
+                            + {shippingCost} ج.م مصاريف شحن لهذه المحافظة
+                          </p>
+                        )}
+                        {selectedGovernorate && shippingCost === 0 && (
+                          <p className="text-[10px] font-black text-sky-600 mt-2 px-1 animate-in fade-in slide-in-from-top-1">
+                            شحن مجاني لهذه المحافظة
+                          </p>
+                        )}
 
                         {isGovOpen && (
                           <>
@@ -861,26 +895,41 @@ export default function CheckoutView({ params, storeData, showWatermark }: { par
                 ))}
               </div>
 
-              <div className="pt-6 border-t border-zinc-100 space-y-3">
-                <div className="flex justify-between text-zinc-400 font-bold text-xs md:text-sm">
-                  <span>المجموع الفرعي</span>
-                  <span>{totalPrice.toLocaleString()} ج.م</span>
-                </div>
-                {discount > 0 && (
-                  <div className="flex justify-between text-emerald-600 font-bold text-xs md:text-sm">
-                    <span>خصم ({discount}%)</span>
-                    <span>-{(totalPrice * discount / 100).toLocaleString()} ج.م</span>
+                <div className="pt-6 border-t border-zinc-100 space-y-4">
+                  <div className="flex justify-between text-zinc-500 font-bold text-xs md:text-sm">
+                    <span>المجموع الفرعي ({items.reduce((acc, i) => acc + i.quantity, 0)} قطعة)</span>
+                    <span>{totalPrice.toLocaleString()} ج.م</span>
                   </div>
-                )}
-                <div className="flex justify-between text-zinc-400 font-bold text-xs md:text-sm">
-                  <span>الشحن ({shippingType === 'delivery' ? (selectedGovernorate || 'توصيل للمنزل') : 'استلام شخصي'})</span>
-                  <span>{shippingCost > 0 ? `${shippingCost.toLocaleString()} ج.م` : 'مجاني'}</span>
+                  
+                  {discount > 0 && (
+                    <div className="flex justify-between text-emerald-600 font-bold text-xs md:text-sm bg-emerald-50/50 p-2 rounded-lg">
+                      <span>الخصم ({discount}%)</span>
+                      <span>-{(totalPrice * discount / 100).toLocaleString()} ج.م</span>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between text-zinc-500 font-bold text-xs md:text-sm">
+                    <span>الشحن ({shippingType === 'delivery' ? (selectedGovernorate || 'توصيل') : 'استلام'})</span>
+                    <span>{shippingCost > 0 ? `${shippingCost.toLocaleString()} ج.م` : 'مجاني'}</span>
+                  </div>
+
+                  <div className="pt-4 border-t border-zinc-50 flex justify-between items-center">
+                    <span className="text-base font-black text-zinc-900">الإجمالي النهائي</span>
+                    <span className="text-2xl font-black text-[var(--primary)]">{finalPrice.toLocaleString()} ج.م</span>
+                  </div>
+
+                  {paymentMethod === 'الدفع عند الاستلام' && settings?.cod_deposit_required && (
+                    <div className="mt-4 p-4 bg-amber-50 border border-amber-100 rounded-2xl space-y-1.5 animate-in zoom-in-95">
+                      <div className="flex justify-between items-center text-[11px] font-black text-amber-700">
+                        <span>المقدم المطلوب ({settings.deposit_percentage}%)</span>
+                        <span>{((finalPrice * settings.deposit_percentage) / 100).toLocaleString()} ج.م</span>
+                      </div>
+                      <p className="text-[9px] text-amber-600 font-bold leading-relaxed">
+                        * سيتم دفع هذا المبلغ كعربون لتأكيد الجدية، والباقي عند الاستلام.
+                      </p>
+                    </div>
+                  )}
                 </div>
-                <div className="flex justify-between text-xl md:text-2xl font-black text-zinc-900 pt-2">
-                  <span>الإجمالي الكلي</span>
-                  <span className="text-[var(--primary)]">{finalPrice.toLocaleString()} ج.م</span>
-                </div>
-              </div>
 
               <button
                 onClick={handleCheckout}

@@ -116,15 +116,21 @@ export default function DefaultCart({
             </div>
             <div className="lg:col-span-1">
               <div className="bg-white rounded-[2.5rem] border border-zinc-100 p-8 shadow-xl shadow-zinc-200/50 sticky top-28">
-                <h3 className="text-xl font-black text-zinc-900 mb-6 text-right">ملخص الطلب</h3>
+                <h3 className="text-xl font-black text-zinc-900 mb-6 text-right">ملخص الحساب</h3>
                 <div className="space-y-4 mb-8">
-                  <div className="flex justify-between text-zinc-500 font-bold">
-                    <span>عدد المنتجات</span>
-                    <span>{totalItems}</span>
+                  <div className="flex justify-between items-center text-sm font-bold">
+                    <span className="text-zinc-400">إجمالي المنتجات ({totalItems} قطعة)</span>
+                    <span className="text-zinc-900">{totalPrice.toLocaleString()} ج.م</span>
                   </div>
-                  <div className="h-px bg-zinc-50" />
-                  <div className="flex justify-between text-xl font-black text-zinc-900">
-                    <span>الإجمالي</span>
+                  
+                  <div className="flex justify-between items-center text-sm font-bold">
+                    <span className="text-zinc-400">مصاريف الشحن</span>
+                    <span className="text-zinc-300 text-[10px]">تحدد في الخطوة التالية</span>
+                  </div>
+
+                  <div className="h-px bg-zinc-100 mt-6" />
+                  <div className="flex justify-between items-center text-xl font-black text-zinc-900">
+                    <span>الإجمالي المتوقع</span>
                     <span className="text-[var(--primary)]">{totalPrice.toLocaleString()} ج.م</span>
                   </div>
                 </div>

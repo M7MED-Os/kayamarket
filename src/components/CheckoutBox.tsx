@@ -8,6 +8,7 @@ import {
 } from 'lucide-react'
 import WishlistButton from './WishlistButton'
 import { createOrder, saveDraftOrder } from '@/app/actions/order'
+import { validateCoupon } from '@/app/actions/coupons'
 import { useRouter } from 'next/navigation'
 import toast from 'react-hot-toast'
 import { useCart } from '@/context/CartContext'
@@ -78,16 +79,13 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
     setLoading(true)
     try {
       if (storeId) {
-        const { data, error } = await supabase.rpc('validate_coupon', { p_store_id: storeId, p_code: couponCode.trim() })
-        if (error) {
-          setDiscount(0)
-          toast.error('تعذّر التحقق من الكوبون')
-        } else if (data && data[0]?.is_valid) {
-          setDiscount(data[0].discount_percentage)
-          toast.success(`تم تفعيل خصم ${data[0].discount_percentage}%`)
+        const res = await validateCoupon(couponCode, storeId)
+        if (res.success) {
+          setDiscount(res.discount || 0)
+          toast.success(`تم تفعيل خصم ${res.discount}%`)
         } else {
           setDiscount(0)
-          toast.error(data?.[0]?.error_message || 'كود غير صحيح')
+          toast.error(res.error || 'كود غير صحيح')
         }
       }
     } catch {
@@ -207,7 +205,7 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-6">
           <div className="text-4xl font-bold text-[var(--primary)] tracking-tighter">
-            {finalPrice?.toLocaleString()} <span className="text-sm font-black opacity-60">ج.م</span>
+            {basePrice?.toLocaleString()} <span className="text-sm font-black opacity-60">ج.م</span>
           </div>
           {product.original_price && Number(product.original_price) > basePrice && (
             <div className="text-lg font-bold text-zinc-300 line-through">
@@ -305,6 +303,16 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
                   </span>
                   <ChevronDown className={`h-3 w-3 text-zinc-400 transition-transform duration-300 ${isGovOpen ? 'rotate-180 text-[var(--primary)]' : ''}`} />
                 </button>
+                {selectedGov && shippingCost > 0 && (
+                  <p className="text-[10px] font-black text-emerald-600 mt-1.5 px-1 animate-in fade-in slide-in-from-top-1">
+                    + {shippingCost} ج.م مصاريف شحن
+                  </p>
+                )}
+                {selectedGov && shippingCost === 0 && (
+                  <p className="text-[10px] font-black text-sky-600 mt-1.5 px-1 animate-in fade-in slide-in-from-top-1">
+                    شحن مجاني لهذه المحافظة
+                  </p>
+                )}
 
                 {isGovOpen && (
                   <>
@@ -380,6 +388,47 @@ export default function CheckoutBox({ product, storeId, storeSlug, selectedTheme
           </button>
         </div>
         {discount > 0 && <p className="text-[10px] font-black text-emerald-600 px-1 mt-2">✓ تم تفعيل خصم {discount}%</p>}
+
+        {/* 📋 ORDER SUMMARY BOX */}
+        <div className="mt-8 p-6 bg-zinc-50 border border-zinc-100 space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-700">
+          <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 border-b border-zinc-200 pb-3 mb-4">تفاصيل الحساب</h4>
+          
+          <div className="flex justify-between items-center text-xs font-bold">
+            <span className="text-zinc-500">سعر المنتج ({quantity} قطعة)</span>
+            <span className="text-zinc-900">{(basePrice * quantity).toLocaleString()} ج.م</span>
+          </div>
+
+          {shippingCost > 0 && (
+            <div className="flex justify-between items-center text-xs font-bold">
+              <span className="text-zinc-500">مصاريف الشحن</span>
+              <span className="text-zinc-900">{shippingCost} ج.م</span>
+            </div>
+          )}
+
+          {discount > 0 && (
+            <div className="flex justify-between items-center text-xs font-bold text-emerald-600">
+              <span>الخصم ({discount}%)</span>
+              <span>- {( (basePrice * quantity) * discount / 100 ).toLocaleString()} ج.م</span>
+            </div>
+          )}
+
+          <div className="pt-3 border-t border-zinc-200 flex justify-between items-center">
+            <span className="text-sm font-black text-zinc-900">الإجمالي النهائي</span>
+            <span className="text-xl font-black text-[var(--primary)]">{finalPrice.toLocaleString()} ج.م</span>
+          </div>
+
+          {paymentMethod === 'الدفع عند الاستلام' && settings.cod_deposit_required && (
+            <div className="mt-4 p-3 bg-amber-50 border border-amber-100 rounded-none space-y-2">
+              <div className="flex justify-between items-center text-[10px] font-black text-amber-700">
+                <span>المقدم المطلوب ({settings.deposit_percentage}%)</span>
+                <span>{((finalPrice * settings.deposit_percentage) / 100).toLocaleString()} ج.م</span>
+              </div>
+              <p className="text-[9px] text-amber-600 font-bold leading-relaxed">
+                * سيتم دفع هذا المبلغ كعربون لتأكيد الجدية، والباقي عند الاستلام.
+              </p>
+            </div>
+          )}
+        </div>
 
         <div className="pt-6 space-y-4">
           <div className="flex gap-4">
